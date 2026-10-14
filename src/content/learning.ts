@@ -117,6 +117,7 @@ export const MISSIONS: Mission[] = [
   { animal: 'squirrel', animalName: 'squirrel', food: 'nut', foodOne: 'nut', foodMany: 'nuts' },
   { animal: 'unicorn', animalName: 'unicorn', food: 'star', foodOne: 'star', foodMany: 'stars' },
   { animal: 'bear', animalName: 'bear', food: 'fish', foodOne: 'fish', foodMany: 'fish' },
+  { animal: 'kitten', animalName: 'kitten', food: 'fish', foodOne: 'fish', foodMany: 'fish' },
   { animal: 'panda', animalName: 'panda', food: 'strawberry', foodOne: 'strawberry', foodMany: 'strawberries' },
 ];
 
@@ -165,6 +166,183 @@ export const PLACES = [
 ];
 
 // ---------------------------------------------------------------------------
+// Build-a-Story
+// ---------------------------------------------------------------------------
+
+export const STORY_HEROES = [
+  { id: 'unicorn', name: 'Sparkle', intro: 'a little unicorn named Sparkle' },
+  { id: 'princess', name: 'Princess Lily', intro: 'a kind princess named Lily' },
+  { id: 'dragon', name: 'Ember', intro: 'a friendly dragon named Ember' },
+  { id: 'kitten', name: 'Whiskers', intro: 'a curious kitten named Whiskers' },
+  { id: 'puppy', name: 'Biscuit', intro: 'a playful puppy named Biscuit' },
+  { id: 'fairy', name: 'Twinkle', intro: 'a tiny fairy named Twinkle' },
+  { id: 'bunny', name: 'Hoppy', intro: 'a fluffy bunny named Hoppy' },
+  { id: 'teddy bear', name: 'Teddy', intro: 'a cuddly teddy bear named Teddy' },
+];
+
+/** Where a story can happen: matches PLACES, with words for the story. */
+export const STORY_PLACES: Record<string, { home: string; short: string }> = {
+  castle: { home: 'a sparkly castle on top of a hill', short: 'castle' },
+  garden: { home: 'a garden full of flowers', short: 'garden' },
+  beach: { home: 'a little house by the sunny beach', short: 'beach' },
+  night: { home: 'a cozy cloud, high up in the night sky', short: 'sky' },
+  snow: { home: 'a snowy land where snowflakes danced', short: 'snowy land' },
+};
+
+export const STORY_OBJECTS = [
+  { id: 'wand', name: 'magic wand', event: 'With one wave of the magic wand, the whole {place} filled with rainbows!' },
+  { id: 'gem', name: 'shiny gem', event: 'The shiny gem sparkled so brightly that everyone in the {place} came to see.' },
+  { id: 'balloon', name: 'red balloon', event: 'Holding the red balloon, our friend floated up, up, up, high over the {place}.' },
+  { id: 'cupcake', name: 'giant cupcake', event: 'The giant cupcake was big enough to share with every friend in the {place}.' },
+  { id: 'kite', name: 'rainbow kite', event: 'The rainbow kite flew high above the {place}, dancing with the wind.' },
+  { id: 'crown', name: 'golden crown', event: 'With the golden crown, our friend threw the biggest party the {place} had ever seen!' },
+];
+
+// ---------------------------------------------------------------------------
+// Little Chef
+// ---------------------------------------------------------------------------
+
+export type ChefStep =
+  | { kind: 'add'; item: string; one: string; many: string; count: number }
+  | { kind: 'stir' }
+  | { kind: 'bake' }
+  | { kind: 'sort' };
+
+export const RECIPES: { id: string; name: string; result: string; steps: ChefStep[] }[] = [
+  {
+    id: 'fruit-salad',
+    name: 'fruit salad',
+    result: 'salad',
+    steps: [
+      { kind: 'add', item: 'apple', one: 'apple', many: 'apples', count: 3 },
+      { kind: 'add', item: 'banana', one: 'banana', many: 'bananas', count: 2 },
+      { kind: 'stir' },
+    ],
+  },
+  {
+    id: 'pizza',
+    name: 'pizza',
+    result: 'pizza',
+    steps: [
+      { kind: 'add', item: 'tomato', one: 'tomato', many: 'tomatoes', count: 4 },
+      { kind: 'add', item: 'mushroom', one: 'mushroom', many: 'mushrooms', count: 3 },
+      { kind: 'bake' },
+    ],
+  },
+  {
+    id: 'smoothie',
+    name: 'smoothie',
+    result: 'smoothie',
+    steps: [
+      { kind: 'sort' },
+      { kind: 'add', item: 'strawberry', one: 'strawberry', many: 'strawberries', count: 5 },
+      { kind: 'stir' },
+    ],
+  },
+  {
+    id: 'pancakes',
+    name: 'pancakes',
+    result: 'pancakes',
+    steps: [
+      { kind: 'add', item: 'egg', one: 'egg', many: 'eggs', count: 2 },
+      { kind: 'stir' },
+      { kind: 'add', item: 'blueberries', one: 'blueberry', many: 'blueberries', count: 6 },
+    ],
+  },
+];
+
+/** Fruit for the sorting step, by color. */
+export const SORT_FRUIT: Record<string, string[]> = {
+  red: ['apple', 'strawberry', 'cherries'],
+  yellow: ['banana', 'lemon'],
+  green: ['green apple', 'pear', 'kiwi'],
+};
+
+const ORDER_WORDS = ['First', 'Next', 'Last'];
+
+// ---------------------------------------------------------------------------
+// Color & Shape Quest
+// ---------------------------------------------------------------------------
+
+export type BuildShape = ShapeName | 'rectangle';
+/** One piece of a build. Position and size are fractions of the build area. */
+export type BuildPiece = { shape: BuildShape; color: string; x: number; y: number; w: number; h: number };
+
+export const BUILDS: { id: string; name: string; pieces: BuildPiece[] }[] = [
+  {
+    id: 'house',
+    name: 'house',
+    pieces: [
+      { shape: 'square', color: 'blue', x: 0.5, y: 0.62, w: 0.46, h: 0.42 },
+      { shape: 'triangle', color: 'red', x: 0.5, y: 0.3, w: 0.6, h: 0.3 },
+      { shape: 'rectangle', color: 'orange', x: 0.5, y: 0.73, w: 0.12, h: 0.2 },
+      { shape: 'circle', color: 'yellow', x: 0.36, y: 0.55, w: 0.11, h: 0.11 },
+      { shape: 'circle', color: 'yellow', x: 0.64, y: 0.55, w: 0.11, h: 0.11 },
+    ],
+  },
+  {
+    id: 'robot',
+    name: 'robot',
+    pieces: [
+      { shape: 'square', color: 'purple', x: 0.5, y: 0.24, w: 0.3, h: 0.24 },
+      { shape: 'rectangle', color: 'blue', x: 0.5, y: 0.6, w: 0.4, h: 0.42 },
+      { shape: 'circle', color: 'yellow', x: 0.43, y: 0.22, w: 0.08, h: 0.08 },
+      { shape: 'circle', color: 'yellow', x: 0.57, y: 0.22, w: 0.08, h: 0.08 },
+      { shape: 'heart', color: 'red', x: 0.5, y: 0.56, w: 0.14, h: 0.14 },
+      { shape: 'rectangle', color: 'green', x: 0.22, y: 0.58, w: 0.1, h: 0.3 },
+      { shape: 'rectangle', color: 'green', x: 0.78, y: 0.58, w: 0.1, h: 0.3 },
+    ],
+  },
+  {
+    id: 'rocket',
+    name: 'rocket',
+    pieces: [
+      { shape: 'rectangle', color: 'blue', x: 0.5, y: 0.56, w: 0.24, h: 0.44 },
+      { shape: 'triangle', color: 'red', x: 0.5, y: 0.24, w: 0.24, h: 0.2 },
+      { shape: 'circle', color: 'yellow', x: 0.5, y: 0.46, w: 0.12, h: 0.12 },
+      { shape: 'triangle', color: 'orange', x: 0.33, y: 0.76, w: 0.14, h: 0.16 },
+      { shape: 'triangle', color: 'orange', x: 0.67, y: 0.76, w: 0.14, h: 0.16 },
+      { shape: 'star', color: 'pink', x: 0.5, y: 0.66, w: 0.1, h: 0.1 },
+    ],
+  },
+];
+
+// ---------------------------------------------------------------------------
+// Music Maker
+// ---------------------------------------------------------------------------
+
+/** Xylophone bars, C major, low to high. Each has a sound effect `xylo-N`. */
+export const XYLOPHONE = [
+  { note: 'C', color: '#F2545B' },
+  { note: 'D', color: '#FF9F43' },
+  { note: 'E', color: '#FFD23F' },
+  { note: 'F', color: '#3CC47C' },
+  { note: 'G', color: '#2EC4B6' },
+  { note: 'A', color: '#4D9DE0' },
+  { note: 'B', color: '#9B6DE3' },
+  { note: 'C', color: '#FF7EB6' },
+];
+
+/** The alphabet song: each letter with its xylophone bar (0-7) and length in beats. */
+export const ABC_SONG: [string, number, number][] = [
+  ['a', 0, 1], ['b', 0, 1], ['c', 4, 1], ['d', 4, 1], ['e', 5, 1], ['f', 5, 1], ['g', 4, 2],
+  ['h', 3, 1], ['i', 3, 1], ['j', 2, 1], ['k', 2, 1], ['l', 1, 0.5], ['m', 1, 0.5], ['n', 1, 0.5], ['o', 1, 0.5], ['p', 0, 2],
+  ['q', 4, 1], ['r', 4, 1], ['s', 3, 2], ['t', 2, 1], ['u', 2, 1], ['v', 1, 2],
+  ['w', 4, 1], ['x', 4, 1], ['y', 3, 2], ['z', 2, 2],
+];
+
+// ---------------------------------------------------------------------------
+// My Little Pet
+// ---------------------------------------------------------------------------
+
+export const PETS = [
+  { id: 'puppy', name: 'Puppy', mission: 'puppy' },
+  { id: 'kitten', name: 'Kitten', mission: 'kitten' },
+  { id: 'unicorn', name: 'Unicorn', mission: 'unicorn' },
+  { id: 'bunny', name: 'Bunny', mission: 'bunny' },
+];
+
+// ---------------------------------------------------------------------------
 // Games
 // ---------------------------------------------------------------------------
 
@@ -176,7 +354,12 @@ export const GAMES = [
   { id: 'memory', title: 'Flip & Find', picture: 'cat', color: '#3CC47C' },
   { id: 'sounds', title: 'Sound Safari', picture: 'lion', color: '#FFB627' },
   { id: 'puzzles', title: 'Puzzle World', picture: 'puzzle', color: '#2EC4B6' },
-  { id: 'friends', title: 'Make a Friend', picture: 'unicorn', color: '#F25F8B' },
+  { id: 'friends', title: 'Make a Friend', picture: 'princess', color: '#F25F8B' },
+  { id: 'story', title: 'Build a Story', picture: 'book', color: '#7C6CF2' },
+  { id: 'chef', title: 'Little Chef', picture: 'chef', color: '#F28C38' },
+  { id: 'quest', title: 'Shape Quest', picture: 'blue diamond', color: '#3AA0D9' },
+  { id: 'music', title: 'Music Maker', picture: 'piano', color: '#E85D9C' },
+  { id: 'pet', title: 'My Little Pet', picture: 'puppy', color: '#5BBF6A' },
 ] as const;
 export type GameId = (typeof GAMES)[number]['id'];
 
@@ -210,11 +393,23 @@ export const say = {
   shape: (shape: ShapeName) => `shape-${shape}`,
   color: (color: string) => `color-${color}`,
   place: (id: string) => `place-${id}`,
+  storyIntro: (hero: string) => `story-intro-${idOf(hero)}`,
+  storyHome: (hero: string, place: string) => `story-home-${idOf(hero)}-${place}`,
+  storyFind: (hero: string, object: string) => `story-find-${idOf(hero)}-${object}`,
+  storyEvent: (object: string, place: string) => `story-event-${object}-${place}`,
+  storyDrawing: (hero: string) => `story-drawing-${idOf(hero)}`,
+  storyEnd: (hero: string) => `story-end-${idOf(hero)}`,
+  recipe: (id: string) => `recipe-${id}`,
+  recipeDone: (id: string) => `recipe-done-${id}`,
+  recipeStep: (id: string, step: number) => `recipe-${id}-step-${step}`,
+  build: (id: string) => `build-${id}`,
+  buildDone: (id: string) => `build-done-${id}`,
+  pet: (pet: string, what: 'hungry' | 'teach' | 'toy' | 'lovesToy' | 'loves' | 'giggle' | 'hello') => `pet-${pet}-${what}`,
 };
 
 /** Fixed lines: instructions, encouragement and celebrations. */
 export const LINES = {
-  welcome: "Hi Hailey! Welcome to your Learning Land. What would you like to play?",
+  welcome: "Hi friend! Welcome to Hailey's Learning Land. What would you like to play?",
   great: 'Great job!',
   youDidIt: 'You did it!',
   wonderful: 'Wonderful!',
@@ -245,12 +440,36 @@ export const LINES = {
   jigsawIntro: 'Drag the pieces to finish the picture.',
   questDone: 'You found them all!',
   friendIntro: 'Make a new friend! Pick a friend to dress up.',
-  pickPlace: 'Where does your friend live? Pick a place.',
+  pickPlace: 'Now pick a home for your friend.',
   addStickers: 'Now add some sparkle! Drag stickers onto the picture.',
   grownUps: 'This part is for grown-ups.',
   nextLetter: "Let's try the next letter!",
   newWord: "Here's a new word.",
   levelUp: "You're getting so good at this! Let's make it a little harder.",
+  storyPickHero: "Let's make a story! First, pick who the story is about.",
+  storyPickPlace: 'Where does the story happen? Pick a place.',
+  storyPickObject: 'What does our friend find? Pick something magical.',
+  storyDraw: "Now draw a picture for the story. Tap the book when you're done.",
+  storyReady: "Here's your story!",
+  chefPick: 'What shall we cook today? Pick a recipe.',
+  chefStir: 'Move your finger round and round the bowl to stir.',
+  chefBake: 'Tap the oven to bake it.',
+  chefSort: 'Sort the fruit by color. Drag each fruit to the plate that matches.',
+  questPick: 'Do you want to hunt for shapes, or build something?',
+  questHunt: "Let's hunt for shapes!",
+  questBuild: 'Pick something to build.',
+  blastOff: 'Three, two, one, blast off!',
+  musicIntro: "Let's make music! Tap the colors to play.",
+  drumsIntro: 'Tap the drums to make a beat!',
+  copyIntro: 'Listen to my song, then copy it!',
+  yourTurn: 'Your turn!',
+  listenAgain: "Let's listen again.",
+  singAbc: "Let's sing the alphabet song!",
+  abcEnd: 'Now I know my A B Cs!',
+  singCount: "Let's count to ten!",
+  countEnd: 'We counted to ten!',
+  petPick: 'Pick a pet to take care of!',
+  petDrawDone: "Tap the check when you're done drawing.",
 };
 
 /** Every spoken line, as id -> text. Lines starting with "/" are phonemes, not words. */
@@ -304,6 +523,45 @@ export function spokenLines(): Record<string, string> {
     lines[say.findColor(color.name)] = `Find everything that is ${color.name}!`;
   }
   for (const place of PLACES) lines[say.place(place.id)] = `The ${place.name}!`;
+
+  for (const hero of STORY_HEROES) {
+    lines[say.storyIntro(hero.id)] = `Once upon a time, there was ${hero.intro}.`;
+    for (const [placeId, place] of Object.entries(STORY_PLACES)) lines[say.storyHome(hero.id, placeId)] = `${hero.name} lived in ${place.home}.`;
+    for (const object of STORY_OBJECTS) lines[say.storyFind(hero.id, object.id)] = `One day, ${hero.name} found a ${object.name}!`;
+    lines[say.storyDrawing(hero.id)] = `${hero.name} made a special picture, too. Look! It's wonderful.`;
+    lines[say.storyEnd(hero.id)] = `When the day was done, ${hero.name} snuggled up, happy and sleepy. The end!`;
+  }
+  for (const object of STORY_OBJECTS) {
+    for (const [placeId, place] of Object.entries(STORY_PLACES)) lines[say.storyEvent(object.id, placeId)] = object.event.replace('{place}', place.short);
+  }
+  for (const recipe of RECIPES) {
+    lines[say.recipe(recipe.id)] = `Let's make ${recipe.name}!`;
+    lines[say.recipeDone(recipe.id)] = `Yum! Your ${recipe.name} ${recipe.name.endsWith('s') ? 'are' : 'is'} ready!`;
+    recipe.steps.forEach((step, i) => {
+      const order = ORDER_WORDS[i];
+      lines[say.recipeStep(recipe.id, i)] =
+        step.kind === 'add'
+          ? `${order}, add ${NUMBER_WORDS[step.count]} ${step.count === 1 ? step.one : step.many}.`
+          : step.kind === 'stir'
+            ? `${order}, stir it all up!`
+            : step.kind === 'bake'
+              ? `${order}, bake it in the oven!`
+              : `${order}, sort the fruit by color.`;
+    });
+  }
+  for (const build of BUILDS) {
+    lines[say.build(build.id)] = `Let's build a ${build.name}! Drag each shape into place.`;
+    lines[say.buildDone(build.id)] = `You built a ${build.name}!`;
+  }
+  for (const pet of PETS) {
+    lines[say.pet(pet.id, 'hello')] = `Hi! I'm your ${pet.name.toLowerCase()}. Let's play together!`;
+    lines[say.pet(pet.id, 'hungry')] = `${pet.name} is hungry!`;
+    lines[say.pet(pet.id, 'teach')] = `${pet.name} wants to learn a new word!`;
+    lines[say.pet(pet.id, 'toy')] = `Draw a toy for ${pet.name.toLowerCase()}!`;
+    lines[say.pet(pet.id, 'lovesToy')] = `${pet.name} loves the toy!`;
+    lines[say.pet(pet.id, 'loves')] = `${pet.name} loves you so much!`;
+    lines[say.pet(pet.id, 'giggle')] = `Hee hee! That tickles!`;
+  }
   return lines;
 }
 

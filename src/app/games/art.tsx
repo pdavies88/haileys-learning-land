@@ -13,7 +13,7 @@ import { Pic } from '@/components/pic';
 import { Txt } from '@/components/txt';
 import { Colors, Spacing, cardShadow } from '@/constants/theme';
 import { say } from '@/content/learning';
-import { COLORING_FILES } from '@/content/picture-files';
+import { COLORING_CATEGORIES, COLORING_FILES } from '@/content/picture-files';
 import { playSfx, speak } from '@/lib/audio';
 
 const PALETTE = ['#F2545B', '#FF9F43', '#FFD23F', '#3CC47C', '#2EC4B6', '#4D9DE0', '#9B6DE3', '#FF7EB6', '#8B5A3C', '#3B2A5C'];
@@ -65,6 +65,7 @@ export default function Art() {
   const [active, setActive] = useState<Mark | null>(null);
   const [page, setPage] = useState<string | null>(null);
   const [choosing, setChoosing] = useState(false);
+  const [category, setCategory] = useState(COLORING_CATEGORIES[0].id);
   const [paper, setPaper] = useState({ width: 0, height: 0 });
   const current = useRef<{ path: SkPathBuilder; dots: Dot[]; last: { x: number; y: number }; mark?: Mark } | null>(null);
 
@@ -228,15 +229,29 @@ export default function Art() {
             <Txt size={26} weight="heavy">
               What would you like to color?
             </Txt>
-            <ScrollView contentContainerStyle={styles.pages}>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.tabsScroll} contentContainerStyle={styles.tabs}>
+              {COLORING_CATEGORIES.map((c) => (
+                <Bouncy
+                  key={c.id}
+                  accessibilityLabel={c.title}
+                  style={[styles.tab, category === c.id && styles.tabOn]}
+                  onPress={() => setCategory(c.id)}>
+                  <Pic name={c.icon} size={30} />
+                  <Txt size={15} color={category === c.id ? Colors.white : Colors.text}>
+                    {c.title}
+                  </Txt>
+                </Bouncy>
+              ))}
+            </ScrollView>
+            <ScrollView key={category} contentContainerStyle={styles.pages}>
               <Bouncy accessibilityLabel="Blank paper" style={styles.pageThumb} onPress={() => choosePage(null)}>
                 <Txt size={18} color={Colors.textSoft}>
                   Blank
                 </Txt>
               </Bouncy>
-              {Object.keys(COLORING_FILES).map((name) => (
+              {COLORING_CATEGORIES.find((c) => c.id === category)!.pages.map((name) => (
                 <Bouncy key={name} accessibilityLabel={name} style={styles.pageThumb} onPress={() => choosePage(name)}>
-                  <Image source={COLORING_FILES[name]} style={{ width: 92, height: 92 }} contentFit="contain" />
+                  <Image source={COLORING_FILES[name]} style={{ width: 80, height: 80 }} contentFit="contain" />
                 </Bouncy>
               ))}
             </ScrollView>
@@ -266,9 +281,13 @@ const styles = StyleSheet.create({
   swatchOn: { borderColor: Colors.text, transform: [{ scale: 1.15 }] },
   sizeButton: { width: 56, height: 48, borderRadius: 16, backgroundColor: Colors.white, alignItems: 'center', justifyContent: 'center', ...cardShadow },
   stampChoice: { width: 56, height: 56, borderRadius: 18, backgroundColor: Colors.white, alignItems: 'center', justifyContent: 'center', ...cardShadow },
-  chooser: { ...StyleSheet.absoluteFill, backgroundColor: 'rgba(59,42,92,0.35)', alignItems: 'center', justifyContent: 'center', padding: Spacing.lg },
-  chooserCard: { backgroundColor: Colors.white, borderRadius: 32, padding: Spacing.lg, gap: Spacing.md, alignItems: 'center', maxWidth: 640, maxHeight: '90%', width: '100%' },
-  pages: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: Spacing.md },
-  pageThumb: { width: 110, height: 110, borderRadius: 22, backgroundColor: Colors.background, alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: '#EEE' },
+  chooser: { ...StyleSheet.absoluteFill, backgroundColor: 'rgba(59,42,92,0.35)', alignItems: 'center', justifyContent: 'center', padding: Spacing.md },
+  chooserCard: { backgroundColor: Colors.white, borderRadius: 32, padding: Spacing.md, gap: Spacing.md, alignItems: 'center', maxWidth: 640, maxHeight: '90%', width: '100%' },
+  pages: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: Spacing.md, paddingBottom: Spacing.sm },
+  tabsScroll: { flexGrow: 0, flexShrink: 0, height: 62, alignSelf: 'stretch' },
+  tabs: { gap: 8, paddingHorizontal: 4, alignItems: 'center' },
+  tab: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 12, paddingVertical: 8, borderRadius: 999, backgroundColor: Colors.background },
+  tabOn: { backgroundColor: Colors.purple },
+  pageThumb: { width: 96, height: 96, borderRadius: 22, backgroundColor: Colors.background, alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: '#EEE' },
   closeChooser: { backgroundColor: Colors.purple, borderRadius: 999, paddingHorizontal: Spacing.xl, paddingVertical: Spacing.sm },
 });

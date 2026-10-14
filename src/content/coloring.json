@@ -1,0 +1,147 @@
+{
+  "_comment": "Coloring pages by category: page name -> Noto Emoji codepoint(s). icon is a picture from pictures.json. Run `npm run generate:pictures` after editing.",
+  "categories": [
+    {
+      "id": "animals",
+      "title": "Animals",
+      "icon": "cat",
+      "pages": {
+        "kitty": "1f408",
+        "puppy dog": "1f415",
+        "bunny": "1f407",
+        "pig": "1f437",
+        "cow": "1f404",
+        "horse": "1f40e",
+        "sheep": "1f411",
+        "chick": "1f424",
+        "lion": "1f981",
+        "tiger": "1f405",
+        "elephant": "1f418",
+        "giraffe": "1f992",
+        "monkey": "1f412",
+        "bear": "1f43b",
+        "panda": "1f43c",
+        "koala": "1f428",
+        "fox": "1f98a",
+        "hedgehog": "1f994",
+        "owl": "1f989",
+        "penguin": "1f427",
+        "flamingo": "1f9a9",
+        "swan": "1f9a2",
+        "snail": "1f40c",
+        "ladybug": "1f41e",
+        "bee": "1f41d",
+        "butterfly": "1f98b",
+        "turtle": "1f422",
+        "frog": "1f438",
+        "dinosaur": "1f995",
+        "t-rex": "1f996"
+      }
+    },
+    {
+      "id": "sea",
+      "title": "Sea",
+      "icon": "dolphin",
+      "pages": {
+        "fish": "1f41f",
+        "puffer fish": "1f421",
+        "dolphin": "1f42c",
+        "whale": "1f40b",
+        "shark": "1f988",
+        "octopus": "1f419",
+        "crab": "1f980",
+        "lobster": "1f99e",
+        "squid": "1f991",
+        "seal": "1f9ad",
+        "jellyfish": "1fabc",
+        "shell": "1f41a",
+        "sailboat": "26f5"
+      }
+    },
+    {
+      "id": "magic",
+      "title": "Magic",
+      "icon": "unicorn",
+      "pages": {
+        "unicorn": "1f984",
+        "princess": "1f478",
+        "prince": "1f934",
+        "fairy": "1f9da",
+        "mermaid": "1f9dc_200d_2640",
+        "wizard": "1f9d9",
+        "castle": "1f3f0",
+        "crown": "1f451",
+        "magic wand": "1fa84",
+        "rainbow": "1f308",
+        "gem": "1f48e",
+        "ghost": "1f47b",
+        "robot": "1f916",
+        "carousel horse": "1f3a0",
+        "moon": "1f319",
+        "smiling sun": "1f31e"
+      }
+    },
+    {
+      "id": "treats",
+      "title": "Treats",
+      "icon": "cupcake",
+      "pages": {
+        "ice cream sundae": "1f368",
+        "ice cream cone": "1f366",
+        "cupcake": "1f9c1",
+        "birthday cake": "1f382",
+        "donut": "1f369",
+        "lollipop": "1f36d",
+        "pizza": "1f355",
+        "burger": "1f354",
+        "fries": "1f35f",
+        "watermelon": "1f349",
+        "strawberry": "1f353",
+        "pineapple": "1f34d",
+        "apple": "1f34e",
+        "banana": "1f34c",
+        "cherries": "1f352",
+        "pancakes": "1f95e",
+        "popcorn": "1f37f"
+      }
+    },
+    {
+      "id": "nature",
+      "title": "Nature",
+      "icon": "sunflower",
+      "pages": {
+        "tulip": "1f337",
+        "sunflower": "1f33b",
+        "hibiscus": "1f33a",
+        "daisy": "1f33c",
+        "tree": "1f333",
+        "palm tree": "1f334",
+        "cactus": "1f335",
+        "mushroom": "1f344",
+        "four leaf clover": "1f340",
+        "snowman": "26c4",
+        "house": "1f3e0",
+        "tent": "26fa"
+      }
+    },
+    {
+      "id": "go",
+      "title": "Things That Go",
+      "icon": "car",
+      "pages": {
+        "car": "1f697",
+        "bus": "1f68c",
+        "fire truck": "1f692",
+        "police car": "1f693",
+        "ambulance": "1f691",
+        "tractor": "1f69c",
+        "train": "1f682",
+        "airplane": "2708",
+        "helicopter": "1f681",
+        "rocket": "1f680",
+        "ship": "1f6a2",
+        "flying saucer": "1f6f8"
+      }
+    }
+  ]
+}

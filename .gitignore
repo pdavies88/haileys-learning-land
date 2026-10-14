@@ -47,3 +47,6 @@ example
 
 # Downloaded source artwork
 .cache
+
+# Python venv for audio-tools/coloring.py
+.art-venv

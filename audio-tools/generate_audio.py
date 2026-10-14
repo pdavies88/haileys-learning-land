@@ -34,10 +34,10 @@ TTS_DIR = ROOT / ".tts"
 TTS_CACHE = TTS_DIR / "cache"
 
 SR = 24000  # Kokoro's own rate; plenty for speech and simple effects
-# The narrator: Kokoro voice "Heart" (American English), warm and clear, a touch slower for kids.
+# The narrator: Kokoro voice "Heart" (American English), warm and clear, a little slower for kids.
 VOICE = "af_heart"
 VOICE_LANG = "en-us"
-VOICE_SPEED = 0.9
+VOICE_SPEED = 0.85
 
 _kokoro = None
 
@@ -153,9 +153,50 @@ def sfx_star():
     return seq(*[(i * 0.07, tone(f, 0.4, 0.15, up)) for i, f in enumerate([784, 988, 1175, 1568])])
 
 
+XYLO_FREQS = [523.25, 587.33, 659.25, 698.46, 783.99, 880.0, 987.77, 1046.5]  # C major, C5 to C6
+
+
+def xylo(freq: float):
+    """A warm wooden bar: a round fundamental with the bright fourth partial of a marimba."""
+    return tone(freq, 1.2, 0.35, ((1, 1.0), (4, 0.25), (10, 0.06)))
+
+
+def sfx_drum():
+    t = np.arange(int(SR * 0.6)) / SR
+    pitch = 55 + 90 * np.exp(-t / 0.04)
+    body = np.sin(2 * np.pi * np.cumsum(pitch) / SR) * np.exp(-t / 0.18)
+    rng = np.random.default_rng(5)
+    thump = rng.standard_normal(len(t)) * np.exp(-t / 0.01) * 0.3
+    return body + thump
+
+
+def sfx_clap():
+    rng = np.random.default_rng(9)
+    n = int(SR * 0.3)
+    t = np.arange(n) / SR
+    noise = rng.standard_normal(n)
+    sos = signal.butter(2, [900, 3500], btype="bandpass", fs=SR, output="sos")
+    burst = sum(np.exp(-np.maximum(t - d, 0) / 0.012) * (t >= d) for d in (0, 0.011, 0.022))
+    return signal.sosfilt(sos, noise) * (burst + 0.6 * np.exp(-t / 0.08))
+
+
+def sfx_shaker():
+    rng = np.random.default_rng(11)
+    n = int(SR * 0.28)
+    t = np.arange(n) / SR
+    sos = signal.butter(2, [3000, 9000], btype="bandpass", fs=SR, output="sos")
+    return signal.sosfilt(sos, rng.standard_normal(n)) * np.sin(np.pi * t / t[-1]) ** 0.7
+
+
+def sfx_bell():
+    return tone(1318.5, 1.6, 0.6, ((1, 1.0), (2.4, 0.4), (5.95, 0.15)))
+
+
 SFX = {
     "pop": sfx_pop, "chime": sfx_chime, "sparkle": sfx_sparkle, "tada": sfx_tada, "whoosh": sfx_whoosh,
     "bloop": sfx_bloop, "snap": sfx_snap, "flip": sfx_flip, "star": sfx_star,
+    "drum": sfx_drum, "clap": sfx_clap, "shaker": sfx_shaker, "bell": sfx_bell,
+    **{f"xylo{i}": (lambda f=f: xylo(f)) for i, f in enumerate(XYLO_FREQS)},
 }
 
 

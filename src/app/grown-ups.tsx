@@ -82,9 +82,10 @@ export default function GrownUps() {
               About this app
             </Txt>
             <Txt size={17} weight="regular">
-              Hailey&apos;s Learning Land has eight learning games for young children: letter tracing, sight words,
-              counting, drawing, memory, letter sounds, puzzles and dress-up. Every game is free and unlocked. There
-              are no ads, no in-app purchases and no accounts.
+              Hailey&apos;s Learning Land has thirteen learning games for young children: letter tracing, sight
+              words, counting, drawing, memory, letter sounds, puzzles, dress-up, stories, cooking, shapes, music and
+              a pet to care for. Every game is free and unlocked. There are no ads, no in-app purchases and no
+              accounts.
             </Txt>
           </View>
           <View style={styles.card}>
@@ -114,7 +115,7 @@ export default function GrownUps() {
               Credits
             </Txt>
             <Txt size={15} weight="regular">
-              Pictures: Noto Emoji by Google, Apache License 2.0. Voice: generated with the open-source Kokoro
+              Pictures and coloring pages: based on Noto Emoji by Google, Apache License 2.0. Voice: generated with the open-source Kokoro
               text-to-speech model, Apache License 2.0. Font: Fredoka, SIL Open Font License. Sight words from the
               Dolch word list.
             </Txt>

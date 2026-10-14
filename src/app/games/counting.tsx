@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import { StyleSheet, View, useWindowDimensions } from 'react-native';
-import Animated, { ZoomIn, ZoomOut, useAnimatedStyle, useSharedValue, withSequence, withSpring } from 'react-native-reanimated';
+import Animated, { ZoomIn } from 'react-native-reanimated';
 
-import { Bouncy } from '@/components/bouncy';
 import { useCelebration } from '@/components/celebration';
 import { Choice } from '@/components/choice';
+import { FeedTray } from '@/components/feed-tray';
 import { GameScreen } from '@/components/game-screen';
 import { Pic } from '@/components/pic';
 import { Txt } from '@/components/txt';
@@ -50,25 +50,10 @@ function promptFor(q: Question) {
   return say.addition(q.a, q.b);
 }
 
-/** The hungry animal: it bounces happily every time it gets a treat. */
-function Animal({ name, size, fed }: { name: string; size: number; fed: number }) {
-  const scale = useSharedValue(1);
-  useEffect(() => {
-    if (fed > 0) scale.value = withSequence(withSpring(1.15), withSpring(1));
-  }, [fed, scale]);
-  const style = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
-  return (
-    <Animated.View style={style}>
-      <Pic name={name} size={size} />
-    </Animated.View>
-  );
-}
-
 export default function Counting() {
   const { width, height } = useWindowDimensions();
   const round = useRound({ total: 5, maxLevel: 3 });
   const [question, setQuestion] = useState<Question>(() => newQuestion(0));
-  const [eaten, setEaten] = useState<number[]>([]);
   const [wiggles, setWiggles] = useState<Record<number, number>>({});
   const [found, setFound] = useState(false);
   const [hint, setHint] = useState(false);
@@ -83,26 +68,10 @@ export default function Counting() {
   const next = () => {
     const q = newQuestion(round.level);
     setQuestion(q);
-    setEaten([]);
     setWiggles({});
     setFound(false);
     setHint(false);
     speak(promptFor(q));
-  };
-
-  const feed = async (item: number) => {
-    if (question.kind !== 'feed' || found || eaten.includes(item)) return;
-    const nowEaten = [...eaten, item];
-    setEaten(nowEaten);
-    playSfx('pop');
-    if (nowEaten.length < question.target) {
-      speak(say.number(nowEaten.length));
-      return;
-    }
-    setFound(true);
-    await speak(say.number(nowEaten.length));
-    await round.success(celebrate);
-    next();
   };
 
   const answer = async (n: number) => {
@@ -125,31 +94,17 @@ export default function Counting() {
   const short = Math.min(width, height);
   let body;
   if (question.kind === 'feed') {
-    const itemSize = Math.min(short * 0.16, 90);
     body = (
-      <View style={[styles.feed, width > height && styles.feedWide]}>
-        <View style={styles.animalSpot}>
-          <Animal name={question.mission.animal} size={Math.min(short * 0.32, 220)} fed={eaten.length} />
-          <View style={styles.counter}>
-            <Txt size={34} weight="heavy" color={Colors.orange}>
-              {eaten.length} / {question.target}
-            </Txt>
-          </View>
-        </View>
-        <View style={[styles.tray, { maxWidth: itemSize * 5 + Spacing.md * 6 }]}>
-          {Array.from({ length: question.items }, (_, i) =>
-            eaten.includes(i) ? (
-              <View key={i} style={{ width: itemSize, height: itemSize }} />
-            ) : (
-              <Animated.View key={`${question.key}-${i}`} entering={ZoomIn.delay(i * 40)} exiting={ZoomOut}>
-                <Bouncy accessibilityLabel={question.mission.foodOne} onPress={() => feed(i)} sound={false} style={{ padding: 4 }}>
-                  <Pic name={question.mission.food} size={itemSize} />
-                </Bouncy>
-              </Animated.View>
-            ),
-          )}
-        </View>
-      </View>
+      <FeedTray
+        key={question.key}
+        mission={question.mission}
+        target={question.target}
+        onDone={async () => {
+          setFound(true);
+          await round.success(celebrate);
+          next();
+        }}
+      />
     );
   } else {
     const cardSize = Math.min(short * 0.24, 150);
@@ -204,11 +159,6 @@ export default function Counting() {
 }
 
 const styles = StyleSheet.create({
-  feed: { flex: 1, alignItems: 'center', justifyContent: 'space-evenly', padding: Spacing.md },
-  feedWide: { flexDirection: 'row-reverse' },
-  animalSpot: { alignItems: 'center', gap: Spacing.sm },
-  counter: { backgroundColor: Colors.white, borderRadius: 999, paddingHorizontal: Spacing.lg, paddingVertical: 4, ...cardShadow },
-  tray: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: Spacing.md },
   numbers: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: Spacing.xl, padding: Spacing.md },
   sum: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md, flexWrap: 'wrap', justifyContent: 'center' },
   group: { flexDirection: 'row', flexWrap: 'wrap', maxWidth: 150, gap: 4, justifyContent: 'center', backgroundColor: Colors.white, borderRadius: 20, padding: Spacing.sm, ...cardShadow },

@@ -23,12 +23,22 @@ export function useDropTargets() {
     });
   };
 
-  /** The target under the point, allowing a little slack around each one for small fingers. */
-  const hit = (x: number, y: number, slack = 24): string | null => {
+  /**
+   * The target under the point, allowing a little slack around each one for small fingers. When
+   * targets overlap (an eye inside a head), the smallest one wins. `accepts` can skip targets that
+   * can't take this drop, such as a slot that is already filled.
+   */
+  const hit = (x: number, y: number, slack = 24, accepts?: (id: string) => boolean): string | null => {
+    let best: string | null = null;
+    let bestArea = Infinity;
     for (const [id, r] of rects.current) {
-      if (x >= r.x - slack && x <= r.x + r.width + slack && y >= r.y - slack && y <= r.y + r.height + slack) return id;
+      const inside = x >= r.x - slack && x <= r.x + r.width + slack && y >= r.y - slack && y <= r.y + r.height + slack;
+      if (inside && r.width * r.height < bestArea && (!accepts || accepts(id))) {
+        best = id;
+        bestArea = r.width * r.height;
+      }
     }
-    return null;
+    return best;
   };
 
   return { register, measure, hit };
