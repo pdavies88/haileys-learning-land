@@ -1,0 +1,215 @@
+"""Generates every sound the app ships with. Nothing is downloaded at runtime.
+
+    .tts/venv/bin/python audio-tools/generate_audio.py            # speech and sound effects
+    .tts/venv/bin/python audio-tools/generate_audio.py speech [id ...]
+    .tts/venv/bin/python audio-tools/generate_audio.py sfx
+
+Speech comes from audio-tools/speech.json (run `node scripts/build-speech-list.mjs` first), spoken
+by the Kokoro open-source voice model (Apache 2.0). Lines starting with "/" are phonemes, used for
+letter sounds. Sound effects are synthesized from tones and noise. Output is AAC (.m4a), encoded
+with macOS's built-in afconvert. The script also writes src/content/audio-files.ts.
+
+Setup: .tts/ holds the Kokoro model and a Python venv with kokoro-onnx, soundfile and scipy.
+"""
+
+from __future__ import annotations
+
+import hashlib
+import json
+import subprocess
+import sys
+import tempfile
+from pathlib import Path
+
+import numpy as np
+import soundfile as sf
+from scipy import signal
+
+ROOT = Path(__file__).resolve().parent.parent
+SPEECH_LIST = ROOT / "audio-tools" / "speech.json"
+OUT_SPEECH = ROOT / "assets" / "audio" / "speech"
+OUT_SFX = ROOT / "assets" / "audio" / "sfx"
+AUDIO_MAP = ROOT / "src" / "content" / "audio-files.ts"
+TTS_DIR = ROOT / ".tts"
+TTS_CACHE = TTS_DIR / "cache"
+
+SR = 24000  # Kokoro's own rate; plenty for speech and simple effects
+# The narrator: Kokoro voice "Heart" (American English), warm and clear, a touch slower for kids.
+VOICE = "af_heart"
+VOICE_LANG = "en-us"
+VOICE_SPEED = 0.9
+
+_kokoro = None
+
+
+def speak(text: str) -> np.ndarray:
+    """Speaks one line (or phonemes, if it starts with "/"). Results are cached by voice and text."""
+    global _kokoro
+    key = hashlib.sha1(f"{VOICE}|{VOICE_SPEED}|{text}".encode()).hexdigest()
+    cached = TTS_CACHE / f"{key}.npy"
+    if cached.exists():
+        return np.load(cached)
+    if _kokoro is None:
+        from kokoro_onnx import Kokoro
+
+        _kokoro = Kokoro(str(TTS_DIR / "kokoro-v1.0.onnx"), str(TTS_DIR / "voices-v1.0.bin"))
+    phonemes = text.startswith("/")
+    samples, rate = _kokoro.create(
+        text[1:] if phonemes else text, voice=VOICE, speed=VOICE_SPEED, lang=VOICE_LANG, is_phonemes=phonemes
+    )
+    audio = np.asarray(samples, dtype=np.float64)
+    if rate != SR:
+        audio = signal.resample_poly(audio, SR, rate)
+    loud = np.flatnonzero(np.abs(audio) > 0.01)
+    if len(loud):
+        audio = audio[max(0, loud[0] - int(0.02 * SR)) : loud[-1] + int(0.06 * SR)]
+    TTS_CACHE.mkdir(parents=True, exist_ok=True)
+    np.save(cached, audio)
+    return audio
+
+
+def encode(audio: np.ndarray, out_path: Path, bitrate: int) -> None:
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    audio = audio / (np.max(np.abs(audio)) + 1e-9) * 10 ** (-1.5 / 20)
+    with tempfile.TemporaryDirectory() as tmp:
+        wav = Path(tmp) / "in.wav"
+        sf.write(wav, audio.astype(np.float32), SR, subtype="PCM_16")
+        subprocess.run(
+            ["afconvert", "-f", "m4af", "-d", "aac", "-b", str(bitrate), str(wav), str(out_path)],
+            check=True,
+        )
+
+
+# ---------------------------------------------------------------------------
+# Sound effects
+# ---------------------------------------------------------------------------
+
+def tone(freq: float, seconds: float, decay: float, harmonics=((1, 1.0),)) -> np.ndarray:
+    t = np.arange(int(SR * seconds)) / SR
+    out = sum(amp * np.sin(2 * np.pi * freq * k * t) for k, amp in harmonics)
+    return out * np.exp(-t / decay) * np.minimum(1, t / 0.004)
+
+
+def seq(*parts: tuple[float, np.ndarray]) -> np.ndarray:
+    length = max(int(at * SR) + len(p) for at, p in parts)
+    out = np.zeros(length)
+    for at, p in parts:
+        start = int(at * SR)
+        out[start : start + len(p)] += p
+    return out
+
+
+def sfx_pop():
+    t = np.arange(int(SR * 0.12)) / SR
+    freq = 900 * np.exp(-t / 0.03) + 300
+    return np.sin(2 * np.pi * np.cumsum(freq) / SR) * np.exp(-t / 0.035)
+
+
+def sfx_chime():
+    bell = ((1, 1.0), (2, 0.3), (3, 0.12))
+    return seq((0, tone(1046.5, 0.8, 0.25, bell)), (0.09, tone(1318.5, 0.9, 0.3, bell)), (0.18, tone(1568.0, 1.1, 0.4, bell)))
+
+
+def sfx_sparkle():
+    rng = np.random.default_rng(7)
+    parts = [(i * 0.045, tone(f, 0.5, 0.12, ((1, 1.0), (2, 0.2)))) for i, f in enumerate(rng.choice([1568, 1760, 2093, 2349, 2637, 3136], 10))]
+    return seq(*parts)
+
+
+def sfx_tada():
+    warm = ((1, 1.0), (2, 0.45), (3, 0.2), (4, 0.1))
+    chord = lambda at, notes, length: [(at, tone(f, length, length / 2.5, warm)) for f in notes]
+    return seq(*chord(0, [523.25, 659.25], 0.25), *chord(0.16, [587.33, 739.99], 0.25), *chord(0.32, [523.25, 659.25, 783.99, 1046.5], 1.4))
+
+
+def sfx_whoosh():
+    rng = np.random.default_rng(3)
+    n = int(SR * 0.3)
+    t = np.arange(n) / SR
+    noise = rng.standard_normal(n)
+    sos = signal.butter(2, [600, 3000], btype="bandpass", fs=SR, output="sos")
+    return signal.sosfilt(sos, noise) * np.sin(np.pi * t / t[-1]) ** 2
+
+
+def sfx_bloop():
+    """A soft, friendly 'not quite' sound: two gentle low notes, never a buzzer."""
+    soft = ((1, 1.0), (2, 0.15))
+    return seq((0, tone(440, 0.3, 0.12, soft)), (0.12, tone(349.2, 0.4, 0.15, soft)))
+
+
+def sfx_snap():
+    t = np.arange(int(SR * 0.08)) / SR
+    return np.sin(2 * np.pi * 1200 * t) * np.exp(-t / 0.012) + 0.6 * np.sin(2 * np.pi * 600 * t) * np.exp(-t / 0.02)
+
+
+def sfx_flip():
+    t = np.arange(int(SR * 0.1)) / SR
+    freq = 400 + 1400 * t / t[-1]
+    return np.sin(2 * np.pi * np.cumsum(freq) / SR) * np.sin(np.pi * t / t[-1])
+
+
+def sfx_star():
+    up = ((1, 1.0), (2, 0.25))
+    return seq(*[(i * 0.07, tone(f, 0.4, 0.15, up)) for i, f in enumerate([784, 988, 1175, 1568])])
+
+
+SFX = {
+    "pop": sfx_pop, "chime": sfx_chime, "sparkle": sfx_sparkle, "tada": sfx_tada, "whoosh": sfx_whoosh,
+    "bloop": sfx_bloop, "snap": sfx_snap, "flip": sfx_flip, "star": sfx_star,
+}
+
+
+# ---------------------------------------------------------------------------
+
+def generate_speech(only: list[str]) -> None:
+    lines = json.loads(SPEECH_LIST.read_text())
+    print(f"Speech: {len(lines)} lines")
+    for i, (sid, text) in enumerate(lines.items()):
+        if only and sid not in only:
+            continue
+        out = OUT_SPEECH / f"{sid}.m4a"
+        audio = speak(text)
+        encode(audio, out, 40000)
+        if (i + 1) % 100 == 0:
+            print(f"  {i + 1} done")
+    # Remove files for lines that no longer exist.
+    for old in OUT_SPEECH.glob("*.m4a"):
+        if old.stem not in lines:
+            old.unlink()
+
+
+def generate_sfx() -> None:
+    print("Sound effects")
+    for name, make in SFX.items():
+        encode(make(), OUT_SFX / f"{name}.m4a", 64000)
+
+
+def write_audio_map() -> None:
+    lines = json.loads(SPEECH_LIST.read_text())
+    out = [
+        "// Generated by audio-tools/generate_audio.py. Do not edit by hand.",
+        "// Metro only bundles files referenced by a static require(), so every file is listed here.",
+        "",
+        "export const SPEECH_FILES: Record<string, number> = {",
+        *[f"  '{sid}': require('../../assets/audio/speech/{sid}.m4a')," for sid in lines],
+        "};",
+        "",
+        "export const SFX_FILES = {",
+        *[f"  {name}: require('../../assets/audio/sfx/{name}.m4a')," for name in SFX],
+        "} as const;",
+        "",
+        "export type SfxName = keyof typeof SFX_FILES;",
+        "",
+    ]
+    AUDIO_MAP.write_text("\n".join(out))
+    print(f"  wrote {AUDIO_MAP.relative_to(ROOT)}")
+
+
+if __name__ == "__main__":
+    args = sys.argv[1:]
+    target = args[0] if args else "all"
+    if target in ("all", "speech"):
+        generate_speech(args[1:] if target == "speech" else [])
+    if target in ("all", "sfx"):
+        generate_sfx()
+    write_audio_map()

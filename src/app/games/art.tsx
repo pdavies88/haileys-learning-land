@@ -1,0 +1,274 @@
+/* eslint-disable react-hooks/refs, react-hooks/purity -- the flagged code runs in finger handlers handed to a
+ gesture builder, not during render. The component opts out of React Compiler with 'use no memo'. */
+import { Canvas, Circle, DiscretePathEffect, Path, Skia, type SkPath, type SkPathBuilder } from '@shopify/react-native-skia';
+import { Image } from 'expo-image';
+import { useEffect, useRef, useState } from 'react';
+import { ScrollView, StyleSheet, View, useWindowDimensions, type LayoutChangeEvent } from 'react-native';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import Animated, { FadeIn, FadeOut, ZoomIn } from 'react-native-reanimated';
+
+import { Bouncy } from '@/components/bouncy';
+import { GameScreen } from '@/components/game-screen';
+import { Pic } from '@/components/pic';
+import { Txt } from '@/components/txt';
+import { Colors, Spacing, cardShadow } from '@/constants/theme';
+import { say } from '@/content/learning';
+import { COLORING_FILES } from '@/content/picture-files';
+import { playSfx, speak } from '@/lib/audio';
+
+const PALETTE = ['#F2545B', '#FF9F43', '#FFD23F', '#3CC47C', '#2EC4B6', '#4D9DE0', '#9B6DE3', '#FF7EB6', '#8B5A3C', '#3B2A5C'];
+const STAMPS = ['unicorn', 'heart', 'star', 'butterfly', 'flower', 'rainbow', 'crown', 'cat', 'fish', 'sun'];
+const SIZES = [8, 18, 34];
+const GLITTER = ['#FFD23F', '#FF7EB6', '#FFFFFF', '#9B6DE3', '#4D9DE0', '#FFB3D9'];
+
+type Tool = 'crayon' | 'marker' | 'glitter' | 'stamp' | 'eraser';
+type Dot = { x: number; y: number; r: number; color: string };
+type Mark =
+  | { kind: 'line'; tool: 'crayon' | 'marker' | 'eraser'; path: SkPath; color: string; width: number }
+  | { kind: 'glitter'; dots: Dot[] }
+  | { kind: 'stamp'; name: string; x: number; y: number; size: number };
+
+const TOOLS: { id: Tool; picture: string; label: string }[] = [
+  { id: 'crayon', picture: 'crayon', label: 'Crayon' },
+  { id: 'marker', picture: 'brush', label: 'Marker' },
+  { id: 'glitter', picture: 'sparkles', label: 'Glitter' },
+  { id: 'stamp', picture: 'heart', label: 'Stamps' },
+  { id: 'eraser', picture: 'eraser', label: 'Eraser' },
+];
+
+function LineMark({ mark }: { mark: Extract<Mark, { kind: 'line' }> }) {
+  const color = mark.tool === 'eraser' ? '#FFFFFF' : mark.color;
+  return (
+    <Path
+      path={mark.path}
+      color={color}
+      style="stroke"
+      strokeWidth={mark.width}
+      strokeCap="round"
+      strokeJoin="round"
+      opacity={mark.tool === 'crayon' ? 0.82 : 1}>
+      {mark.tool === 'crayon' ? <DiscretePathEffect length={6} deviation={1.6} /> : null}
+    </Path>
+  );
+}
+
+export default function Art() {
+  // The finger handlers below only run on touches, but React Compiler can't tell that from a gesture
+  // builder. This screen redraws on every move anyway, so it opts out of the compiler.
+  'use no memo';
+  const { width } = useWindowDimensions();
+  const [tool, setTool] = useState<Tool>('crayon');
+  const [color, setColor] = useState(PALETTE[6]);
+  const [size, setSize] = useState(1);
+  const [stamp, setStamp] = useState(STAMPS[0]);
+  const [marks, setMarks] = useState<Mark[]>([]);
+  const [active, setActive] = useState<Mark | null>(null);
+  const [page, setPage] = useState<string | null>(null);
+  const [choosing, setChoosing] = useState(false);
+  const [paper, setPaper] = useState({ width: 0, height: 0 });
+  const current = useRef<{ path: SkPathBuilder; dots: Dot[]; last: { x: number; y: number }; mark?: Mark } | null>(null);
+
+  useEffect(() => {
+    speak(say.line('artIntro'));
+  }, []);
+
+  const begin = (x: number, y: number) => {
+    if (tool === 'stamp') {
+      playSfx('pop');
+      setMarks((m) => [...m, { kind: 'stamp', name: stamp, x, y, size: 40 + size * 26 }]);
+      return;
+    }
+    const path = Skia.PathBuilder.Make().moveTo(x, y).lineTo(x + 0.1, y);
+    current.current = { path, dots: [], last: { x, y } };
+    update(x, y);
+  };
+
+  const update = (x: number, y: number) => {
+    const c = current.current;
+    if (!c || tool === 'stamp') return;
+    if (tool === 'glitter') {
+      const step = Math.hypot(x - c.last.x, y - c.last.y);
+      if (step < 6 && c.dots.length) return;
+      for (let i = 0; i < 3; i++) {
+        c.dots.push({
+          x: x + (Math.random() - 0.5) * SIZES[size] * 1.4,
+          y: y + (Math.random() - 0.5) * SIZES[size] * 1.4,
+          r: 1.5 + Math.random() * (SIZES[size] / 6),
+          color: GLITTER[Math.floor(Math.random() * GLITTER.length)],
+        });
+      }
+      c.last = { x, y };
+      c.mark = { kind: 'glitter', dots: [...c.dots] };
+      setActive(c.mark);
+      return;
+    }
+    c.path.lineTo(x, y);
+    const lineTool = tool === 'eraser' ? 'eraser' : tool;
+    c.mark = { kind: 'line', tool: lineTool, path: c.path.build(), color, width: SIZES[size] * (tool === 'eraser' ? 1.6 : 1) };
+    setActive(c.mark);
+  };
+
+  const end = () => {
+    const finished = current.current?.mark;
+    if (finished) setMarks((m) => [...m, finished]);
+    setActive(null);
+    current.current = null;
+  };
+
+  const pan = Gesture.Pan()
+    .runOnJS(true)
+    .minDistance(0)
+    .onBegin((e) => begin(e.x, e.y))
+    .onUpdate((e) => update(e.x, e.y))
+    .onFinalize(() => end());
+
+  const choosePage = (name: string | null) => {
+    playSfx('sparkle');
+    setPage(name);
+    setMarks([]);
+    setChoosing(false);
+    speak(name ? say.line('artColoring') : say.line('artBlank'));
+  };
+
+  const swatch = Math.min(46, (width - 200) / PALETTE.length);
+  // Seven tool buttons and a divider fit on one row, even on a phone.
+  const toolSize = Math.min(56, (width - 32 - 7 * 6 - 14) / 7);
+  const toolStyle = { width: toolSize, height: toolSize, borderRadius: toolSize * 0.32 };
+  return (
+    <GameScreen title="Art Studio" background="#F1E8FF" onRepeat={() => speak(say.line('artIntro'))}>
+      <View style={styles.body}>
+        <View style={styles.tools}>
+          {TOOLS.map((t) => (
+            <Bouncy key={t.id} accessibilityLabel={t.label} style={[styles.tool, toolStyle, tool === t.id && styles.selected]} onPress={() => setTool(t.id)}>
+              <Pic name={t.picture} size={toolSize * 0.6} />
+            </Bouncy>
+          ))}
+          <View style={styles.divider} />
+          <Bouncy accessibilityLabel="Undo" style={[styles.tool, toolStyle]} onPress={() => setMarks((m) => m.slice(0, -1))}>
+            <Pic name="undo" size={toolSize * 0.54} />
+          </Bouncy>
+          <Bouncy accessibilityLabel="Pictures to color" style={[styles.tool, toolStyle]} onPress={() => setChoosing(true)}>
+            <Pic name="paper" size={toolSize * 0.58} />
+          </Bouncy>
+        </View>
+
+        <View style={styles.paperArea} onLayout={(e: LayoutChangeEvent) => setPaper({ width: e.nativeEvent.layout.width, height: e.nativeEvent.layout.height })}>
+          <GestureDetector gesture={pan}>
+            <View style={styles.paper}>
+              <Canvas style={StyleSheet.absoluteFill}>
+                {[...marks, ...(active ? [active] : [])].map((mark, i) =>
+                  mark.kind === 'line' ? (
+                    <LineMark key={i} mark={mark} />
+                  ) : mark.kind === 'glitter' ? (
+                    mark.dots.map((d, j) => <Circle key={`${i}-${j}`} cx={d.x} cy={d.y} r={d.r} color={d.color} />)
+                  ) : null,
+                )}
+              </Canvas>
+              {marks.map((mark, i) =>
+                mark.kind === 'stamp' ? (
+                  <Animated.View
+                    key={i}
+                    entering={ZoomIn.springify()}
+                    pointerEvents="none"
+                    style={{ position: 'absolute', left: mark.x - mark.size / 2, top: mark.y - mark.size / 2 }}>
+                    <Pic name={mark.name} size={mark.size} />
+                  </Animated.View>
+                ) : null,
+              )}
+              {page && (
+                <Image
+                  source={COLORING_FILES[page]}
+                  contentFit="contain"
+                  pointerEvents="none"
+                  style={[StyleSheet.absoluteFill, { margin: Math.min(paper.width, paper.height) * 0.04 }]}
+                />
+              )}
+            </View>
+          </GestureDetector>
+        </View>
+
+        <View style={styles.bottom}>
+          {tool === 'stamp' ? (
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.row}>
+              {STAMPS.map((name) => (
+                <Bouncy key={name} accessibilityLabel={name} style={[styles.stampChoice, stamp === name && styles.selected]} onPress={() => setStamp(name)}>
+                  <Pic name={name} size={38} />
+                </Bouncy>
+              ))}
+            </ScrollView>
+          ) : (
+            <View style={styles.row}>
+              {PALETTE.map((c) => (
+                <Bouncy
+                  key={c}
+                  accessibilityLabel="Color"
+                  style={[styles.swatch, { width: swatch, height: swatch, backgroundColor: c }, color === c && styles.swatchOn]}
+                  onPress={() => {
+                    setColor(c);
+                    if (tool === 'eraser') setTool('crayon');
+                  }}>
+                  <View />
+                </Bouncy>
+              ))}
+            </View>
+          )}
+          <View style={styles.row}>
+            {SIZES.map((s, i) => (
+              <Bouncy key={s} accessibilityLabel={['Small', 'Medium', 'Big'][i]} style={[styles.sizeButton, size === i && styles.selected]} onPress={() => setSize(i)}>
+                <View style={{ width: s * 0.9 + 6, height: s * 0.9 + 6, borderRadius: 99, backgroundColor: tool === 'eraser' ? '#CCC' : color }} />
+              </Bouncy>
+            ))}
+          </View>
+        </View>
+      </View>
+
+      {choosing && (
+        <Animated.View entering={FadeIn} exiting={FadeOut} style={styles.chooser}>
+          <View style={styles.chooserCard}>
+            <Txt size={26} weight="heavy">
+              What would you like to color?
+            </Txt>
+            <ScrollView contentContainerStyle={styles.pages}>
+              <Bouncy accessibilityLabel="Blank paper" style={styles.pageThumb} onPress={() => choosePage(null)}>
+                <Txt size={18} color={Colors.textSoft}>
+                  Blank
+                </Txt>
+              </Bouncy>
+              {Object.keys(COLORING_FILES).map((name) => (
+                <Bouncy key={name} accessibilityLabel={name} style={styles.pageThumb} onPress={() => choosePage(name)}>
+                  <Image source={COLORING_FILES[name]} style={{ width: 92, height: 92 }} contentFit="contain" />
+                </Bouncy>
+              ))}
+            </ScrollView>
+            <Bouncy accessibilityLabel="Close" style={styles.closeChooser} onPress={() => setChoosing(false)}>
+              <Txt size={20} color={Colors.white}>
+                Keep drawing
+              </Txt>
+            </Bouncy>
+          </View>
+        </Animated.View>
+      )}
+    </GameScreen>
+  );
+}
+
+const styles = StyleSheet.create({
+  body: { flex: 1, padding: Spacing.sm, gap: Spacing.sm },
+  tools: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 6 },
+  tool: { width: 56, height: 56, borderRadius: 18, backgroundColor: Colors.white, alignItems: 'center', justifyContent: 'center', ...cardShadow },
+  selected: { backgroundColor: '#FFF3B0', borderWidth: 3, borderColor: Colors.yellow },
+  divider: { width: 2, height: 36, backgroundColor: 'rgba(0,0,0,0.08)', marginHorizontal: 4 },
+  paperArea: { flex: 1 },
+  paper: { flex: 1, backgroundColor: Colors.white, borderRadius: 28, overflow: 'hidden', ...cardShadow },
+  bottom: { gap: Spacing.sm, alignItems: 'center' },
+  row: { flexDirection: 'row', gap: Spacing.sm, alignItems: 'center', justifyContent: 'center', paddingHorizontal: Spacing.sm },
+  swatch: { borderRadius: 99, borderWidth: 3, borderColor: Colors.white, ...cardShadow },
+  swatchOn: { borderColor: Colors.text, transform: [{ scale: 1.15 }] },
+  sizeButton: { width: 56, height: 48, borderRadius: 16, backgroundColor: Colors.white, alignItems: 'center', justifyContent: 'center', ...cardShadow },
+  stampChoice: { width: 56, height: 56, borderRadius: 18, backgroundColor: Colors.white, alignItems: 'center', justifyContent: 'center', ...cardShadow },
+  chooser: { ...StyleSheet.absoluteFill, backgroundColor: 'rgba(59,42,92,0.35)', alignItems: 'center', justifyContent: 'center', padding: Spacing.lg },
+  chooserCard: { backgroundColor: Colors.white, borderRadius: 32, padding: Spacing.lg, gap: Spacing.md, alignItems: 'center', maxWidth: 640, maxHeight: '90%', width: '100%' },
+  pages: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: Spacing.md },
+  pageThumb: { width: 110, height: 110, borderRadius: 22, backgroundColor: Colors.background, alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: '#EEE' },
+  closeChooser: { backgroundColor: Colors.purple, borderRadius: 999, paddingHorizontal: Spacing.xl, paddingVertical: Spacing.sm },
+});
