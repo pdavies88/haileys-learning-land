@@ -82,7 +82,8 @@ export default function Story() {
     go('hero');
   };
 
-  const tile = Math.min((width - Spacing.md * 5) / (width >= 700 ? 4 : 2), 170);
+  const columns = width >= 700 ? 5 : 2;
+  const tile = Math.min((width - Spacing.md * (columns + 2)) / columns, 170);
   const choices =
     step === 'hero'
       ? STORY_HEROES.map((h) => ({ id: h.id, picture: h.id, label: h.name, bg: Colors.white, pick: () => { setHero(h); speak(say.picture(h.id)); go('place'); } }))

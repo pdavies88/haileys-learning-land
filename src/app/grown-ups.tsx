@@ -8,10 +8,20 @@ import { Bouncy } from '@/components/bouncy';
 import { Txt } from '@/components/txt';
 import { Colors, Spacing, cardShadow } from '@/constants/theme';
 import { NUMBER_WORDS, say } from '@/content/learning';
+import STORIES from '@/content/stories.json';
 import { speak } from '@/lib/audio';
 import { randomInt, shuffle } from '@/lib/random';
 
 const SITE = 'https://pdavies88.github.io/haileys-learning-land';
+
+const CREDITS = [
+  { what: 'Pictures', who: 'Fluent Emoji by Microsoft, MIT License.' },
+  { what: 'Coloring pages', who: 'Traced from Noto Emoji by Google, Apache License 2.0.' },
+  { what: 'Sound effects and jingles', who: 'Kenney (kenney.nl), Creative Commons CC0.' },
+  { what: 'Voice', who: 'Generated with the open-source Kokoro text-to-speech model, Apache License 2.0.' },
+  { what: 'Font', who: 'Fredoka by Milena Brandão, SIL Open Font License.' },
+  { what: 'Sight words', who: 'The Dolch word list.' },
+];
 
 function newGate() {
   const first = randomInt(1, 9);
@@ -82,9 +92,9 @@ export default function GrownUps() {
               About this app
             </Txt>
             <Txt size={17} weight="regular">
-              Hailey&apos;s Learning Land has thirteen learning games for young children: letter tracing, sight
-              words, counting, drawing, memory, letter sounds, puzzles, dress-up, stories, cooking, shapes, music and
-              a pet to care for. Every game is free and unlocked. There are no ads, no in-app purchases and no
+              Hailey&apos;s Learning Land has fourteen learning games for young children: letter tracing, reading
+              and spelling, picture books, counting and sums, drawing, memory, letter sounds, puzzles and patterns,
+              dress-up, stories, cooking, shapes, music and a pet to care for. Every game is free and unlocked. There are no ads, no in-app purchases and no
               accounts.
             </Txt>
           </View>
@@ -112,13 +122,33 @@ export default function GrownUps() {
           </View>
           <View style={styles.card}>
             <Txt size={20} weight="heavy">
-              Credits
+              Thank you
+            </Txt>
+            <Txt size={15} weight="regular" color={Colors.textSoft}>
+              This app is built from free, openly licensed work by these people and groups.
+            </Txt>
+            {CREDITS.map((credit) => (
+              <View key={credit.what} style={styles.credit}>
+                <Txt size={16} weight="bold">
+                  {credit.what}
+                </Txt>
+                <Txt size={15} weight="regular">
+                  {credit.who}
+                </Txt>
+              </View>
+            ))}
+            <Txt size={16} weight="bold" style={{ marginTop: Spacing.sm }}>
+              Story Shelf books
             </Txt>
             <Txt size={15} weight="regular">
-              Pictures and coloring pages: based on Noto Emoji by Google, Apache License 2.0. Voice: generated with the open-source Kokoro
-              text-to-speech model, Apache License 2.0. Font: Fredoka, SIL Open Font License. Sight words from the
-              Dolch word list.
+              From Book Dash (bookdash.org), licensed under Creative Commons Attribution 4.0. Pictures were resized and narration
+              was added for this app.
             </Txt>
+            {STORIES.map((story) => (
+              <Txt key={story.slug} size={14} weight="regular" color={Colors.textSoft}>
+                {story.title}: {story.credit}
+              </Txt>
+            ))}
           </View>
         </>
       )}
@@ -134,4 +164,5 @@ const styles = StyleSheet.create({
   pad: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: Spacing.sm, marginTop: Spacing.md, maxWidth: 320 },
   key: { width: 80, height: 72, borderRadius: 20, backgroundColor: Colors.sky, alignItems: 'center', justifyContent: 'center' },
   link: { paddingVertical: Spacing.sm },
+  credit: { gap: 2 },
 });

@@ -97,6 +97,27 @@ export const SIGHT_WORDS_MORE = [
 
 export const SIGHT_WORDS = [...SIGHT_WORDS_EASY, ...SIGHT_WORDS_MORE];
 
+/** Words to spell from a picture, shortest first. Each has a picture of the same name. */
+export const SPELL_WORDS = [
+  ['cat', 'dog', 'pig', 'sun', 'hat', 'van', 'fox', 'bus', 'bed', 'web', 'map', 'bat', 'log', 'ant', 'egg', 'cow', 'bee'],
+  ['fish', 'frog', 'duck', 'drum', 'crab', 'nest', 'ship', 'milk', 'bell', 'star', 'moon', 'tree', 'kite', 'cake', 'ring', 'corn', 'boat'],
+  ['snake', 'sheep', 'spoon', 'zebra', 'tiger', 'apple', 'lemon', 'horse', 'chair', 'snail'],
+];
+
+/** Groups of pictures whose names rhyme. */
+export const RHYMES = [
+  ['cat', 'hat', 'bat'],
+  ['dog', 'frog', 'log'],
+  ['bee', 'tree', 'key'],
+  ['moon', 'spoon'],
+  ['star', 'car'],
+  ['cake', 'snake'],
+  ['mouse', 'house'],
+  ['bear', 'pear', 'chair'],
+  ['fox', 'socks'],
+  ['goat', 'boat'],
+];
+
 // ---------------------------------------------------------------------------
 // Numbers
 // ---------------------------------------------------------------------------
@@ -125,6 +146,10 @@ export const MISSIONS: Mission[] = [
 export const ADDITION: [number, number][] = [];
 for (let a = 1; a <= 9; a++) for (let b = 1; a + b <= 10; b++) ADDITION.push([a, b]);
 
+/** Take-away facts for Count & Collect: start with `a`, take away `b`, from ten down. */
+export const SUBTRACTION: [number, number][] = [];
+for (let a = 2; a <= 10; a++) for (let b = 1; b < a; b++) SUBTRACTION.push([a, b]);
+
 // ---------------------------------------------------------------------------
 // Memory, puzzles and dress-up
 // ---------------------------------------------------------------------------
@@ -152,10 +177,10 @@ export const COLORS: { name: string; hex: string }[] = [
 /** Jigsaw pictures for Little Puzzle World. */
 export const JIGSAW_PICTURES = ['unicorn', 'castle', 'butterfly', 'rainbow', 'lion', 'princess', 'rocket', 'turtle'];
 
-export const FRIENDS = ['princess', 'unicorn', 'kitten', 'puppy', 'dragon', 'fairy', 'bunny', 'teddy bear'];
+export const FRIENDS = ['princess', 'robot', 'unicorn', 'dinosaur', 'kitten', 'puppy', 'dragon', 'fairy', 'bunny', 'teddy bear'];
 export const STICKERS = [
   'crown', 'bow', 'glasses', 'hat', 'flower', 'star', 'butterfly', 'heart', 'rainbow', 'balloon', 'wand', 'sparkles',
-  'gem', 'lollipop',
+  'gem', 'lollipop', 'rocket', 'car', 'ball', 'guitar',
 ];
 export const PLACES = [
   { id: 'castle', name: 'castle', colors: ['#F8D7F0', '#C9B8FF'], decor: ['castle', 'sparkles', 'rainbow'] },
@@ -178,6 +203,8 @@ export const STORY_HEROES = [
   { id: 'fairy', name: 'Twinkle', intro: 'a tiny fairy named Twinkle' },
   { id: 'bunny', name: 'Hoppy', intro: 'a fluffy bunny named Hoppy' },
   { id: 'teddy bear', name: 'Teddy', intro: 'a cuddly teddy bear named Teddy' },
+  { id: 'robot', name: 'Bolt', intro: 'a helpful robot named Bolt' },
+  { id: 'dinosaur', name: 'Rex', intro: 'a gentle dinosaur named Rex' },
 ];
 
 /** Where a story can happen: matches PLACES, with words for the story. */
@@ -305,6 +332,33 @@ export const BUILDS: { id: string; name: string; pieces: BuildPiece[] }[] = [
       { shape: 'star', color: 'pink', x: 0.5, y: 0.66, w: 0.1, h: 0.1 },
     ],
   },
+  {
+    id: 'castle',
+    name: 'castle',
+    pieces: [
+      { shape: 'square', color: 'purple', x: 0.5, y: 0.66, w: 0.44, h: 0.4 },
+      { shape: 'rectangle', color: 'blue', x: 0.22, y: 0.6, w: 0.14, h: 0.52 },
+      { shape: 'rectangle', color: 'blue', x: 0.78, y: 0.6, w: 0.14, h: 0.52 },
+      { shape: 'triangle', color: 'pink', x: 0.22, y: 0.25, w: 0.2, h: 0.18 },
+      { shape: 'triangle', color: 'pink', x: 0.78, y: 0.25, w: 0.2, h: 0.18 },
+      { shape: 'rectangle', color: 'orange', x: 0.5, y: 0.76, w: 0.14, h: 0.2 },
+      { shape: 'heart', color: 'red', x: 0.5, y: 0.56, w: 0.12, h: 0.12 },
+      { shape: 'star', color: 'yellow', x: 0.5, y: 0.34, w: 0.14, h: 0.14 },
+    ],
+  },
+  {
+    id: 'car',
+    name: 'car',
+    pieces: [
+      { shape: 'rectangle', color: 'red', x: 0.5, y: 0.58, w: 0.76, h: 0.22 },
+      { shape: 'rectangle', color: 'orange', x: 0.5, y: 0.4, w: 0.42, h: 0.16 },
+      { shape: 'square', color: 'blue', x: 0.4, y: 0.41, w: 0.12, h: 0.1 },
+      { shape: 'square', color: 'blue', x: 0.6, y: 0.41, w: 0.12, h: 0.1 },
+      { shape: 'circle', color: 'purple', x: 0.28, y: 0.72, w: 0.18, h: 0.18 },
+      { shape: 'circle', color: 'purple', x: 0.72, y: 0.72, w: 0.18, h: 0.18 },
+      { shape: 'circle', color: 'yellow', x: 0.84, y: 0.55, w: 0.07, h: 0.07 },
+    ],
+  },
 ];
 
 // ---------------------------------------------------------------------------
@@ -346,20 +400,28 @@ export const PETS = [
 // Games
 // ---------------------------------------------------------------------------
 
+export const GAME_SECTIONS = [
+  { id: 'create', title: 'Create', picture: 'paint' },
+  { id: 'read', title: 'Read & Spell', picture: 'book' },
+  { id: 'numbers', title: 'Numbers', picture: 'abacus' },
+  { id: 'think', title: 'Think & Solve', picture: 'puzzle' },
+] as const;
+
 export const GAMES = [
-  { id: 'letters', title: 'Magic Letters', picture: 'butterfly', color: '#FF7EB6' },
-  { id: 'sight-words', title: 'Word Detective', picture: 'magnifier', color: '#4D9DE0' },
-  { id: 'counting', title: 'Count & Collect', picture: 'strawberry', color: '#FF9F43' },
-  { id: 'art', title: 'Art Studio', picture: 'paint', color: '#9B6DE3' },
-  { id: 'memory', title: 'Flip & Find', picture: 'cat', color: '#3CC47C' },
-  { id: 'sounds', title: 'Sound Safari', picture: 'lion', color: '#FFB627' },
-  { id: 'puzzles', title: 'Puzzle World', picture: 'puzzle', color: '#2EC4B6' },
-  { id: 'friends', title: 'Make a Friend', picture: 'princess', color: '#F25F8B' },
-  { id: 'story', title: 'Build a Story', picture: 'book', color: '#7C6CF2' },
-  { id: 'chef', title: 'Little Chef', picture: 'chef', color: '#F28C38' },
-  { id: 'quest', title: 'Shape Quest', picture: 'blue diamond', color: '#3AA0D9' },
-  { id: 'music', title: 'Music Maker', picture: 'piano', color: '#E85D9C' },
-  { id: 'pet', title: 'My Little Pet', picture: 'puppy', color: '#5BBF6A' },
+  { id: 'art', title: 'Art Studio', picture: 'paint', color: '#8B5CF6', section: 'create', skills: 'Draw, color, mirror' },
+  { id: 'story', title: 'Build a Story', picture: 'book', color: '#6366F1', section: 'create', skills: 'Imagine and tell' },
+  { id: 'friends', title: 'Make a Friend', picture: 'teddy bear', color: '#F43F8E', section: 'create', skills: 'Dress up and decorate' },
+  { id: 'music', title: 'Music Maker', picture: 'piano', color: '#EC4899', section: 'create', skills: 'Play and remember tunes' },
+  { id: 'letters', title: 'Magic Letters', picture: 'butterfly', color: '#FF5FA2', section: 'read', skills: 'Trace letters' },
+  { id: 'sight-words', title: 'Word Detective', picture: 'magnifier', color: '#3B8EF0', section: 'read', skills: 'Read, spell, rhyme' },
+  { id: 'sounds', title: 'Sound Safari', picture: 'lion', color: '#F59E0B', section: 'read', skills: 'Letter sounds' },
+  { id: 'books', title: 'Story Shelf', picture: 'books', color: '#0D9488', section: 'read', skills: 'Read picture books' },
+  { id: 'counting', title: 'Count & Collect', picture: 'strawberry', color: '#FF8A3D', section: 'numbers', skills: 'Count, add, take away' },
+  { id: 'chef', title: 'Little Chef', picture: 'chef', color: '#F97316', section: 'numbers', skills: 'Count and follow steps' },
+  { id: 'puzzles', title: 'Puzzle World', picture: 'puzzle', color: '#14B8A6', section: 'think', skills: 'Jigsaws and patterns' },
+  { id: 'memory', title: 'Flip & Find', picture: 'cat', color: '#22C17A', section: 'think', skills: 'Memory and matching' },
+  { id: 'quest', title: 'Shape Quest', picture: 'blue diamond', color: '#0EA5E9', section: 'think', skills: 'Shapes and building' },
+  { id: 'pet', title: 'My Little Pet', picture: 'puppy', color: '#4CAF50', section: 'think', skills: 'Care and share' },
 ] as const;
 export type GameId = (typeof GAMES)[number]['id'];
 
@@ -387,6 +449,12 @@ export const say = {
   findNumber: (n: number) => `find-num-${n}`,
   mission: (m: Mission, n: number) => `mission-${m.animal}-${n}`,
   addition: (a: number, b: number) => `add-${a}-${b}`,
+  subtraction: (a: number, b: number) => `sub-${a}-${b}`,
+  spell: (word: string) => `spell-${idOf(word)}`,
+  /** Story Shelf narration. The lines come from src/content/stories.json (see scripts/build-speech-list.mjs). */
+  bookTitle: (slug: string) => `book-${slug}-title`,
+  bookPage: (slug: string, page: number) => `book-${slug}-${page}`,
+  rhyme: (word: string) => `rhyme-${idOf(word)}`,
   shapeHome: (color: string, shape: ShapeName) => `home-${color}-${shape}`,
   findShape: (shape: ShapeName) => `find-shape-${shape}`,
   findColor: (color: string) => `find-color-${color}`,
@@ -470,6 +538,22 @@ export const LINES = {
   countEnd: 'We counted to ten!',
   petPick: 'Pick a pet to take care of!',
   petDrawDone: "Tap the check when you're done drawing.",
+  missingNumber: 'What number is missing?',
+  whichMore: 'Which group has more?',
+  whichFewer: 'Which group has fewer?',
+  readPicture: 'Read the word. Which picture is it?',
+  spellIt: 'Tap the letters in order to spell the word.',
+  whichLetter: 'Which letter does it start with?',
+  whatNext: 'What comes next in the pattern?',
+  patternIntro: 'Look at the pattern. Can you figure it out?',
+  memoryLetters: 'Match each big letter with its little letter!',
+  questCreate: 'Make your own picture! Tap a shape, then drag it anywhere you like.',
+  mirrorOn: 'Magic mirror! Draw on one side and watch the other side copy you.',
+  rainbowOn: 'Rainbow magic!',
+  shelfIntro: 'Welcome to the story shelf! Pick a book, and we can read it together.',
+  readToMe: "I'll read it to you. Tap the arrow to turn the page.",
+  youRead: 'Your turn to read! Tap the speaker if you want help.',
+  theEnd: 'The end!',
 };
 
 /** Every spoken line, as id -> text. Lines starting with "/" are phonemes, not words. */
@@ -496,6 +580,8 @@ export function spokenLines(): Record<string, string> {
     ...JIGSAW_PICTURES,
     ...FRIENDS,
     ...LETTERS.map((l) => l.word),
+    ...SPELL_WORDS.flat(),
+    ...RHYMES.flat(),
   ]);
   for (const picture of pictureNames) lines[say.picture(picture)] = capitalize(picture === 'queen' ? 'queen' : picture);
 
@@ -512,6 +598,9 @@ export function spokenLines(): Record<string, string> {
       lines[say.mission(m, n)] = `Give the ${m.animalName} ${NUMBER_WORDS[n]} ${n === 1 ? m.foodOne : m.foodMany}.`;
     }
   }
+  for (const [a, b] of SUBTRACTION) lines[say.subtraction(a, b)] = `${capitalize(NUMBER_WORDS[a])} take away ${NUMBER_WORDS[b]}. How many are left?`;
+  for (const word of SPELL_WORDS.flat()) lines[say.spell(word)] = `Can you spell ${word}?`;
+  for (const word of RHYMES.flat()) lines[say.rhyme(word)] = `Which one rhymes with ${word}?`;
   for (const [a, b] of ADDITION) lines[say.addition(a, b)] = `${capitalize(NUMBER_WORDS[a])} plus ${NUMBER_WORDS[b]}. How many altogether?`;
   for (const shape of SHAPES) {
     lines[say.shape(shape)] = capitalize(shape);

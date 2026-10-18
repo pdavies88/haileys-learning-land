@@ -1,0 +1,11 @@
+Story Shelf picture books
+
+The picture books in Story Shelf are published by Book Dash (https://bookdash.org) and come from
+https://github.com/bookdash/bookdash-books. Each book is licensed under the Creative Commons
+Attribution 4.0 International License (https://creativecommons.org/licenses/by/4.0/).
+
+Changes made for this app: page pictures were resized and recompressed, and spoken narration was
+added. The text of each book is unchanged.
+
+The authors and illustrators of each book are listed in src/content/stories.json (the "credit"
+field), at the end of each book in the app, and on the app's grown-ups screen.

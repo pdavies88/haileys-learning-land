@@ -6,7 +6,9 @@
 
 Speech comes from audio-tools/speech.json (run `node scripts/build-speech-list.mjs` first), spoken
 by the Kokoro open-source voice model (Apache 2.0). Lines starting with "/" are phonemes, used for
-letter sounds. Sound effects are synthesized from tones and noise. Output is AAC (.m4a), encoded
+letter sounds. Interface sounds and celebration jingles come from Kenney's sound packs (CC0,
+kenney.nl), downloaded once into .cache/kenney/. Instruments and the gentle "try again" sound are
+synthesized from tones and noise. Output is AAC (.m4a), encoded
 with macOS's built-in afconvert. The script also writes src/content/audio-files.ts.
 
 Setup: .tts/ holds the Kokoro model and a Python venv with kokoro-onnx, soundfile and scipy.
@@ -15,10 +17,13 @@ Setup: .tts/ holds the Kokoro model and a Python venv with kokoro-onnx, soundfil
 from __future__ import annotations
 
 import hashlib
+import io
 import json
 import subprocess
 import sys
 import tempfile
+import urllib.request
+import zipfile
 from pathlib import Path
 
 import numpy as np
@@ -192,9 +197,43 @@ def sfx_bell():
     return tone(1318.5, 1.6, 0.6, ((1, 1.0), (2.4, 0.4), (5.95, 0.15)))
 
 
+# Kenney sound packs (CC0). Each pack is downloaded once and unzipped into .cache/kenney/<pack>/.
+KENNEY_DIR = ROOT / ".cache" / "kenney"
+KENNEY_PACKS = {
+    "kenney_interface-sounds": "https://kenney.nl/media/pages/assets/interface-sounds/fa43c1dd4d-1677589452/kenney_interface-sounds.zip",
+    "kenney_music-jingles": "https://kenney.nl/media/pages/assets/music-jingles/f37e530b9e-1677590399/kenney_music-jingles.zip",
+}
+
+
+def kenney(pack: str, name: str):
+    """Loads one Kenney sound as mono audio at the app's sample rate."""
+
+    def load() -> np.ndarray:
+        folder = KENNEY_DIR / pack
+        if not folder.exists():
+            with urllib.request.urlopen(KENNEY_PACKS[pack]) as response:
+                zipfile.ZipFile(io.BytesIO(response.read())).extractall(folder)
+        audio, rate = sf.read(next(folder.rglob(name)))
+        if audio.ndim > 1:
+            audio = audio.mean(axis=1)
+        return signal.resample_poly(audio, SR, rate) if rate != SR else audio
+
+    return load
+
+
+UI = "kenney_interface-sounds"
+JINGLES = "kenney_music-jingles"
+
 SFX = {
-    "pop": sfx_pop, "chime": sfx_chime, "sparkle": sfx_sparkle, "tada": sfx_tada, "whoosh": sfx_whoosh,
-    "bloop": sfx_bloop, "snap": sfx_snap, "flip": sfx_flip, "star": sfx_star,
+    "pop": kenney(UI, "drop_002.ogg"),
+    "chime": kenney(UI, "confirmation_001.ogg"),
+    "sparkle": kenney(JINGLES, "jingles_PIZZI10.ogg"),
+    "tada": kenney(JINGLES, "jingles_PIZZI02.ogg"),
+    "whoosh": kenney(UI, "minimize_007.ogg"),
+    "bloop": sfx_bloop,
+    "snap": kenney(UI, "drop_001.ogg"),
+    "flip": kenney(UI, "drop_003.ogg"),
+    "star": kenney(UI, "maximize_009.ogg"),
     "drum": sfx_drum, "clap": sfx_clap, "shaker": sfx_shaker, "bell": sfx_bell,
     **{f"xylo{i}": (lambda f=f: xylo(f)) for i, f in enumerate(XYLO_FREQS)},
 }

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { StyleSheet, View, useWindowDimensions } from 'react-native';
 import Animated, { ZoomIn, useAnimatedStyle, useSharedValue, withDelay, withRepeat, withSequence, withTiming } from 'react-native-reanimated';
 
@@ -11,11 +11,11 @@ import { Shape } from '@/components/shape';
 import { ShapeHunt } from '@/components/shape-hunt';
 import { Txt } from '@/components/txt';
 import { Colors, Spacing, cardShadow } from '@/constants/theme';
-import { BUILDS, COLORS, say, type BuildPiece } from '@/content/learning';
+import { BUILDS, COLORS, say, type BuildPiece, type BuildShape } from '@/content/learning';
 import { useDropTargets } from '@/hooks/use-drop-targets';
 import { useRound } from '@/hooks/use-round';
 import { playSfx, speak } from '@/lib/audio';
-import { shuffle } from '@/lib/random';
+import { randomInt, shuffle } from '@/lib/random';
 
 type Build = (typeof BUILDS)[number];
 const hex = (name: string) => COLORS.find((c) => c.name === name)!.hex;
@@ -111,19 +111,77 @@ function Builder({ build, onBuilt }: { build: Build; onBuilt: () => void }) {
   );
 }
 
+/** Free building: tap a shape to add it, drag it anywhere, and make any picture she likes. */
+function FreeBuild() {
+  const { width, height } = useWindowDimensions();
+  const [pieces, setPieces] = useState<{ id: number; shape: BuildShape; color: string; size: number; x: number; y: number }[]>([]);
+  const [color, setColor] = useState(COLORS[4].hex);
+  const [size, setSize] = useState(1);
+  const nextId = useRef(1);
+  const area = { width: Math.min(width - Spacing.md * 2, 760), height: Math.max(220, height * 0.5) };
+  const SIZES = [44, 72, 110];
+
+  const add = (shape: BuildShape) => {
+    const s = SIZES[size];
+    playSfx('pop');
+    setPieces((p) => [
+      ...p,
+      { id: nextId.current++, shape, color, size: s, x: randomInt(10, Math.max(10, area.width - s - 10)), y: randomInt(10, Math.max(10, area.height - s - 10)) },
+    ]);
+  };
+
+  return (
+    <View style={styles.create}>
+      <View style={[styles.canvas, { width: area.width, height: area.height }]}>
+        {pieces.map((piece) => (
+          <View key={piece.id} style={{ position: 'absolute', left: piece.x, top: piece.y }}>
+            <Draggable stayWhereDropped onPickUp={() => playSfx('pop')} onDrop={() => false}>
+              <Shape shape={piece.shape} color={piece.color} size={piece.size} width={piece.shape === 'rectangle' ? piece.size * 0.55 : piece.size} />
+            </Draggable>
+          </View>
+        ))}
+      </View>
+      <View style={styles.palette}>
+        {(['circle', 'square', 'rectangle', 'triangle', 'star', 'heart', 'diamond'] as BuildShape[]).map((shape) => (
+          <Bouncy key={shape} accessibilityLabel={`Add a ${shape}`} sound={false} style={styles.paletteButton} onPress={() => add(shape)}>
+            <Shape shape={shape} color={color} size={shape === 'rectangle' ? 30 : 38} width={shape === 'rectangle' ? 24 : 38} height={38} />
+          </Bouncy>
+        ))}
+      </View>
+      <View style={styles.palette}>
+        {COLORS.map((c) => (
+          <Bouncy key={c.name} accessibilityLabel={c.name} style={[styles.colorDot, { backgroundColor: c.hex }, color === c.hex && styles.colorOn]} onPress={() => setColor(c.hex)}>
+            <View />
+          </Bouncy>
+        ))}
+      </View>
+      <View style={styles.palette}>
+        {SIZES.map((s, i) => (
+          <Bouncy key={s} accessibilityLabel={['Small', 'Medium', 'Big'][i]} style={[styles.paletteButton, size === i && styles.colorOn]} onPress={() => setSize(i)}>
+            <View style={{ width: 12 + i * 10, height: 12 + i * 10, borderRadius: 6, backgroundColor: color }} />
+          </Bouncy>
+        ))}
+        <Bouncy accessibilityLabel="Start over" style={styles.paletteButton} onPress={() => setPieces([])}>
+          <Pic name="eraser" size={30} />
+        </Bouncy>
+      </View>
+    </View>
+  );
+}
+
 export default function Quest() {
   const { width } = useWindowDimensions();
-  const [mode, setMode] = useState<'menu' | 'hunt' | 'pick' | 'build'>('menu');
+  const [mode, setMode] = useState<'menu' | 'hunt' | 'pick' | 'build' | 'create'>('menu');
   const [build, setBuild] = useState<Build>(BUILDS[0]);
   const [huntKey, setHuntKey] = useState(0);
-  const round = useRound({ total: 3, maxLevel: 3 });
+  const round = useRound({ total: 3, maxLevel: 3, start: 1 });
   const { celebrate, overlay } = useCelebration();
 
   useEffect(() => {
     speak(say.line('questPick'));
   }, []);
 
-  const tile = Math.min((width - Spacing.md * 4) / 2, 210);
+  const tile = Math.min((width - Spacing.md * 5) / 3, 210);
   const menuButton = (label: string, picture: string, color: string, onPress: () => void) => (
     <Bouncy accessibilityLabel={label} style={[styles.menuCard, { width: tile, height: tile, backgroundColor: color }]} onPress={onPress}>
       <View style={styles.bubble}>
@@ -147,6 +205,10 @@ export default function Quest() {
           setMode('pick');
           speak(say.line('questBuild'));
         })}
+        {menuButton('Create', 'paint', '#8B5CF6', () => {
+          setMode('create');
+          speak(say.line('questCreate'));
+        })}
       </View>
     );
   } else if (mode === 'hunt') {
@@ -160,6 +222,8 @@ export default function Quest() {
         }}
       />
     );
+  } else if (mode === 'create') {
+    body = <FreeBuild />;
   } else if (mode === 'pick') {
     body = (
       <View style={styles.menu}>
@@ -172,7 +236,7 @@ export default function Quest() {
                 setBuild(b);
                 setMode('build');
               }}>
-              <Pic name={b.id === 'house' ? 'house' : b.id} size={tile * 0.45} />
+              <Pic name={b.id} size={tile * 0.45} />
               <Txt size={20} style={{ textTransform: 'capitalize' }}>
                 {b.name}
               </Txt>
@@ -199,13 +263,14 @@ export default function Quest() {
   return (
     <GameScreen
       title="Shape Quest"
-      background="#E2F2FC"
-      onRepeat={() => speak(say.line(mode === 'hunt' ? 'questHunt' : mode === 'menu' ? 'questPick' : 'questBuild'))}
-      progress={mode === 'hunt' ? { done: round.done, total: round.total } : undefined}>
+      background="#D6EEFC"
+      onRepeat={() => speak(say.line(mode === 'hunt' ? 'questHunt' : mode === 'menu' ? 'questPick' : mode === 'create' ? 'questCreate' : 'questBuild'))}
+      progress={mode === 'hunt' ? { done: round.done, total: round.total } : undefined}
+      level={mode === 'hunt' ? round.level : undefined}>
       {mode !== 'menu' && (
         <Bouncy accessibilityLabel="Back to the start" style={styles.back} onPress={() => setMode('menu')}>
           <Txt size={16} color={Colors.textSoft}>
-            ‹ Hunt or build
+            ‹ Hunt, build or create
           </Txt>
         </Bouncy>
       )}
@@ -216,6 +281,12 @@ export default function Quest() {
 }
 
 const styles = StyleSheet.create({
+  create: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: Spacing.md, padding: Spacing.md },
+  canvas: { backgroundColor: Colors.white, borderRadius: 28, overflow: 'hidden', ...cardShadow },
+  palette: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', gap: Spacing.sm },
+  paletteButton: { width: 50, height: 50, borderRadius: 16, backgroundColor: Colors.white, alignItems: 'center', justifyContent: 'center', ...cardShadow },
+  colorDot: { width: 38, height: 38, borderRadius: 19, borderWidth: 3, borderColor: Colors.white, ...cardShadow },
+  colorOn: { borderColor: Colors.text, borderWidth: 3 },
   menu: { flex: 1, flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', alignContent: 'center', justifyContent: 'center', gap: Spacing.md, padding: Spacing.md },
   menuCard: { borderRadius: 28, alignItems: 'center', justifyContent: 'center', gap: Spacing.sm, ...cardShadow },
   bubble: { backgroundColor: 'rgba(255,255,255,0.85)', borderRadius: 999, padding: Spacing.md },

@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/refs, react-hooks/purity -- the flagged code runs in finger handlers handed to a
  gesture builder, not during render. The component opts out of React Compiler with 'use no memo'. */
-import { Canvas, Circle, DiscretePathEffect, Path, Skia, type SkPath, type SkPathBuilder } from '@shopify/react-native-skia';
+import { Canvas, Circle, DiscretePathEffect, FillType, Group, LinearGradient, Path, Skia, vec, type SkPath, type SkPathBuilder } from '@shopify/react-native-skia';
 import { Image } from 'expo-image';
 import { useEffect, useRef, useState } from 'react';
 import { ScrollView, StyleSheet, View, useWindowDimensions, type LayoutChangeEvent } from 'react-native';
@@ -11,22 +11,31 @@ import { Bouncy } from '@/components/bouncy';
 import { GameScreen } from '@/components/game-screen';
 import { Pic } from '@/components/pic';
 import { Txt } from '@/components/txt';
-import { Colors, Spacing, cardShadow } from '@/constants/theme';
+import { Colors, Spacing, cardShadow, gradient } from '@/constants/theme';
 import { say } from '@/content/learning';
+import OUTLINES from '@/content/coloring-outlines.json';
 import { COLORING_CATEGORIES, COLORING_FILES } from '@/content/picture-files';
 import { playSfx, speak } from '@/lib/audio';
 
 const PALETTE = ['#F2545B', '#FF9F43', '#FFD23F', '#3CC47C', '#2EC4B6', '#4D9DE0', '#9B6DE3', '#FF7EB6', '#8B5A3C', '#3B2A5C'];
-const STAMPS = ['unicorn', 'heart', 'star', 'butterfly', 'flower', 'rainbow', 'crown', 'cat', 'fish', 'sun'];
+const STAMPS = [
+  'unicorn', 'heart', 'star', 'butterfly', 'flower', 'rainbow', 'crown', 'cat', 'fish', 'sun', 'dinosaur', 'dragon',
+  'mermaid', 'rocket', 'tree', 'snowflake', 'balloon', 'cupcake', 'ladybug', 'gem',
+];
+/** The "rainbow" color paints a rainbow that runs across the whole page. */
+const RAINBOW = 'rainbow';
+const RAINBOW_COLORS = ['#F2545B', '#FF9F43', '#FFD23F', '#3CC47C', '#4D9DE0', '#9B6DE3', '#FF7EB6'];
 const SIZES = [8, 18, 34];
 const GLITTER = ['#FFD23F', '#FF7EB6', '#FFFFFF', '#9B6DE3', '#4D9DE0', '#FFB3D9'];
 
 type Tool = 'crayon' | 'marker' | 'glitter' | 'stamp' | 'eraser';
 type Dot = { x: number; y: number; r: number; color: string };
-type Mark =
+// Marks made in mirror mode are drawn twice: once where she drew, and flipped across the middle.
+type Mark = (
   | { kind: 'line'; tool: 'crayon' | 'marker' | 'eraser'; path: SkPath; color: string; width: number }
   | { kind: 'glitter'; dots: Dot[] }
-  | { kind: 'stamp'; name: string; x: number; y: number; size: number };
+  | { kind: 'stamp'; name: string; x: number; y: number; size: number }
+) & { mirror?: boolean };
 
 const TOOLS: { id: Tool; picture: string; label: string }[] = [
   { id: 'crayon', picture: 'crayon', label: 'Crayon' },
@@ -36,8 +45,9 @@ const TOOLS: { id: Tool; picture: string; label: string }[] = [
   { id: 'eraser', picture: 'eraser', label: 'Eraser' },
 ];
 
-function LineMark({ mark }: { mark: Extract<Mark, { kind: 'line' }> }) {
-  const color = mark.tool === 'eraser' ? '#FFFFFF' : mark.color;
+function LineMark({ mark, page }: { mark: Extract<Mark, { kind: 'line' }>; page: { width: number; height: number } }) {
+  const rainbow = mark.tool !== 'eraser' && mark.color === RAINBOW;
+  const color = mark.tool === 'eraser' ? '#FFFFFF' : rainbow ? '#FFFFFF' : mark.color;
   return (
     <Path
       path={mark.path}
@@ -48,7 +58,31 @@ function LineMark({ mark }: { mark: Extract<Mark, { kind: 'line' }> }) {
       strokeJoin="round"
       opacity={mark.tool === 'crayon' ? 0.82 : 1}>
       {mark.tool === 'crayon' ? <DiscretePathEffect length={6} deviation={1.6} /> : null}
+      {rainbow ? <LinearGradient start={vec(0, 0)} end={vec(page.width, page.height)} colors={RAINBOW_COLORS} /> : null}
     </Path>
+  );
+}
+
+// Each page's outline as a Skia path, made the first time the page is opened.
+const outlinePaths = new Map<string, SkPath>();
+
+/** A coloring page's outlines, drawn as vectors on top of her coloring so they stay sharp at any size. */
+function ColoringPage({ name, width, height }: { name: string; width: number; height: number }) {
+  const outline = OUTLINES[name as keyof typeof OUTLINES];
+  if (!outline) return null;
+  if (!outlinePaths.has(name)) {
+    // The tracer nests each line's inner edge inside its outer edge: even-odd fill leaves the gap.
+    const path = Skia.PathBuilder.MakeFromPath(Skia.Path.MakeFromSVGString(outline.d)!).setFillType(FillType.EvenOdd).build();
+    outlinePaths.set(name, path);
+  }
+  const fit = Math.min(width, height) * 0.92;
+  const scale = fit / outline.size;
+  return (
+    <Canvas style={StyleSheet.absoluteFill} pointerEvents="none">
+      <Group transform={[{ translateX: (width - fit) / 2 }, { translateY: (height - fit) / 2 }, { scale }]}>
+        <Path path={outlinePaths.get(name)!} color="#2B2B3A" />
+      </Group>
+    </Canvas>
   );
 }
 
@@ -67,6 +101,7 @@ export default function Art() {
   const [choosing, setChoosing] = useState(false);
   const [category, setCategory] = useState(COLORING_CATEGORIES[0].id);
   const [paper, setPaper] = useState({ width: 0, height: 0 });
+  const [mirror, setMirror] = useState(false);
   const current = useRef<{ path: SkPathBuilder; dots: Dot[]; last: { x: number; y: number }; mark?: Mark } | null>(null);
 
   useEffect(() => {
@@ -76,7 +111,7 @@ export default function Art() {
   const begin = (x: number, y: number) => {
     if (tool === 'stamp') {
       playSfx('pop');
-      setMarks((m) => [...m, { kind: 'stamp', name: stamp, x, y, size: 40 + size * 26 }]);
+      setMarks((m) => [...m, { kind: 'stamp', name: stamp, x, y, size: 40 + size * 26, mirror }]);
       return;
     }
     const path = Skia.PathBuilder.Make().moveTo(x, y).lineTo(x + 0.1, y);
@@ -99,13 +134,13 @@ export default function Art() {
         });
       }
       c.last = { x, y };
-      c.mark = { kind: 'glitter', dots: [...c.dots] };
+      c.mark = { kind: 'glitter', dots: [...c.dots], mirror };
       setActive(c.mark);
       return;
     }
     c.path.lineTo(x, y);
     const lineTool = tool === 'eraser' ? 'eraser' : tool;
-    c.mark = { kind: 'line', tool: lineTool, path: c.path.build(), color, width: SIZES[size] * (tool === 'eraser' ? 1.6 : 1) };
+    c.mark = { kind: 'line', tool: lineTool, path: c.path.build(), color, width: SIZES[size] * (tool === 'eraser' ? 1.6 : 1), mirror };
     setActive(c.mark);
   };
 
@@ -131,12 +166,19 @@ export default function Art() {
     speak(name ? say.line('artColoring') : say.line('artBlank'));
   };
 
-  const swatch = Math.min(46, (width - 200) / PALETTE.length);
-  // Seven tool buttons and a divider fit on one row, even on a phone.
-  const toolSize = Math.min(56, (width - 32 - 7 * 6 - 14) / 7);
+  const swatch = Math.min(46, (width - 200) / (PALETTE.length + 1));
+  // Eight tool buttons and a divider fit on one row, even on a phone.
+  const toolSize = Math.min(56, (width - 32 - 8 * 6 - 14) / 8);
+  const flip = [{ translateX: paper.width }, { scaleX: -1 }];
+  const drawMark = (mark: Mark, key: string) =>
+    mark.kind === 'line' ? (
+      <LineMark key={key} mark={mark} page={paper} />
+    ) : mark.kind === 'glitter' ? (
+      mark.dots.map((d, j) => <Circle key={`${key}-${j}`} cx={d.x} cy={d.y} r={d.r} color={d.color} />)
+    ) : null;
   const toolStyle = { width: toolSize, height: toolSize, borderRadius: toolSize * 0.32 };
   return (
-    <GameScreen title="Art Studio" background="#F1E8FF" onRepeat={() => speak(say.line('artIntro'))}>
+    <GameScreen title="Art Studio" background="#EADFFF" onRepeat={() => speak(say.line('artIntro'))}>
       <View style={styles.body}>
         <View style={styles.tools}>
           {TOOLS.map((t) => (
@@ -145,6 +187,15 @@ export default function Art() {
             </Bouncy>
           ))}
           <View style={styles.divider} />
+          <Bouncy
+            accessibilityLabel="Magic mirror"
+            style={[styles.tool, toolStyle, mirror && styles.selected]}
+            onPress={() => {
+              if (!mirror) speak(say.line('mirrorOn'));
+              setMirror(!mirror);
+            }}>
+            <Pic name="butterfly" size={toolSize * 0.6} />
+          </Bouncy>
           <Bouncy accessibilityLabel="Undo" style={[styles.tool, toolStyle]} onPress={() => setMarks((m) => m.slice(0, -1))}>
             <Pic name="undo" size={toolSize * 0.54} />
           </Bouncy>
@@ -157,33 +208,28 @@ export default function Art() {
           <GestureDetector gesture={pan}>
             <View style={styles.paper}>
               <Canvas style={StyleSheet.absoluteFill}>
-                {[...marks, ...(active ? [active] : [])].map((mark, i) =>
-                  mark.kind === 'line' ? (
-                    <LineMark key={i} mark={mark} />
-                  ) : mark.kind === 'glitter' ? (
-                    mark.dots.map((d, j) => <Circle key={`${i}-${j}`} cx={d.x} cy={d.y} r={d.r} color={d.color} />)
-                  ) : null,
-                )}
+                {[...marks, ...(active ? [active] : [])].map((mark, i) => (
+                  <Group key={i}>
+                    {drawMark(mark, `m${i}`)}
+                    {mark.mirror ? <Group transform={flip}>{drawMark(mark, `f${i}`)}</Group> : null}
+                  </Group>
+                ))}
               </Canvas>
-              {marks.map((mark, i) =>
-                mark.kind === 'stamp' ? (
-                  <Animated.View
-                    key={i}
-                    entering={ZoomIn.springify()}
-                    pointerEvents="none"
-                    style={{ position: 'absolute', left: mark.x - mark.size / 2, top: mark.y - mark.size / 2 }}>
-                    <Pic name={mark.name} size={mark.size} />
-                  </Animated.View>
-                ) : null,
+              {marks.flatMap((mark, i) =>
+                mark.kind === 'stamp'
+                  ? [mark.x, ...(mark.mirror ? [paper.width - mark.x] : [])].map((x, j) => (
+                      <Animated.View
+                        key={`${i}-${j}`}
+                        entering={ZoomIn.springify()}
+                        pointerEvents="none"
+                        style={{ position: 'absolute', left: x - mark.size / 2, top: mark.y - mark.size / 2, transform: j ? [{ scaleX: -1 }] : [] }}>
+                        <Pic name={mark.name} size={mark.size} />
+                      </Animated.View>
+                    ))
+                  : [],
               )}
-              {page && (
-                <Image
-                  source={COLORING_FILES[page]}
-                  contentFit="contain"
-                  pointerEvents="none"
-                  style={[StyleSheet.absoluteFill, { margin: Math.min(paper.width, paper.height) * 0.04 }]}
-                />
-              )}
+              {mirror && <View pointerEvents="none" style={styles.mirrorLine} />}
+              {page && paper.width > 0 && <ColoringPage name={page} width={paper.width} height={paper.height} />}
             </View>
           </GestureDetector>
         </View>
@@ -199,6 +245,16 @@ export default function Art() {
             </ScrollView>
           ) : (
             <View style={styles.row}>
+              <Bouncy
+                accessibilityLabel="Rainbow"
+                style={[styles.swatch, styles.rainbow, { width: swatch, height: swatch }, color === RAINBOW && styles.swatchOn]}
+                onPress={() => {
+                  if (color !== RAINBOW) speak(say.line('rainbowOn'));
+                  setColor(RAINBOW);
+                  if (tool === 'eraser' || tool === 'glitter') setTool('marker');
+                }}>
+                <View />
+              </Bouncy>
               {PALETTE.map((c) => (
                 <Bouncy
                   key={c}
@@ -216,7 +272,7 @@ export default function Art() {
           <View style={styles.row}>
             {SIZES.map((s, i) => (
               <Bouncy key={s} accessibilityLabel={['Small', 'Medium', 'Big'][i]} style={[styles.sizeButton, size === i && styles.selected]} onPress={() => setSize(i)}>
-                <View style={{ width: s * 0.9 + 6, height: s * 0.9 + 6, borderRadius: 99, backgroundColor: tool === 'eraser' ? '#CCC' : color }} />
+                <View style={[{ width: s * 0.9 + 6, height: s * 0.9 + 6, borderRadius: 99, backgroundColor: tool === 'eraser' ? '#CCC' : color }, color === RAINBOW && tool !== 'eraser' && styles.rainbow]} />
               </Bouncy>
             ))}
           </View>
@@ -279,6 +335,8 @@ const styles = StyleSheet.create({
   row: { flexDirection: 'row', gap: Spacing.sm, alignItems: 'center', justifyContent: 'center', paddingHorizontal: Spacing.sm },
   swatch: { borderRadius: 99, borderWidth: 3, borderColor: Colors.white, ...cardShadow },
   swatchOn: { borderColor: Colors.text, transform: [{ scale: 1.15 }] },
+  rainbow: gradient('#F2545B', '#9B6DE3', 135),
+  mirrorLine: { position: 'absolute', top: 0, bottom: 0, left: '50%', width: 0, borderLeftWidth: 2, borderStyle: 'dashed', borderColor: 'rgba(139,92,246,0.35)' },
   sizeButton: { width: 56, height: 48, borderRadius: 16, backgroundColor: Colors.white, alignItems: 'center', justifyContent: 'center', ...cardShadow },
   stampChoice: { width: 56, height: 56, borderRadius: 18, backgroundColor: Colors.white, alignItems: 'center', justifyContent: 'center', ...cardShadow },
   chooser: { ...StyleSheet.absoluteFill, backgroundColor: 'rgba(59,42,92,0.35)', alignItems: 'center', justifyContent: 'center', padding: Spacing.md },

@@ -59,7 +59,7 @@ export default function Friends() {
     speak(say.line('friendIntro'));
   };
 
-  const columns = width >= 700 ? 4 : 2;
+  const columns = width >= 700 ? 5 : 2;
   const tile = Math.min((width - Spacing.md * (columns + 2)) / columns, 180);
 
   if (step === 'friend' || step === 'place') {

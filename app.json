@@ -52,7 +52,7 @@
     "android": {
       "package": "com.pdavies.haileyslearningland",
       "adaptiveIcon": {
-        "backgroundColor": "#FFE3F1",
+        "backgroundColor": "#6D7CF5",
         "foregroundImage": "./assets/images/android-icon-foreground.png"
       },
       "predictiveBackGestureEnabled": false,
@@ -78,7 +78,7 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#FFF6FB",
+          "backgroundColor": "#F6F3FF",
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 200
         }
@@ -100,6 +100,6 @@
       "typedRoutes": true,
       "reactCompiler": true
     },
-    "backgroundColor": "#FFF6FB"
+    "backgroundColor": "#F6F3FF"
   }
 }
