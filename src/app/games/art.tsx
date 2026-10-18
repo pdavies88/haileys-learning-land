@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/refs, react-hooks/purity -- the flagged code runs in finger handlers handed to a
  gesture builder, not during render. The component opts out of React Compiler with 'use no memo'. */
-import { Canvas, Circle, DiscretePathEffect, Group, LinearGradient, Path, Skia, vec, type SkPath, type SkPathBuilder } from '@shopify/react-native-skia';
+import { Canvas, Circle, DiscretePathEffect, FillType, Group, LinearGradient, Path, Skia, vec, type SkPath, type SkPathBuilder } from '@shopify/react-native-skia';
 import { Image } from 'expo-image';
 import { useEffect, useRef, useState } from 'react';
 import { ScrollView, StyleSheet, View, useWindowDimensions, type LayoutChangeEvent } from 'react-native';
@@ -13,6 +13,7 @@ import { Pic } from '@/components/pic';
 import { Txt } from '@/components/txt';
 import { Colors, Spacing, cardShadow, gradient } from '@/constants/theme';
 import { say } from '@/content/learning';
+import OUTLINES from '@/content/coloring-outlines.json';
 import { COLORING_CATEGORIES, COLORING_FILES } from '@/content/picture-files';
 import { playSfx, speak } from '@/lib/audio';
 
@@ -59,6 +60,30 @@ function LineMark({ mark, page }: { mark: Extract<Mark, { kind: 'line' }>; page:
       {mark.tool === 'crayon' ? <DiscretePathEffect length={6} deviation={1.6} /> : null}
       {rainbow ? <LinearGradient start={vec(0, 0)} end={vec(page.width, page.height)} colors={RAINBOW_COLORS} /> : null}
     </Path>
+  );
+}
+
+// Each page's outline as a Skia path, made the first time the page is opened.
+const outlinePaths = new Map<string, SkPath>();
+
+/** A coloring page's outlines, drawn as vectors on top of her coloring so they stay sharp at any size. */
+function ColoringPage({ name, width, height }: { name: string; width: number; height: number }) {
+  const outline = OUTLINES[name as keyof typeof OUTLINES];
+  if (!outline) return null;
+  if (!outlinePaths.has(name)) {
+    const path = Skia.Path.MakeFromSVGString(outline.d)!;
+    // The tracer nests each line's inner edge inside its outer edge: even-odd fill leaves the gap.
+    path.setFillType(FillType.EvenOdd);
+    outlinePaths.set(name, path);
+  }
+  const fit = Math.min(width, height) * 0.92;
+  const scale = fit / outline.size;
+  return (
+    <Canvas style={StyleSheet.absoluteFill} pointerEvents="none">
+      <Group transform={[{ translateX: (width - fit) / 2 }, { translateY: (height - fit) / 2 }, { scale }]}>
+        <Path path={outlinePaths.get(name)!} color="#2B2B3A" />
+      </Group>
+    </Canvas>
   );
 }
 
@@ -205,14 +230,7 @@ export default function Art() {
                   : [],
               )}
               {mirror && <View pointerEvents="none" style={styles.mirrorLine} />}
-              {page && (
-                <Image
-                  source={COLORING_FILES[page]}
-                  contentFit="contain"
-                  pointerEvents="none"
-                  style={[StyleSheet.absoluteFill, { margin: Math.min(paper.width, paper.height) * 0.04 }]}
-                />
-              )}
+              {page && paper.width > 0 && <ColoringPage name={page} width={paper.width} height={paper.height} />}
             </View>
           </GestureDetector>
         </View>

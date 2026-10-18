@@ -33,7 +33,7 @@ Every instruction is spoken aloud, and the speaker button repeats it. Wrong answ
 All pictures and sounds are generated on a Mac and committed, so the app never downloads anything.
 
 ```bash
-npm run generate:pictures      # Fluent Emoji 3D -> assets/pics; Noto Emoji -> assets/coloring; src/content/picture-files.ts
+npm run generate:pictures      # Fluent Emoji 3D -> assets/pics; Noto Emoji -> src/content/coloring-outlines.json + assets/coloring previews
 node scripts/import-stories.mjs  # Book Dash books -> assets/stories, src/content/stories.json, src/content/story-files.ts
 npm run generate:speech-list   # src/content/learning.ts -> audio-tools/speech.json
 npm run generate:audio         # speech + sound effects -> assets/audio, src/content/audio-files.ts
@@ -41,7 +41,7 @@ node scripts/import-stories.mjs --durations  # after generating audio: page narr
 npm run generate:brand         # app icon, splash and website logos
 ```
 
-- **Pictures:** [Fluent Emoji](https://github.com/microsoft/fluentui-emoji) 3D artwork by Microsoft (MIT). The generator fetches only the images it needs with a sparse git clone. Coloring pages come from [Noto Emoji](https://github.com/googlefonts/noto-emoji) by Google (Apache 2.0), whose flat artwork is rendered large and traced into clean line art by `scripts/coloring.py` (needs a small Python environment in `.art-venv/`: `python3 -m venv .art-venv && .art-venv/bin/pip install pillow numpy scipy`).
+- **Pictures:** [Fluent Emoji](https://github.com/microsoft/fluentui-emoji) 3D artwork by Microsoft (MIT). The generator fetches only the images it needs with a sparse git clone. Coloring pages come from [Noto Emoji](https://github.com/googlefonts/noto-emoji) by Google (Apache 2.0), whose flat artwork is rendered large, split into color areas and traced into smooth vector outlines by `scripts/coloring.py` (needs a small Python environment in `.art-venv/`: `python3 -m venv .art-venv && .art-venv/bin/pip install pillow numpy scipy potracer`). Art Studio draws the outlines with Skia, so they stay sharp at any size. potracer (GPL) runs only at build time.
 - **Voice:** the open-source [Kokoro](https://github.com/thewh1teagle/kokoro-onnx) text-to-speech model (Apache 2.0), voice `af_heart` at 0.85 speed. Letter sounds are generated from phonemes. The model and its Python venv live in the git-ignored `.tts/` folder (see the Relaxation Station README for setup).
 - **Sound effects:** interface sounds and celebration jingles from [Kenney](https://kenney.nl) (CC0), downloaded once into `.cache/kenney/`. Instruments and the gentle "try again" sound are synthesized in `audio-tools/generate_audio.py`.
 - **Picture books:** [Book Dash](https://bookdash.org) books from [github.com/bookdash/bookdash-books](https://github.com/bookdash/bookdash-books), CC BY 4.0. Each book's creators are credited at the end of the book and on the grown-ups screen. Pictures are resized with `sips`; narration is generated with the app's voice.
