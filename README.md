@@ -1,6 +1,6 @@
 # Hailey's Learning Land
 
-A free learning app for young children, with thirteen games, built with Expo (SDK 57) and React Native. It runs on iPhone, iPad and Android, including Amazon Fire tablets. Everything works offline: no accounts, ads, purchases, tracking or saved data.
+A free learning app for young children, with fourteen games, built with Expo (SDK 57) and React Native. It runs on iPhone, iPad and Android, including Amazon Fire tablets. Everything works offline: no accounts, ads, purchases, tracking or saved data.
 
 ## Games
 
@@ -9,6 +9,7 @@ A free learning app for young children, with thirteen games, built with Expo (SD
 - **Count & Collect:** feed animals, find numbers up to 20, fill in missing numbers, compare groups (more or fewer), and add and take away within ten.
 - **Art Studio:** crayon, marker, glitter, 20 stamps and eraser, 10 colors plus a rainbow, 3 sizes, undo, a magic mirror for symmetrical drawings, and 100 coloring pages in six category tabs (`src/content/coloring.json`).
 - **Flip & Find:** a memory game that grows from 4 to 10 pairs. Every third board matches big letters to little letters.
+- **Story Shelf:** 11 picture books from Book Dash (CC BY 4.0). "Read to me" narrates each page and lights up each word. "I'll read" lets her read alone and tap a word to hear it.
 - **Sound Safari:** pick the picture that starts with a letter's sound, or pick the first letter of a picture.
 - **Puzzle World:** pattern puzzles (AB, AAB, ABC and more), a shape sorter, and 4-, 9- and 16-piece jigsaws.
 - **Make a Friend:** choose a friend and a home, then decorate with stickers.
@@ -32,15 +33,18 @@ Every instruction is spoken aloud, and the speaker button repeats it. Wrong answ
 All pictures and sounds are generated on a Mac and committed, so the app never downloads anything.
 
 ```bash
-npm run generate:pictures      # Noto Emoji SVGs -> assets/pics, assets/coloring, src/content/picture-files.ts
+npm run generate:pictures      # Fluent Emoji 3D -> assets/pics; Noto Emoji -> assets/coloring; src/content/picture-files.ts
+node scripts/import-stories.mjs  # Book Dash books -> assets/stories, src/content/stories.json, src/content/story-files.ts
 npm run generate:speech-list   # src/content/learning.ts -> audio-tools/speech.json
 npm run generate:audio         # speech + sound effects -> assets/audio, src/content/audio-files.ts
+node scripts/import-stories.mjs --durations  # after generating audio: page narration lengths for word highlighting
 npm run generate:brand         # app icon, splash and website logos
 ```
 
-- **Pictures:** [Noto Emoji](https://github.com/googlefonts/noto-emoji) by Google (Apache 2.0), rendered to PNG with resvg. Coloring pages are the same artwork rendered large and traced into clean line art by `scripts/coloring.py` (needs a small Python environment in `.art-venv/`: `python3 -m venv .art-venv && .art-venv/bin/pip install pillow numpy scipy`).
+- **Pictures:** [Fluent Emoji](https://github.com/microsoft/fluentui-emoji) 3D artwork by Microsoft (MIT). The generator fetches only the images it needs with a sparse git clone. Coloring pages come from [Noto Emoji](https://github.com/googlefonts/noto-emoji) by Google (Apache 2.0), whose flat artwork is rendered large and traced into clean line art by `scripts/coloring.py` (needs a small Python environment in `.art-venv/`: `python3 -m venv .art-venv && .art-venv/bin/pip install pillow numpy scipy`).
 - **Voice:** the open-source [Kokoro](https://github.com/thewh1teagle/kokoro-onnx) text-to-speech model (Apache 2.0), voice `af_heart` at 0.85 speed. Letter sounds are generated from phonemes. The model and its Python venv live in the git-ignored `.tts/` folder (see the Relaxation Station README for setup).
-- **Sound effects:** synthesized from tones and noise in `audio-tools/generate_audio.py`.
+- **Sound effects:** interface sounds and celebration jingles from [Kenney](https://kenney.nl) (CC0), downloaded once into `.cache/kenney/`. Instruments and the gentle "try again" sound are synthesized in `audio-tools/generate_audio.py`.
+- **Picture books:** [Book Dash](https://bookdash.org) books from [github.com/bookdash/bookdash-books](https://github.com/bookdash/bookdash-books), CC BY 4.0. Each book's creators are credited at the end of the book and on the grown-ups screen. Pictures are resized with `sips`; narration is generated with the app's voice.
 
 ## Commands
 
@@ -57,4 +61,4 @@ npm test
 
 ## License
 
-Code: all rights reserved. Artwork and voice model: Apache License 2.0. Font: SIL Open Font License.
+Code: all rights reserved. Pictures: MIT (Fluent Emoji). Coloring pages and voice model: Apache License 2.0. Sound effects: CC0 (Kenney). Picture books: CC BY 4.0 (Book Dash and each book's creators). Font: SIL Open Font License.

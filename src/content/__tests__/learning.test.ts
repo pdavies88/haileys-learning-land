@@ -2,6 +2,7 @@ import { describe, expect, it } from '@jest/globals';
 
 import coloring from '../coloring.json';
 import pictures from '../pictures.json';
+import stories from '../stories.json';
 import {
   BUILDS, FRIENDS, GAMES, GAME_SECTIONS, RHYMES, SPELL_WORDS, JIGSAW_PICTURES, LETTERS, MEMORY_SETS, MISSIONS, PETS, PLACES, RECIPES, SIGHT_WORDS, SORT_FRUIT,
   SOUND_PICTURES, STICKERS, STORY_HEROES, STORY_OBJECTS, STORY_PLACES, say, spokenLines,
@@ -40,9 +41,18 @@ describe('content', () => {
     }
   });
 
-  it('has thirteen games, each with a screen and a card picture', () => {
-    expect(GAMES).toHaveLength(13);
-    expect(new Set(GAMES.map((g) => g.id)).size).toBe(13);
+  it('has fourteen games, each with a screen and a card picture', () => {
+    expect(GAMES).toHaveLength(14);
+    expect(new Set(GAMES.map((g) => g.id)).size).toBe(14);
+  });
+
+  it('credits every Story Shelf book and gives each page a picture', () => {
+    for (const story of stories) {
+      expect(story.credit).toMatch(/Book Dash/);
+      expect(story.source).toMatch(/^https:\/\/github\.com\/bookdash\//);
+      expect(story.pages.length).toBeGreaterThan(0);
+      for (const page of story.pages) expect(page.image).toMatch(/^\d\d$/);
+    }
   });
 
   it('builds each picture in Shape Quest inside its area', () => {

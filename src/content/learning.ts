@@ -413,6 +413,7 @@ export const GAMES = [
   { id: 'letters', title: 'Magic Letters', picture: 'butterfly', color: '#FF5FA2', section: 'read', skills: 'Trace letters' },
   { id: 'sight-words', title: 'Word Detective', picture: 'magnifier', color: '#3B8EF0', section: 'read', skills: 'Read, spell, rhyme' },
   { id: 'sounds', title: 'Sound Safari', picture: 'lion', color: '#F59E0B', section: 'read', skills: 'Letter sounds' },
+  { id: 'books', title: 'Story Shelf', picture: 'books', color: '#0D9488', section: 'read', skills: 'Read picture books' },
   { id: 'counting', title: 'Count & Collect', picture: 'strawberry', color: '#FF8A3D', section: 'numbers', skills: 'Count, add, take away' },
   { id: 'chef', title: 'Little Chef', picture: 'chef', color: '#F97316', section: 'numbers', skills: 'Count and follow steps' },
   { id: 'puzzles', title: 'Puzzle World', picture: 'puzzle', color: '#14B8A6', section: 'think', skills: 'Jigsaws and patterns' },
@@ -448,6 +449,9 @@ export const say = {
   addition: (a: number, b: number) => `add-${a}-${b}`,
   subtraction: (a: number, b: number) => `sub-${a}-${b}`,
   spell: (word: string) => `spell-${idOf(word)}`,
+  /** Story Shelf narration. The lines come from src/content/stories.json (see scripts/build-speech-list.mjs). */
+  bookTitle: (slug: string) => `book-${slug}-title`,
+  bookPage: (slug: string, page: number) => `book-${slug}-${page}`,
   rhyme: (word: string) => `rhyme-${idOf(word)}`,
   shapeHome: (color: string, shape: ShapeName) => `home-${color}-${shape}`,
   findShape: (shape: ShapeName) => `find-shape-${shape}`,
@@ -544,6 +548,10 @@ export const LINES = {
   questCreate: 'Make your own picture! Tap a shape, then drag it anywhere you like.',
   mirrorOn: 'Magic mirror! Draw on one side and watch the other side copy you.',
   rainbowOn: 'Rainbow magic!',
+  shelfIntro: 'Welcome to the story shelf! Pick a book, and we can read it together.',
+  readToMe: "I'll read it to you. Tap the arrow to turn the page.",
+  youRead: 'Your turn to read! Tap the speaker if you want help.',
+  theEnd: 'The end!',
 };
 
 /** Every spoken line, as id -> text. Lines starting with "/" are phonemes, not words. */
