@@ -58,14 +58,14 @@ export function SpellWord({ word, decoys, onMiss, onDone }: Props) {
     }
   };
 
-  const slot = Math.min((width - 60) / word.length - Spacing.sm, height * 0.11, 84);
-  const tile = Math.min((width - 60) / Math.min(tiles.length, 5) - Spacing.sm, height * 0.11, 84);
+  const slot = Math.min((width - 60) / word.length - Spacing.sm, height * 0.11, 124);
+  const tile = Math.min((width - 60) / Math.min(tiles.length, 5) - Spacing.sm, height * 0.11, 124);
   const nextTile = tiles.find((t) => !used.includes(t.id) && t.letter === word[typed]);
 
   return (
     <View style={styles.body}>
       <View style={styles.picture}>
-        <Pic name={word} size={Math.min(height * 0.2, 170)} />
+        <Pic name={word} size={Math.min(height * 0.22, 260)} />
       </View>
       <View style={styles.slots}>
         {[...word].map((letter, i) => (

@@ -136,7 +136,7 @@ function FreeBuild() {
         {pieces.map((piece) => (
           <View key={piece.id} style={{ position: 'absolute', left: piece.x, top: piece.y }}>
             <Draggable stayWhereDropped onPickUp={() => playSfx('pop')} onDrop={() => false}>
-              <Shape shape={piece.shape} color={piece.color} size={piece.size} />
+              <Shape shape={piece.shape} color={piece.color} size={piece.size} width={piece.shape === 'rectangle' ? piece.size * 0.55 : piece.size} />
             </Draggable>
           </View>
         ))}
@@ -154,7 +154,8 @@ function FreeBuild() {
             <View />
           </Bouncy>
         ))}
-        <View style={styles.divider} />
+      </View>
+      <View style={styles.palette}>
         {SIZES.map((s, i) => (
           <Bouncy key={s} accessibilityLabel={['Small', 'Medium', 'Big'][i]} style={[styles.paletteButton, size === i && styles.colorOn]} onPress={() => setSize(i)}>
             <View style={{ width: 12 + i * 10, height: 12 + i * 10, borderRadius: 6, backgroundColor: color }} />
@@ -283,10 +284,9 @@ const styles = StyleSheet.create({
   create: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: Spacing.md, padding: Spacing.md },
   canvas: { backgroundColor: Colors.white, borderRadius: 28, overflow: 'hidden', ...cardShadow },
   palette: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', gap: Spacing.sm },
-  paletteButton: { width: 56, height: 56, borderRadius: 18, backgroundColor: Colors.white, alignItems: 'center', justifyContent: 'center', ...cardShadow },
-  colorDot: { width: 40, height: 40, borderRadius: 20, borderWidth: 3, borderColor: Colors.white, ...cardShadow },
+  paletteButton: { width: 50, height: 50, borderRadius: 16, backgroundColor: Colors.white, alignItems: 'center', justifyContent: 'center', ...cardShadow },
+  colorDot: { width: 38, height: 38, borderRadius: 19, borderWidth: 3, borderColor: Colors.white, ...cardShadow },
   colorOn: { borderColor: Colors.text, borderWidth: 3 },
-  divider: { width: 2, height: 32, backgroundColor: 'rgba(0,0,0,0.08)', marginHorizontal: 4 },
   menu: { flex: 1, flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', alignContent: 'center', justifyContent: 'center', gap: Spacing.md, padding: Spacing.md },
   menuCard: { borderRadius: 28, alignItems: 'center', justifyContent: 'center', gap: Spacing.sm, ...cardShadow },
   bubble: { backgroundColor: 'rgba(255,255,255,0.85)', borderRadius: 999, padding: Spacing.md },

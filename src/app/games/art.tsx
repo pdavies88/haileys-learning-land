@@ -71,9 +71,8 @@ function ColoringPage({ name, width, height }: { name: string; width: number; he
   const outline = OUTLINES[name as keyof typeof OUTLINES];
   if (!outline) return null;
   if (!outlinePaths.has(name)) {
-    const path = Skia.Path.MakeFromSVGString(outline.d)!;
     // The tracer nests each line's inner edge inside its outer edge: even-odd fill leaves the gap.
-    path.setFillType(FillType.EvenOdd);
+    const path = Skia.PathBuilder.MakeFromPath(Skia.Path.MakeFromSVGString(outline.d)!).setFillType(FillType.EvenOdd).build();
     outlinePaths.set(name, path);
   }
   const fit = Math.min(width, height) * 0.92;

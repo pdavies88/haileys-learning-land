@@ -55,6 +55,27 @@ npm run typecheck
 npm test
 ```
 
+## Releasing to TestFlight
+
+Builds are made in the cloud with EAS (`eas.json`). The `production` profile increments the iOS build number on each build, tracked by EAS.
+
+First time only:
+
+```bash
+npx eas-cli@latest init                      # links the project to your Expo account (adds extra.eas.projectId to app.json)
+npx eas-cli@latest build:version:set -p ios  # only if builds were uploaded before: enter the last build number
+```
+
+Each release:
+
+```bash
+npx eas-cli@latest build --platform ios --profile production --auto-submit
+```
+
+EAS asks for your Apple ID the first time and manages the signing certificates. If the app doesn't exist in App Store Connect yet, create it with bundle ID `com.pdavies.haileyslearningland`. Then paste the "What to Test" text from `store/app-store/metadata.md`.
+
+Store listing text, privacy answers and screenshots (6.9-inch iPhone and 13-inch iPad) are in `store/app-store/`. Retake the screenshots after visible design changes.
+
 ## Website
 
 `docs/` is the GitHub Pages site with the privacy policy and support page that the app and store listings link to.
