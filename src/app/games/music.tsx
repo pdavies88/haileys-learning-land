@@ -97,7 +97,7 @@ export default function Music() {
       setListening(true);
       await wait(400);
       await celebrate(false);
-      newTune(Math.min(tune.length + 1, 7));
+      newTune(Math.min(tune.length + 1, 8));
     }
   };
 
@@ -133,7 +133,7 @@ export default function Music() {
     if (next === 'drums') speak(say.line('drumsIntro'));
     if (next === 'copy') {
       speak(say.line('copyIntro'));
-      setTimeout(() => newTune(2), 1800);
+      setTimeout(() => newTune(3), 1800);
     }
   };
 

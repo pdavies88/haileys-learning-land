@@ -5,20 +5,20 @@ A free learning app for young children, with thirteen games, built with Expo (SD
 ## Games
 
 - **Magic Letters:** trace uppercase and lowercase letters with a finger. A finished letter "comes alive" with a picture, its name and its sound.
-- **Word Detective:** find the spoken sight word among 2 to 4 cards (Dolch pre-primer, then primer words).
-- **Count & Collect:** feed animals the right number of treats, find numbers up to 20, and try simple addition.
-- **Art Studio:** crayon, marker, glitter, stamps and eraser, 10 colors, 3 sizes, undo, and 100 coloring pages in six category tabs (`src/content/coloring.json`).
-- **Flip & Find:** a memory game that grows from 3 to 8 pairs.
-- **Sound Safari:** pick the picture that starts with a letter's sound.
-- **Puzzle World:** shape sorter and 4- and 9-piece jigsaws.
+- **Word Detective:** find the spoken sight word (Dolch pre-primer, then primer words), read a word and pick its picture, spell 3- to 5-letter words from letter tiles, and find rhymes.
+- **Count & Collect:** feed animals, find numbers up to 20, fill in missing numbers, compare groups (more or fewer), and add and take away within ten.
+- **Art Studio:** crayon, marker, glitter, 20 stamps and eraser, 10 colors plus a rainbow, 3 sizes, undo, a magic mirror for symmetrical drawings, and 100 coloring pages in six category tabs (`src/content/coloring.json`).
+- **Flip & Find:** a memory game that grows from 4 to 10 pairs. Every third board matches big letters to little letters.
+- **Sound Safari:** pick the picture that starts with a letter's sound, or pick the first letter of a picture.
+- **Puzzle World:** pattern puzzles (AB, AAB, ABC and more), a shape sorter, and 4-, 9- and 16-piece jigsaws.
 - **Make a Friend:** choose a friend and a home, then decorate with stickers.
 - **Build a Story:** pick a hero, a place and a magical object, draw a picture, and hear a story built from prerecorded sentences.
 - **Little Chef:** recipes with first, next and last steps: count ingredients into a bowl, stir, bake and sort fruit by color.
-- **Shape Quest:** hunt for shapes or colors, or drag shapes into an outline to build a house, a robot or a rocket.
-- **Music Maker:** xylophone, drums, copy-a-tune, and sing-along songs (the alphabet song and counting to ten).
+- **Shape Quest:** hunt for shapes or colors, drag shapes into an outline to build a house, robot, rocket, castle or car, or make any picture in free-build Create mode.
+- **Music Maker:** xylophone, drums, copy-a-tune (3 to 8 notes), and sing-along songs (the alphabet song and counting to ten).
 - **My Little Pet:** care for a puppy, kitten, unicorn or bunny by feeding it (counting), teaching it words and drawing it toys.
 
-Every instruction is spoken aloud, and the speaker button repeats it. Wrong answers get a gentle wiggle and "Let's try again!", never a buzzer. Games move up a level after three first-try answers in a row, and ease off after two misses on one question.
+Every instruction is spoken aloud, and the speaker button repeats it. Wrong answers get a gentle wiggle and "Let's try again!", never a buzzer. Games start at a level pitched for a five-year-old, move up after two first-try answers in a row, and ease off after two misses on one question. The current level shows next to the game's title.
 
 ## How it's built
 

@@ -3,7 +3,7 @@ import { type StyleProp, type ViewStyle } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withSequence, withSpring, withTiming } from 'react-native-reanimated';
 
 import { Bouncy } from '@/components/bouncy';
-import { Colors, cardShadow } from '@/constants/theme';
+import { Colors, Radius, raised } from '@/constants/theme';
 
 type Props = {
   onPress: () => void;
@@ -48,13 +48,13 @@ export function Choice({ onPress, children, accessibilityLabel, wiggle, glow, hi
         sound={false}
         style={[
           {
-            backgroundColor: glow ? '#FFF3B0' : Colors.white,
-            borderRadius: 28,
-            borderWidth: 5,
+            backgroundColor: glow ? '#FFF6CC' : Colors.white,
+            borderRadius: Radius.lg,
+            borderWidth: 4,
             borderColor: glow ? Colors.yellow : hint ? Colors.pink : 'transparent',
             alignItems: 'center',
             justifyContent: 'center',
-            ...cardShadow,
+            ...raised(glow ? '#E8B21F' : hint ? '#E0468A' : '#E4DEF5'),
           },
           style,
         ]}>

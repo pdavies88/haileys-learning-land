@@ -18,7 +18,8 @@ type Props = {
 /** A button that squishes down when pressed and springs back: satisfying for little fingers. */
 export function Bouncy({ onPress, children, style, accessibilityLabel, sound = true, disabled }: Props) {
   const scale = useSharedValue(1);
-  const animated = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
+  // Sinks a little as well as shrinking, so raised buttons feel like they press into their edge.
+  const animated = useAnimatedStyle(() => ({ transform: [{ translateY: (1 - scale.value) * 30 }, { scale: scale.value }] }));
 
   return (
     <Pressable
@@ -26,10 +27,10 @@ export function Bouncy({ onPress, children, style, accessibilityLabel, sound = t
       accessibilityLabel={accessibilityLabel}
       disabled={disabled}
       onPressIn={() => {
-        scale.set(withSpring(0.9, { damping: 12, stiffness: 400 }));
+        scale.set(withSpring(0.93, { damping: 14, stiffness: 420 }));
       }}
       onPressOut={() => {
-        scale.set(withSpring(1, { damping: 8, stiffness: 300 }));
+        scale.set(withSpring(1, { damping: 9, stiffness: 320 }));
       }}
       onPress={() => {
         if (sound) playSfx('pop');

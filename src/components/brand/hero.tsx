@@ -13,7 +13,7 @@ import Animated, {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Pic } from '@/components/pic';
-import { Colors } from '@/constants/theme';
+import { Colors, gradient } from '@/constants/theme';
 
 const CELL = 64;
 const ICON_SIZE = 40;
@@ -27,7 +27,7 @@ const PICTURES = ['unicorn', 'rainbow', 'heart', 'star', 'butterfly', 'flower', 
 export function Hero() {
   const insets = useSafeAreaInsets();
   return (
-    <View style={[styles.hero, { height: HERO_HEIGHT + insets.top }]}>
+    <View style={[styles.hero, gradient('#FFD1E8', '#D9CCFF', 150), { height: HERO_HEIGHT + insets.top }]}>
       <View style={styles.pattern} pointerEvents="none" accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
         {Array.from({ length: ROW_COUNT }, (_, row) => (
           <PictureRow key={row} row={row} />
@@ -84,8 +84,8 @@ function PictureStrip({ row }: { row: number }) {
 }
 
 const styles = StyleSheet.create({
-  hero: { overflow: 'hidden', backgroundColor: '#FFE3F1' },
-  pattern: { position: 'absolute', top: -CELL * 1.5, left: -CELL * 3, transform: [{ rotate: '-20deg' }], opacity: 0.5 },
+  hero: { overflow: 'hidden', borderBottomLeftRadius: 40, borderBottomRightRadius: 40 },
+  pattern: { position: 'absolute', top: -CELL * 1.5, left: -CELL * 3, transform: [{ rotate: '-20deg' }], opacity: 0.4 },
   row: { flexDirection: 'row', width: ROW_WIDTH * 2 },
   strip: { flexDirection: 'row', width: ROW_WIDTH, height: CELL },
   cell: { width: CELL, height: CELL, alignItems: 'center', justifyContent: 'center' },
@@ -97,7 +97,9 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background,
     alignItems: 'center',
     justifyContent: 'center',
-    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.12)',
+    borderWidth: 6,
+    borderColor: 'rgba(255,255,255,0.7)',
+    boxShadow: '0 12px 32px rgba(91, 50, 200, 0.25)',
   },
   logo: { width: 112, height: 112 },
 });

@@ -6,11 +6,12 @@ import { speak } from '@/lib/audio';
 /**
  * Tracks a round of questions and adjusts the difficulty as she plays.
  *
- * Three right answers in a row on the first try move up a level. Two misses on one question move
- * the next question down a level. Nothing is saved: every visit starts fresh at the first level.
+ * Two right answers in a row on the first try move up a level. Two misses on one question move
+ * the next question down a level. Nothing is saved: every visit starts fresh at `start`, which is
+ * pitched for a five-year-old rather than a toddler.
  */
-export function useRound({ total, maxLevel }: { total: number; maxLevel: number }) {
-  const [level, setLevel] = useState(0);
+export function useRound({ total, maxLevel, start = 0 }: { total: number; maxLevel: number; start?: number }) {
+  const [level, setLevel] = useState(Math.min(start, maxLevel));
   const [done, setDone] = useState(0);
   const streak = useRef(0);
   const misses = useRef(0);
@@ -28,7 +29,7 @@ export function useRound({ total, maxLevel }: { total: number; maxLevel: number 
     const firstTry = misses.current === 0;
     misses.current = 0;
     streak.current = firstTry ? streak.current + 1 : 0;
-    const levelUp = streak.current >= 3 && level < maxLevel;
+    const levelUp = streak.current >= 2 && level < maxLevel;
     if (levelUp) {
       streak.current = 0;
       setLevel(level + 1);
