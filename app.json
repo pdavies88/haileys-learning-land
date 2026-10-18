@@ -67,6 +67,9 @@
         "android.permission.READ_MEDIA_VIDEO",
         "android.permission.READ_MEDIA_AUDIO",
         "android.permission.SYSTEM_ALERT_WINDOW"
+      ],
+      "permissions": [
+        "android.permission.MODIFY_AUDIO_SETTINGS"
       ]
     },
     "web": {
@@ -100,6 +103,13 @@
       "typedRoutes": true,
       "reactCompiler": true
     },
-    "backgroundColor": "#F6F3FF"
+    "backgroundColor": "#F6F3FF",
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "1d474492-9c52-4261-b905-8280dbd956f0"
+      }
+    },
+    "owner": "preston5"
   }
 }
