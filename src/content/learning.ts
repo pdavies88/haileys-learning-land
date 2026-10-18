@@ -177,10 +177,10 @@ export const COLORS: { name: string; hex: string }[] = [
 /** Jigsaw pictures for Little Puzzle World. */
 export const JIGSAW_PICTURES = ['unicorn', 'castle', 'butterfly', 'rainbow', 'lion', 'princess', 'rocket', 'turtle'];
 
-export const FRIENDS = ['princess', 'unicorn', 'kitten', 'puppy', 'dragon', 'fairy', 'bunny', 'teddy bear'];
+export const FRIENDS = ['princess', 'robot', 'unicorn', 'dinosaur', 'kitten', 'puppy', 'dragon', 'fairy', 'bunny', 'teddy bear'];
 export const STICKERS = [
   'crown', 'bow', 'glasses', 'hat', 'flower', 'star', 'butterfly', 'heart', 'rainbow', 'balloon', 'wand', 'sparkles',
-  'gem', 'lollipop',
+  'gem', 'lollipop', 'rocket', 'car', 'ball', 'guitar',
 ];
 export const PLACES = [
   { id: 'castle', name: 'castle', colors: ['#F8D7F0', '#C9B8FF'], decor: ['castle', 'sparkles', 'rainbow'] },
@@ -203,6 +203,8 @@ export const STORY_HEROES = [
   { id: 'fairy', name: 'Twinkle', intro: 'a tiny fairy named Twinkle' },
   { id: 'bunny', name: 'Hoppy', intro: 'a fluffy bunny named Hoppy' },
   { id: 'teddy bear', name: 'Teddy', intro: 'a cuddly teddy bear named Teddy' },
+  { id: 'robot', name: 'Bolt', intro: 'a helpful robot named Bolt' },
+  { id: 'dinosaur', name: 'Rex', intro: 'a gentle dinosaur named Rex' },
 ];
 
 /** Where a story can happen: matches PLACES, with words for the story. */
@@ -408,7 +410,7 @@ export const GAME_SECTIONS = [
 export const GAMES = [
   { id: 'art', title: 'Art Studio', picture: 'paint', color: '#8B5CF6', section: 'create', skills: 'Draw, color, mirror' },
   { id: 'story', title: 'Build a Story', picture: 'book', color: '#6366F1', section: 'create', skills: 'Imagine and tell' },
-  { id: 'friends', title: 'Make a Friend', picture: 'princess', color: '#F43F8E', section: 'create', skills: 'Dress up and decorate' },
+  { id: 'friends', title: 'Make a Friend', picture: 'teddy bear', color: '#F43F8E', section: 'create', skills: 'Dress up and decorate' },
   { id: 'music', title: 'Music Maker', picture: 'piano', color: '#EC4899', section: 'create', skills: 'Play and remember tunes' },
   { id: 'letters', title: 'Magic Letters', picture: 'butterfly', color: '#FF5FA2', section: 'read', skills: 'Trace letters' },
   { id: 'sight-words', title: 'Word Detective', picture: 'magnifier', color: '#3B8EF0', section: 'read', skills: 'Read, spell, rhyme' },

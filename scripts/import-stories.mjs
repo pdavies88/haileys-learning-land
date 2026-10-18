@@ -20,11 +20,16 @@ const cacheDir = join(root, '.cache', 'bookdash');
 const outDir = join(root, 'assets', 'stories');
 const storiesFile = join(root, 'src', 'content', 'stories.json');
 
-// Short books with simple sentences, about 60 to 220 words each: right for a five-year-old.
+// Book Dash books whose pictures are in the repository, shortest first: from about 60 words for
+// reading alone up to about 420 for "Read to me". A few books in the repository have no page
+// pictures (such as What is it? and Hippo Wants to Dance), so they can't be included.
 const BOOKS = [
-  'come-back-cat', 'what-is-it', 'how-about-you', 'sbus-special-shoes', 'shongololos-shoes', 'bathtub-safari',
-  'a-house-for-mouse', 'who-is-our-friend', 'is-there-anyone-like-me', 'i-will-help-you', 'a-beautiful-day',
-  'little-sock', 'whose-button-is-this', 'hippo-wants-to-dance', 'sleepy-mr-sloth', 'lara-the-yellow-ladybird',
+  'come-back-cat', 'sbus-special-shoes', 'how-about-you', 'bathtub-safari', 'a-house-for-mouse',
+  'is-there-anyone-like-me', 'i-will-help-you', 'a-beautiful-day', 'rafikis-style', 'whose-button-is-this', 'what-if',
+  'grandpas-gold', 'karabos-question', 'little-ants-big-plan', 'lara-the-yellow-ladybird', 'thatos-birthday-surprise',
+  'londi-the-dreaming-girl', 'walking-together', 'why-is-nita-upside-down', 'sleepy-mr-sloth', 'lory-dory',
+  'sima-and-siza', 'there-must-be-a-rainbow', 'amazing-daisy', 'tortoise-finds-his-home', 'sindiwe-and-the-fireflies',
+  'a-tiny-seed', 'a-dancers-tale',
 ];
 
 const lineId = (slug, page) => `book-${slug}-${page}`;

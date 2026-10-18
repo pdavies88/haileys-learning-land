@@ -12,7 +12,7 @@ import { Colors, Radius, Spacing, gradient, raised, shade } from '@/constants/th
 import { GAMES, GAME_SECTIONS, say } from '@/content/learning';
 import { speak } from '@/lib/audio';
 
-// Say hello once each time the app opens, not every time she comes back to this screen.
+// Say hello once each time the app opens, not every time the child comes back to this screen.
 let welcomed = false;
 
 export default function Home() {
@@ -53,7 +53,7 @@ export default function Home() {
         <View style={[styles.content, { paddingHorizontal: sidePadding }]}>
           <View style={[styles.heading, { width: contentWidth }]}>
             <Txt size={width >= 600 ? 40 : 32} weight="heavy" color={Colors.text}>
-              Hi Hailey!
+              Hi there!
             </Txt>
             <Txt size={18} weight="regular" color={Colors.textSoft}>
               What shall we make, read or solve today?

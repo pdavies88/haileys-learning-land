@@ -21,13 +21,13 @@ const ICONS_PER_ROW = 10;
 const ROW_WIDTH = CELL * ICONS_PER_ROW;
 const ROW_COUNT = 7;
 export const HERO_HEIGHT = 250;
-const PICTURES = ['unicorn', 'rainbow', 'heart', 'star', 'butterfly', 'flower', 'crown', 'balloon', 'cupcake', 'sparkles', 'gem', 'lollipop'];
+const PICTURES = ['rocket', 'rainbow', 'dinosaur', 'star', 'butterfly', 'ball', 'unicorn', 'robot', 'balloon', 'car', 'sparkles', 'turtle'];
 
 /** The top of the home screen: friendly pictures drifting by behind the app icon. */
 export function Hero() {
   const insets = useSafeAreaInsets();
   return (
-    <View style={[styles.hero, gradient('#FFD1E8', '#D9CCFF', 150), { height: HERO_HEIGHT + insets.top }]}>
+    <View style={[styles.hero, gradient('#C9EBFF', '#DCD2FF', 150), { height: HERO_HEIGHT + insets.top }]}>
       <View style={styles.pattern} pointerEvents="none" accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
         {Array.from({ length: ROW_COUNT }, (_, row) => (
           <PictureRow key={row} row={row} />

@@ -79,87 +79,6 @@
     ]
   },
   {
-    "slug": "how-about-you",
-    "title": "How About You?",
-    "description": "You don’t need to be alike to be friends. When two very different children meet an unusual creature, it’s a chance to ask, How About You?",
-    "credit": "Renate van Rensburg, Margot Bertelsmann, Ronèll Botes. Published by Book Dash, 2015.",
-    "source": "https://github.com/bookdash/bookdash-books/tree/gh-pages/how-about-you",
-    "pages": [
-      {
-        "image": "01",
-        "alt": "A girl wearing dungarees and a cap and a boy wearing a tutu and playing a guitar stand in a puddle.",
-        "text": "Who are you?",
-        "seconds": 0.88
-      },
-      {
-        "image": "02",
-        "alt": "A monster dripping goo looks in their direction.",
-        "text": "Is that goo? Eeuw! I want some too.",
-        "seconds": 2.47
-      },
-      {
-        "image": "03",
-        "alt": "A block with the number 2 stands in the puddle. The number 632 is written in goo.",
-        "text": "We are two. How old are you? Six hundred and thirty two?",
-        "seconds": 3.61
-      },
-      {
-        "image": "04",
-        "alt": "The girl wears blue. The boy wears red shoes.",
-        "text": "I like blue. Do you too? I choose two shoes. Which do you choose?",
-        "seconds": 3.85
-      },
-      {
-        "image": "05",
-        "alt": "The monster has horseshoes for eyes.",
-        "text": "Horseshoes!?",
-        "seconds": 0.95
-      },
-      {
-        "image": "06",
-        "alt": "A ball, a toy car and some marbles lie in a puddle.",
-        "text": "I make toys with boys.",
-        "seconds": 1.5
-      },
-      {
-        "image": "07",
-        "alt": "The boy and the monster shout.",
-        "text": "We make lots of noise. Whaaa! eurgghhh...aargh!",
-        "seconds": 3.1
-      },
-      {
-        "image": "08",
-        "alt": "The girl sleeps on a woman's back.",
-        "text": "I take a nap on Gogo’s back.",
-        "seconds": 1.89
-      },
-      {
-        "image": "09",
-        "alt": "The boy sits in the puddle, wide awake.",
-        "text": "I don’t nap!",
-        "seconds": 0.88
-      },
-      {
-        "image": "10",
-        "alt": "The moon and the sun shine.",
-        "text": "I stay upright all through the night.",
-        "seconds": 1.98
-      },
-      {
-        "image": "11",
-        "alt": "Someone kicks a ball into the monster's goo.",
-        "text": "The ball goes THWOCK! Buddy, you ROCK!",
-        "seconds": 2.31
-      },
-      {
-        "image": "12",
-        "alt": "The monster and the children hold hands.",
-        "text": "That’s what we do. How about you?",
-        "seconds": 2.06
-      }
-    ]
-  },
-  {
     "slug": "sbus-special-shoes",
     "title": "Sbu's Special Shoes",
     "description": "Sbu’s little brother finds Sbu’s favourite shoes. When he tries them on, he discovers something very special about them.",
@@ -237,6 +156,87 @@
         "alt": "The chicken tries the shoes on!",
         "text": "See what you can do in Sbu’s special shoes.",
         "seconds": 2.57
+      }
+    ]
+  },
+  {
+    "slug": "how-about-you",
+    "title": "How About You?",
+    "description": "You don’t need to be alike to be friends. When two very different children meet an unusual creature, it’s a chance to ask, How About You?",
+    "credit": "Renate van Rensburg, Margot Bertelsmann, Ronèll Botes. Published by Book Dash, 2015.",
+    "source": "https://github.com/bookdash/bookdash-books/tree/gh-pages/how-about-you",
+    "pages": [
+      {
+        "image": "01",
+        "alt": "A girl wearing dungarees and a cap and a boy wearing a tutu and playing a guitar stand in a puddle.",
+        "text": "Who are you?",
+        "seconds": 0.88
+      },
+      {
+        "image": "02",
+        "alt": "A monster dripping goo looks in their direction.",
+        "text": "Is that goo? Eeuw! I want some too.",
+        "seconds": 2.47
+      },
+      {
+        "image": "03",
+        "alt": "A block with the number 2 stands in the puddle. The number 632 is written in goo.",
+        "text": "We are two. How old are you? Six hundred and thirty two?",
+        "seconds": 3.61
+      },
+      {
+        "image": "04",
+        "alt": "The girl wears blue. The boy wears red shoes.",
+        "text": "I like blue. Do you too? I choose two shoes. Which do you choose?",
+        "seconds": 3.85
+      },
+      {
+        "image": "05",
+        "alt": "The monster has horseshoes for eyes.",
+        "text": "Horseshoes!?",
+        "seconds": 0.95
+      },
+      {
+        "image": "06",
+        "alt": "A ball, a toy car and some marbles lie in a puddle.",
+        "text": "I make toys with boys.",
+        "seconds": 1.5
+      },
+      {
+        "image": "07",
+        "alt": "The boy and the monster shout.",
+        "text": "We make lots of noise. Whaaa! eurgghhh...aargh!",
+        "seconds": 3.1
+      },
+      {
+        "image": "08",
+        "alt": "The girl sleeps on a woman's back.",
+        "text": "I take a nap on Gogo’s back.",
+        "seconds": 1.89
+      },
+      {
+        "image": "09",
+        "alt": "The boy sits in the puddle, wide awake.",
+        "text": "I don’t nap!",
+        "seconds": 0.88
+      },
+      {
+        "image": "10",
+        "alt": "The moon and the sun shine.",
+        "text": "I stay upright all through the night.",
+        "seconds": 1.98
+      },
+      {
+        "image": "11",
+        "alt": "Someone kicks a ball into the monster's goo.",
+        "text": "The ball goes THWOCK! Buddy, you ROCK!",
+        "seconds": 2.31
+      },
+      {
+        "image": "12",
+        "alt": "The monster and the children hold hands.",
+        "text": "That’s what we do. How about you?",
+        "seconds": 2.06
       }
     ]
   },
@@ -642,6 +642,87 @@
     ]
   },
   {
+    "slug": "rafikis-style",
+    "title": "Rafiki's Style",
+    "description": "Rafiki’s style is all his own, but when the Cool Cat Crew struts by, he starts to wonder if it’s good enough.",
+    "credit": "Louis Greenberg, Audrey Anderson, Wesley Thompson. Published by Book Dash, 2015.",
+    "source": "https://github.com/bookdash/bookdash-books/tree/gh-pages/rafikis-style",
+    "pages": [
+      {
+        "image": "01",
+        "alt": "Rafiki watches soccer on TV with his aunt and uncle. The soccer player wears a red and yellow soccer shirt. His hair is stripey like a zebra.",
+        "text": "On Sunday, Jimmy Zogba scored the winning goal.",
+        "seconds": 2.91
+      },
+      {
+        "image": "02",
+        "alt": "Rafiki wears his usual white shirt. The Cool Cat Crew wear red and yellow soccer shirts and zebra hairstyles.",
+        "text": "On Monday, the Cool Cat Crew strutted by.",
+        "seconds": 2.59
+      },
+      {
+        "image": "03",
+        "alt": "One of the Cool Cat Crew points to his zebra hair. Rafiki looks glum.",
+        "text": "“Hey, Rafiki, where’s your zebra hair? Your hair’s so plain, like you don’t care.”",
+        "seconds": 4.58
+      },
+      {
+        "image": "04",
+        "alt": "Another member of the Cool Cat Crew shows Rafiki the fake tatoo of a soccer ball on his arm.",
+        "text": "“Hey, Rafiki, where’s your fake tattoo? Your skin’s so boring. You are too.”",
+        "seconds": 4.52
+      },
+      {
+        "image": "05",
+        "alt": "The third member of the gang points to his gold teeth. Rafiki touches his own teeth.",
+        "text": "“Hey, Rafiki, where’s your bling? Your teeth are wonky, that’s the thing.”",
+        "seconds": 4.06
+      },
+      {
+        "image": "06",
+        "alt": "Rafiki walks on the pavement, head hung low.",
+        "text": "That day, Rafiki walked home slowly.",
+        "seconds": 2.32
+      },
+      {
+        "image": "07",
+        "alt": "Rafiki's aunt prepares to cut his hair.",
+        "text": "“Auntie, can I have zebra hair?” “I can’t cut you zebra hair. Actually, I wouldn’t dare.”",
+        "seconds": 5.53
+      },
+      {
+        "image": "08",
+        "alt": "Rafiki's sister sits and draws. Rafiki asks her to draw him a tattoo.",
+        "text": "“My skin’s so boring, Sisi. Can you make a fake tattoo?” “You don’t need one to look like you.”",
+        "seconds": 5.78
+      },
+      {
+        "image": "09",
+        "alt": "Rafiki talks to his uncle while his uncle fixes a car.",
+        "text": "“Mkhulu, I wish I had some bling.”“Bling, my child, don’t mean a thing.”",
+        "seconds": 4.38
+      },
+      {
+        "image": "10",
+        "alt": "Rafiki watches soccer on TV with his aunt and uncle. The soccer player wears a white shirt and his hair is shaved like Rafiki's.",
+        "text": "The next weekend, Santi Ramires scored the winning goal.",
+        "seconds": 3.45
+      },
+      {
+        "image": "11",
+        "alt": "Rafiki wears his usual white shirt. The Cool Cat Crew wear white soccer shirts. Their hair is now shaved.",
+        "text": "On Monday, the Cool Cat Crew strutted by. “Hey, Rafiki! Looking fine!”",
+        "seconds": 4.78
+      },
+      {
+        "image": "12",
+        "alt": "Rafiki stands with his aunt and uncle and sister. He shrugs.",
+        "text": "Rafiki shrugged. “I look like me; this style is mine.”",
+        "seconds": 3.41
+      }
+    ]
+  },
+  {
     "slug": "whose-button-is-this",
     "title": "Whose button is this?",
     "description": "Tinny Tim sets out on an adventure to return a lost button. Along the way he goes exploring, has a miraculous escape, and makes new friends.",
@@ -729,83 +810,326 @@
     ]
   },
   {
-    "slug": "sleepy-mr-sloth",
-    "title": "Sleepy Mr Sloth",
-    "description": "He’s quite good at climbing. He knows how to swing. But sleeping’s his favourite, favourite thing!",
-    "credit": "Graham Paterson, Paul Kennedy, Nick Mulgrew. Published by Book Dash, 2014.",
-    "source": "https://github.com/bookdash/bookdash-books/tree/gh-pages/sleepy-mr-sloth",
+    "slug": "what-if",
+    "title": "What if",
+    "description": "Nandi is wondering all sorts of strange things about the world. And it begins with a simple question: What if…?",
+    "credit": "Julie Ann Smith-Belton, MaryAn Hampton, Cristy Zinn. Published by Book Dash, 2015.",
+    "source": "https://github.com/bookdash/bookdash-books/tree/gh-pages/what-if",
     "pages": [
       {
         "image": "01",
-        "alt": "Mr Sloth is sleepy and yawning.",
-        "text": "One day, Mr Sloth came to visit. He said: I’m sleepy! I need a good branch for a bed!",
-        "seconds": 6.01
+        "alt": "A little girl sits outside on the steps of her house. She is dreaming.",
+        "text": "Nandi sat on the blue steps of her house.",
+        "seconds": 2.43
       },
       {
         "image": "02",
-        "alt": "Mr Sloth starts climbing the tree.",
-        "text": "I’m quite good at climbing. I know how to swing. But sleeping’s my favourite, favourite thing!",
-        "seconds": 5.56
+        "alt": "There are dream bubbles, birds and coloured shapes all over.",
+        "text": "She was wondering...",
+        "seconds": 1.15
       },
       {
         "image": "03",
-        "alt": "Mr Sloth spots a branch. Is that a big ear nearby?",
-        "text": "This branch looks lovely! I think I’ll sleep here. And you? Don’t you think that’s a splendid idea?",
-        "seconds": 5.92
+        "alt": "Nandi jumps high above her house.",
+        "text": "What if jelly beans made you jump really high? You could get to school in one big leap!",
+        "seconds": 5.17
       },
       {
         "image": "04",
-        "alt": "A giraffe bites Mr Sloth by mistake!",
-        "text": "Oh no, Mr Sloth! A giraffe’s eating there! He might think you’re lunch and start nibbling your hair!",
-        "seconds": 5.88
+        "alt": "Nandi talks to two chickens and a goat.",
+        "text": "What if goats and chickens could talk? Would they tell good jokes?",
+        "seconds": 3.67
       },
       {
         "image": "05",
-        "alt": "Mr Sloth spots a branch. There are a few bees flying around.",
-        "text": "This branch looks lovely! I think I’ll sleep here. And you? Don’t you think that’s a splendid idea?",
-        "seconds": 5.92
+        "alt": "Nandi blasts off in a rocket ship.",
+        "text": "What if houses were rocket ships? Your family could go on holidays to the moon!",
+        "seconds": 4.65
       },
       {
         "image": "06",
-        "alt": "Bees fly out of a beehive around Mr Sloth!",
-        "text": "Oh no, Mr Sloth! There’s a beehive right there! You’ll never get sleep with those bees everywhere!",
-        "seconds": 5.78
+        "alt": "Nandi sits at the table holding a knife and fork. There is a hamburger on the table.",
+        "text": "What if no one had to cook? What if supper just arrived on the table? (And it was always your favourite.)",
+        "seconds": 6.02
       },
       {
         "image": "07",
-        "alt": "Mr Sloth spots a branch. There is a tail nearby.",
-        "text": "This branch looks lovely! I think I’ll sleep here. And you? Don’t you think that’s a splendid idea?",
-        "seconds": 5.92
+        "alt": "Nandi eats an ice lolly.",
+        "text": "What if ice-lollies never melted? They could last all summer.",
+        "seconds": 3.66
       },
       {
         "image": "08",
-        "alt": "Mr Sloth grabs snake by mistake!",
-        "text": "Oh no, Mr Sloth, that’s a snake over there! Not a branch! Poor old snake. You gave him quite a scare.",
-        "seconds": 6.49
+        "alt": "Tigers, elephants, books and their characters swirl around Nandi's head.",
+        "text": "What if the pictures in books flew around your head when Dad read to you?",
+        "seconds": 3.97
       },
       {
         "image": "09",
-        "alt": "Mr Sloth spots a branch. There are feet nearby.",
-        "text": "This branch looks lovely! I think I’ll sleep here. And you? Don’t you think that’s a splendid idea?",
-        "seconds": 5.92
+        "alt": "Nandi wears pink gum boots and runs very fast.",
+        "text": "What if my pink gumboots were magical? I could run faster than my big brother!",
+        "seconds": 4.75
       },
       {
         "image": "10",
-        "alt": "A hadeda is squawking loudly there!",
-        "text": "Oh no, Mr Sloth! There’s a bird squawking there! You’ll never get sleep with that noise in the air!",
-        "seconds": 5.88
+        "alt": "Nandi squeezes her eyes shut.",
+        "text": "What if you squeezed your eyes shut and...",
+        "seconds": 2.07
       },
       {
         "image": "11",
-        "alt": "Mr Sloth climbs to the top of the tree and smiles.",
-        "text": "Try climb one more branch, Mr Sloth! they all said. And that branch was just the right one for his bed.",
-        "seconds": 6.69
+        "alt": "Nandi sits outside on the steps of her house. She is still dreaming. Her brother stands behind her.",
+        "text": "“Nandi, what are you doing?” asked Nandi’s big brother. Nandi sat back on the step with a big smile on her face.",
+        "seconds": 7.14
       },
       {
         "image": "12",
-        "alt": "Mr Sloth and the animals are all sleeping nicely in the tree together.",
-        "text": "The bird and the snake, the giraffe and each bee were happy to have Mr Sloth in their tree.",
-        "seconds": 5.48
+        "alt": "Nandi smiles.",
+        "text": "“Just wondering,” she said.",
+        "seconds": 1.81
+      }
+    ]
+  },
+  {
+    "slug": "grandpas-gold",
+    "title": "Grandpa's Gold",
+    "description": "The children are talking about their grandpas. Giraffe’s grandpa can build a skyscraper. Elephant’s grandpa can cook a massive feast. But whose grandpa will give the children the biggest surprise?",
+    "credit": "Kerry Saadien-Raad, Elsabé Milandri, Mathilde de Blois. Published by Book Dash, 2014.",
+    "source": "https://github.com/bookdash/bookdash-books/tree/gh-pages/grandpas-gold",
+    "pages": [
+      {
+        "image": "01",
+        "alt": "Elephant, Giraffe, Mountain Goat, Cheetah and Monkey are discussing their grandpas.",
+        "text": "The children were talking about their Grandpas.",
+        "seconds": 2.51
+      },
+      {
+        "image": "02",
+        "alt": "Grandpa Giraffe builds a tower of bricks that touches the clouds.",
+        "text": "My Grandpa can build a tower to the sky, said Giraffe. Once he built a skyscraper for a king.",
+        "seconds": 6.32
+      },
+      {
+        "image": "03",
+        "alt": "Grandpa Cheetah holds a fishing rod. He stands next to a whale in a bath.",
+        "text": "My Grandpa can fish for anything in the sea, said Cheetah. Once he caught a whale and kept it in his bath.",
+        "seconds": 6.74
+      },
+      {
+        "image": "04",
+        "alt": "Grandpa Mountain Goat proudly stands at the peak of a mountain.",
+        "text": "My Grandpa can climb to the clouds in the sky, said Mountain Goat. He climbed the tallest mountain in the world, in just four hours.",
+        "seconds": 8.78
+      },
+      {
+        "image": "05",
+        "alt": "Grandpa Elephant wears a chef's cap. He holds a plate of jelly, a whisk, a tea towel and a tower of cakes. Colourful balloons float all around him.",
+        "text": "My Grandpa can cook a feast, said Elephant. Once he cooked a meal for a president’s birthday party. All by himself.",
+        "seconds": 7.74
+      },
+      {
+        "image": "06",
+        "alt": "Monkey points to his teeth and tells his friends about his Grandpa.",
+        "text": "Well my Grandpa doesn’t build or fish or climb or cook, said Monkey. But he owns gold! He hides it in his mouth. And at night he soaks it in a glass of water.",
+        "seconds": 11.51
+      },
+      {
+        "image": "07",
+        "alt": "The animals fight.",
+        "text": "No, he doesn’t! Yes, he does! No, he doesn’t! Well, come and see if you don’t believe me, said Monkey.",
+        "seconds": 6.7
+      },
+      {
+        "image": "08",
+        "alt": "The children follow Monkey to go and find his Grandpa.",
+        "text": "So the children went to see Monkey’s Grandpa.",
+        "seconds": 2.45
+      },
+      {
+        "image": "09",
+        "alt": "Monkey's Grandpa sits in an armchair. Some of his teeth are gold.",
+        "text": "You see? said Monkey. And he can take them out.",
+        "seconds": 2.89
+      },
+      {
+        "image": "10",
+        "alt": "The childen crowd around Grandpa Monkey.",
+        "text": "No, he can’t! cried the animals.",
+        "seconds": 2.09
+      },
+      {
+        "image": "11",
+        "alt": "Grandpa, tongue hanging out his mouth, holds his false teeth up in the air.",
+        "text": "Waaah! said Grandpa Monkey. And there are enough ...",
+        "seconds": 2.93
+      },
+      {
+        "image": "12",
+        "alt": "The children all smile... with gold teeth in their mouths.",
+        "text": "... for everyone!",
+        "seconds": 1.08
+      }
+    ]
+  },
+  {
+    "slug": "karabos-question",
+    "title": "Karabo's Question",
+    "description": "Little Karabo watches all the grown-ups in her family, and wonders, ‘What do I do? What do I know?’",
+    "credit": "Leisl Jobson, Natalie Propa, Marike Beyleveld. Published by Book Dash, 2015.",
+    "source": "https://github.com/bookdash/bookdash-books/tree/gh-pages/karabos-question",
+    "pages": [
+      {
+        "image": "01",
+        "alt": "Kifue runs after a rooster.",
+        "text": "My sister Kifue chases roosters that crow. What do I do? What do I know?",
+        "seconds": 4.96
+      },
+      {
+        "image": "02",
+        "alt": "Katleho throws a ball in the yard.",
+        "text": "My brother Katleho has a ball to throw. What do I do? What do I know?",
+        "seconds": 4.43
+      },
+      {
+        "image": "03",
+        "alt": "A boy kneels on the ground. He holds a trowel.",
+        "text": "My cousin Kutloano plants seeds in a row. What do I do? What do I know?",
+        "seconds": 4.83
+      },
+      {
+        "image": "04",
+        "alt": "A girl stands on one leg and leans on her hoe.",
+        "text": "My cousin Kamohelo leans on her hoe. What do I do? What do I know?",
+        "seconds": 4.58
+      },
+      {
+        "image": "05",
+        "alt": "An old woman sits outside a hut and sews.",
+        "text": "My aunt Keromang has a dress to sew. What do I do? What do I know?",
+        "seconds": 4.22
+      },
+      {
+        "image": "06",
+        "alt": "A man walks with a cow. He holds a stick.",
+        "text": "My uncle Khotso herds the cattle that low. What do I do? What do I know?",
+        "seconds": 4.66
+      },
+      {
+        "image": "07",
+        "alt": "Mama dries wheat on the ground.",
+        "text": "Mama dries wheat when the wind does not blow. What do I do? What do I know?",
+        "seconds": 4.96
+      },
+      {
+        "image": "08",
+        "alt": "Papa rides his horse.",
+        "text": "Papa rides a horse over mountains in snow. What do I do? What do I know?",
+        "seconds": 4.95
+      },
+      {
+        "image": "09",
+        "alt": "Grandpa smokes a pipe and walks with his donkey.",
+        "text": "Grandpa’s slow donkey walks to and fro. What do I do? What do I know?",
+        "seconds": 4.74
+      },
+      {
+        "image": "10",
+        "alt": "Grandma sits by a fire and sings.",
+        "text": "Grandma sings songs till the fire burns low. What do I do? What do I know?",
+        "seconds": 5.08
+      },
+      {
+        "image": "11",
+        "alt": "A small child looks confused.",
+        "text": "You know how to say yes. You know how to say no. That’s what you do! That’s what you know!",
+        "seconds": 5.11
+      },
+      {
+        "image": "12",
+        "alt": "The small child dances. The rest of the family clap their hands!",
+        "text": "Everyone laughs when you put on a show. Your work is to play. Your work is to grow.",
+        "seconds": 5.05
+      }
+    ]
+  },
+  {
+    "slug": "little-ants-big-plan",
+    "title": "Little Ant's Big Plan",
+    "description": "This is a story about a little ant with a big plan, and how his love for reading saved the day.",
+    "credit": "Candice Dingwall, Steven McKimmie and Telri Stoop. Published by Book Dash, 2015.",
+    "source": "https://github.com/bookdash/bookdash-books/tree/gh-pages/little-ants-big-plan",
+    "pages": [
+      {
+        "image": "01",
+        "alt": "Little Ant wears glasses and sits on top of a book. The other ants hold items of food.",
+        "text": "Little Ant loved to read. Little Ant was often teased. “Ants don’t read. Ants must feed. Ants collect the food they need.”",
+        "seconds": 8.6
+      },
+      {
+        "image": "02",
+        "alt": "A boy lies on a picnic blanket reading a book. The ants carry away his picnic food.",
+        "text": "Little Ant would read all day, he’d read and read the day away. The other ants took what they found to store for winter underground.",
+        "seconds": 8.31
+      },
+      {
+        "image": "03",
+        "alt": "Inside his ant heap, Little Ant's Mum and Dad scold him about reading books all the time. His little sister watches with interest.",
+        "text": "His mum and dad got really mad, and Little Ant felt really bad.",
+        "seconds": 4.09
+      },
+      {
+        "image": "04",
+        "alt": "The trees are bare and autum leaves are all around. The ants look under the leaves and collect a discarded apple core.",
+        "text": "In autumn when the leaves fall down, the ants must keep food underground.",
+        "seconds": 4.26
+      },
+      {
+        "image": "05",
+        "alt": "The Queen addresses the ants.",
+        "text": "The Queen wants food to fill the store, so all the ants must work some more.",
+        "seconds": 4.28
+      },
+      {
+        "image": "06",
+        "alt": "Little Ant's thought bubble shows a hamburger and a restaurant table.",
+        "text": "Little Ant begins to shout about a place he read about. “A restaurant is what we need, a place where people go to feed. It says so in the books I read.”",
+        "seconds": 9.49
+      },
+      {
+        "image": "07",
+        "alt": "The ants march through the day and into the night.",
+        "text": "The ants go marching one by one. They march into the setting sun.",
+        "seconds": 4.12
+      },
+      {
+        "image": "08",
+        "alt": "Little Ant reaches a burger restaurant with tables inside and out.",
+        "text": "And Little Ant said “Hey, there’s one!”",
+        "seconds": 2.22
+      },
+      {
+        "image": "09",
+        "alt": "The ants carry hot dogs, burgers and chicken drumsticks through the day and into the night.",
+        "text": "The ants go marching one by one, carrying a burger, carrying a bun.",
+        "seconds": 4.49
+      },
+      {
+        "image": "10",
+        "alt": "The Queen shakes Little Ant's hand. The rest of the ants cheer.",
+        "text": "When they return the Queen is glad. The stores are full. They cheer like mad.",
+        "seconds": 4.64
+      },
+      {
+        "image": "11",
+        "alt": "Inside his ant heap, Little Ant's Mum and Dad hug Little Ant. His little sister beams happily.",
+        "text": "Ant gets hugs from mum and dad.",
+        "seconds": 1.93
+      },
+      {
+        "image": "12",
+        "alt": "The boy is reading a book. Little Ant and his little sister hold hands on top of the boy's shoulder.",
+        "text": "His baby sister takes his hand “Now I think I understand.” “The way you love to read a book ... Makes me want to take a look.”",
+        "seconds": 7.86
       }
     ]
   },
@@ -887,6 +1211,1058 @@
         "alt": "Lara holds a paintbrush. Her wings are painted with colourful dots and stars and stripes.",
         "text": "To try a bit of purple ... or something nice. But not for ever and just for fun.",
         "seconds": 5.32
+      }
+    ]
+  },
+  {
+    "slug": "thatos-birthday-surprise",
+    "title": "Thato's Birthday Surprise",
+    "description": "It is one week until Thato’s Birthday. His mama tells him he will have a big surprise. What will it be?",
+    "credit": "Jodi Houareau, Brad Cuzen, Corinne Lamoral-Rosmarin. Published by Book Dash, 2015.",
+    "source": "https://github.com/bookdash/bookdash-books/tree/gh-pages/thatos-birthday-surprise",
+    "pages": [
+      {
+        "image": "01",
+        "alt": "Thato points to the calendar on his bedroom wall.",
+        "text": "It is one week until Thato’s birthday. That’s seven whole days!",
+        "seconds": 4.16
+      },
+      {
+        "image": "02",
+        "alt": "Thato eats his breakfast. Mama says he will get a big surprise for his birthday.",
+        "text": "His mama says: “Your birthday present will be a BIG surprise!” Thato wonders: what will it be?",
+        "seconds": 6.48
+      },
+      {
+        "image": "03",
+        "alt": "Thato flies in the sky. He has wings strapped to his arms.",
+        "text": "On Monday Thato thinks: Maybe I will get giant wings so I can fly high in the sky like a bird...”",
+        "seconds": 6.59
+      },
+      {
+        "image": "04",
+        "alt": "The house next door is a giant cake!",
+        "text": "On Tuesday Thato thinks: “Maybe I will have a birthday cake as big as a house!”",
+        "seconds": 4.9
+      },
+      {
+        "image": "05",
+        "alt": "Thato flies in a rocket through space.",
+        "text": "On Wednesday Thato thinks: “Maybe I will get a rocket ship to whizz up to the moon.",
+        "seconds": 5.02
+      },
+      {
+        "image": "06",
+        "alt": "Thato wears goggles and flippers. He swims under the ocean.",
+        "text": "On Thursday Thato thinks: “Maybe I will get fins so I can swim under the water like a fish.”",
+        "seconds": 5.8
+      },
+      {
+        "image": "07",
+        "alt": "Thato is on a soccer field. He holds a trophy high in the air.",
+        "text": "On Friday Thato thinks: “Maybe I will get magic soccer boots and score a thousand goals!”",
+        "seconds": 5.68
+      },
+      {
+        "image": "08",
+        "alt": "Thato wears a crown. He opens a box which sparkles with jewels.",
+        "text": "On Saturday Thato thinks: “Maybe I will get a key that opens a box filled with treasure!”",
+        "seconds": 5.28
+      },
+      {
+        "image": "09",
+        "alt": "Mama opens the door for Thato.",
+        "text": "On Sunday it is Thato’s birthday. Mama smiles and says: “Come and see your surprise!”",
+        "seconds": 5.85
+      },
+      {
+        "image": "10",
+        "alt": "Thato's brother gets out of a taxi. He carries his luggage.",
+        "text": "It is the best present ever. Thato’s big brother Kudzai has come to visit all the way from the big city!",
+        "seconds": 6.73
+      },
+      {
+        "image": "11",
+        "alt": "Thato's brother picks Thato up and hugs him.",
+        "text": "Thato smiles and smiles and his big brother lifts him up in the air and hugs him. Kudzai asks:“What do you want to do for your birthday, little brother?”",
+        "seconds": 9.47
+      },
+      {
+        "image": "12",
+        "alt": "Thato thinks of his wings, his cake, flying through space, swimming, playing soccer and hunting for treasure.",
+        "text": "And Thato knows exactly what they will do the whole day long.",
+        "seconds": 3.67
+      }
+    ]
+  },
+  {
+    "slug": "londi-the-dreaming-girl",
+    "title": "Londi the dreaming girl",
+    "description": "Londi loves to dream all day. But where will her dreams take her? ",
+    "credit": "Lauren Holliday, Nathalie Koenig. Published by Book Dash, 2015.",
+    "source": "https://github.com/bookdash/bookdash-books/tree/gh-pages/londi-the-dreaming-girl",
+    "pages": [
+      {
+        "image": "01",
+        "alt": "Londi stands on the grass looking up at the clouds.",
+        "text": "Londi was a dreaming girl. Up in the sky, she didn’t see clouds.",
+        "seconds": 4.04
+      },
+      {
+        "image": "02",
+        "alt": "The clouds are shaped like geese and fish and sheep.",
+        "text": "Instead Londi saw flying geese, jumping fish, and fluffy sheep running home.",
+        "seconds": 5.06
+      },
+      {
+        "image": "03",
+        "alt": "Londi lies on the grass. Gogo comes outside.",
+        "text": "One afternoon, Gogo came outside, looking tired. “Londi, stop dreaming!” she said. “It’s time to go and fetch the water.”",
+        "seconds": 8.5
+      },
+      {
+        "image": "04",
+        "alt": "Londi's feet are on the grass.",
+        "text": "Londi stood up and smiled at her feet. “Let’s go, feet! You know the way there!”",
+        "seconds": 5.06
+      },
+      {
+        "image": "05",
+        "alt": "Londi walks to the tap carrying her bucket.",
+        "text": "Londi started walking to the tap. She hopped over the rocks. She crept past Mama Neli’s house. She dashed down the path.",
+        "seconds": 7.72
+      },
+      {
+        "image": "06",
+        "alt": "Londi stands behind others in the queue for the tap.",
+        "text": "The line at the tap was long. “Oh no!” Londi said to her feet. “We’ll have to wait. Let’s stay in line. No dreaming away!”",
+        "seconds": 8.21
+      },
+      {
+        "image": "07",
+        "alt": "There is a shiny purple shoe in the bush.",
+        "text": "Ooh! Londi thought. But what’s that shining over there? I wonder who lost their shoe?",
+        "seconds": 4.86
+      },
+      {
+        "image": "08",
+        "alt": "Londi dreams of a girl wearing only one purple shoe. She also dreams of a pig wearing three purple shoes.",
+        "text": "Did it belong to a girl like me? Or something else...",
+        "seconds": 2.93
+      },
+      {
+        "image": "09",
+        "alt": "Londi crouches down next to a yellow bird and her chicks.",
+        "text": "And what’s that under there? Cheep! Cheep!",
+        "seconds": 2.41
+      },
+      {
+        "image": "10",
+        "alt": "Gogo stands with her hands on her hips. She has a big shadow.",
+        "text": "And what’s that big shadow? Uh oh, it’s Gogo! “Londi, your bucket nearly rolled away!” “Sorry, Gogo. I dreamed too far, again.”",
+        "seconds": 8.77
+      },
+      {
+        "image": "11",
+        "alt": "The setting sun smiles. Londi watches. Gogo carries the bucket home.",
+        "text": "They filled up the bucket together. Londi watched the big sun sink into the hills. “Come let’s go, my dreaming girl,” said Gogo.",
+        "seconds": 8.48
+      },
+      {
+        "image": "12",
+        "alt": "Londi looks up and sees a pink pig in the sky.",
+        "text": "“Look, Gogo! There’s a pink pig in the sky!” “Oh Londi... It’s just a cloud,” Gogo sighed. Londi took Gogo’s hand and they walked home together happily.",
+        "seconds": 10.49
+      }
+    ]
+  },
+  {
+    "slug": "walking-together",
+    "title": "Walking Together",
+    "description": "A walk to the clinic doesn’t have to be dull, when there are so many wonderful things to see on the way.",
+    "credit": "Jade Mathieson, Louwrisa Blaauw, Bianca de Jong. Published by Book Dash, 2015.",
+    "source": "https://github.com/bookdash/bookdash-books/tree/gh-pages/walking-together",
+    "pages": [
+      {
+        "image": "01",
+        "alt": "A mother and her young daughter walk away from their rondawel.",
+        "text": "When we go walking and the road is long, we’ll walk together singing a song.",
+        "seconds": 4.38
+      },
+      {
+        "image": "02",
+        "alt": "They walk far down the road. They walk towards the hills.",
+        "text": "I am with you and you are with me. A journey is fun with our family.",
+        "seconds": 4.18
+      },
+      {
+        "image": "03",
+        "alt": "They see a mother hen with a chick under her wing.",
+        "text": "I’ll keep you cosy like a mother hen. She keeps her chicks warm under her wing.",
+        "seconds": 4.84
+      },
+      {
+        "image": "04",
+        "alt": "They see a man walking in the rain. He wears a traditional straw hat.",
+        "text": "If the rain starts to fall down from the sky, like that good hat I’ll keep your face dry.",
+        "seconds": 5.43
+      },
+      {
+        "image": "05",
+        "alt": "The mother and child stand under a rock and watch the rain fall.",
+        "text": "If storm clouds get angry and grumble and moan, be brave, why cry? You’re not alone.",
+        "seconds": 5.6
+      },
+      {
+        "image": "06",
+        "alt": "They see a big waterfall.",
+        "text": "We’re walking together so we never get bored. Look up! Look around! See where we’ve explored!",
+        "seconds": 5.75
+      },
+      {
+        "image": "07",
+        "alt": "They see a donkey carrying sticks on its back. It also wears a traditional straw hat!",
+        "text": "If you see something that’s funny to see, I don’t want to miss it. Please share it with me!",
+        "seconds": 4.96
+      },
+      {
+        "image": "08",
+        "alt": "They arrive at the clinic building.",
+        "text": "If your feet start to hurt from the distance we’ve passed, don’t worry, we’ve made it! Here’s the clinic at last.",
+        "seconds": 6.48
+      },
+      {
+        "image": "09",
+        "alt": "The clinic sister check's the girl's heart, ears and throat.",
+        "text": "We all need to check our throat, lungs and ears. Get strong as you grow, it’s no reason for tears.",
+        "seconds": 6.77
+      },
+      {
+        "image": "10",
+        "alt": "The clinic sister checks her mother's blood pressure.",
+        "text": "Do you think it’s scary? Here, hold my hand. She’ll check your blood pressure with this clever armband.",
+        "seconds": 6.06
+      },
+      {
+        "image": "11",
+        "alt": "The mother and daughter leave the clinic. Mother is carrying a bag of medicine. They are both smiling.",
+        "text": "They give us our medicine, tell us what we should know, to keep us all healthy. Now back home we go.",
+        "seconds": 6.21
+      },
+      {
+        "image": "12",
+        "alt": "It is night time. Mother tucks the little girl into her bed.",
+        "text": "It’s okay to be tired, there’s so much we’ve seen. Now it’s your bedtime. Sleep well and sweet dreams.",
+        "seconds": 6.72
+      }
+    ]
+  },
+  {
+    "slug": "why-is-nita-upside-down",
+    "title": "Why is Nita upside down?",
+    "description": "Nita’s hanging upside down. Can she turn the right way round?",
+    "credit": "Emma Hearne, Roxana Bouwer, Sarah Bouwer. Published by Book Dash, 2015.",
+    "source": "https://github.com/bookdash/bookdash-books/tree/gh-pages/why-is-nita-upside-down",
+    "pages": [
+      {
+        "image": "01",
+        "alt": "Nita hangs upside down from a jungle gym.",
+        "text": "Nita’s hanging upside down, her long hair tickling at the ground. The trees, the grass, the everything is all the wrong way round.",
+        "seconds": 8.72
+      },
+      {
+        "image": "02",
+        "alt": "Navi walks through the play area and waves.",
+        "text": "Her feet, they poke into the sky. Little Navi’s walking by. He says ‘I’ve seen you here before. You’re upside down again! What for?’",
+        "seconds": 8.5
+      },
+      {
+        "image": "03",
+        "alt": "Nita speaks through a broken speech bubble.",
+        "text": "His feet swim lightly in the air. She tries to hide behind her hair. ‘It’s h-h-h-hard to t-t-talk’, she says to him. ‘I’m not the same. I don’t fit in.",
+        "seconds": 10.67
+      },
+      {
+        "image": "04",
+        "alt": "Navi's look-out spot is a tall tree.",
+        "text": "Navi takes her by the hand. He wants to help her understand. They climb to Navi’s look-out spot. From up here they can see a lot. They perch and have a quiet stare at children playing here and there.",
+        "seconds": 12.89
+      },
+      {
+        "image": "05",
+        "alt": "There are children playing on a slide, swings, a seesaw and a merry-go-round.",
+        "text": ""
+      },
+      {
+        "image": "06",
+        "alt": "An overweight boy holds a stick. A girl with freckled cheeks sucks a lolly pop.",
+        "text": "Those kids are not the same at all. Abe’s round. Chi's freckled.",
+        "seconds": 4.21
+      },
+      {
+        "image": "07",
+        "alt": "Lala is a girl with very long legs.",
+        "text": "Lala’s extra tall.",
+        "seconds": 1.35
+      },
+      {
+        "image": "08",
+        "alt": "A boy runs and jumps with his hands in the air. A girl reads a book.",
+        "text": "Bambam’s wild and must be free, while Lulu's reading quietly.",
+        "seconds": 4.05
+      },
+      {
+        "image": "09",
+        "alt": "A girl with long bushy hair swings on the swing.",
+        "text": "Look at Freya's crazy hair.",
+        "seconds": 1.56
+      },
+      {
+        "image": "10",
+        "alt": "A boy wearing spectacles tries to shoot a catapult.",
+        "text": "And Sid wears glasses everywhere.",
+        "seconds": 2.14
+      },
+      {
+        "image": "11",
+        "alt": "Nita and Navi sit on a branch.",
+        "text": "And me, I am just skin and bone. And you are you. You’re not alone. Each human’s sort of strange, you see. That makes you just the same, like me. This world is really one big game. To play, we can’t all be the same.",
+        "seconds": 14.66
+      },
+      {
+        "image": "12",
+        "alt": "Nita stands up straight and smiles.",
+        "text": "Nita feels the right way round, thanks to the new friend she's found. Upside down was never fun. Now she plays with everyone.",
+        "seconds": 8.51
+      }
+    ]
+  },
+  {
+    "slug": "sleepy-mr-sloth",
+    "title": "Sleepy Mr Sloth",
+    "description": "He’s quite good at climbing. He knows how to swing. But sleeping’s his favourite, favourite thing!",
+    "credit": "Graham Paterson, Paul Kennedy, Nick Mulgrew. Published by Book Dash, 2014.",
+    "source": "https://github.com/bookdash/bookdash-books/tree/gh-pages/sleepy-mr-sloth",
+    "pages": [
+      {
+        "image": "01",
+        "alt": "Mr Sloth is sleepy and yawning.",
+        "text": "One day, Mr Sloth came to visit. He said: I’m sleepy! I need a good branch for a bed!",
+        "seconds": 6.01
+      },
+      {
+        "image": "02",
+        "alt": "Mr Sloth starts climbing the tree.",
+        "text": "I’m quite good at climbing. I know how to swing. But sleeping’s my favourite, favourite thing!",
+        "seconds": 5.56
+      },
+      {
+        "image": "03",
+        "alt": "Mr Sloth spots a branch. Is that a big ear nearby?",
+        "text": "This branch looks lovely! I think I’ll sleep here. And you? Don’t you think that’s a splendid idea?",
+        "seconds": 5.92
+      },
+      {
+        "image": "04",
+        "alt": "A giraffe bites Mr Sloth by mistake!",
+        "text": "Oh no, Mr Sloth! A giraffe’s eating there! He might think you’re lunch and start nibbling your hair!",
+        "seconds": 5.88
+      },
+      {
+        "image": "05",
+        "alt": "Mr Sloth spots a branch. There are a few bees flying around.",
+        "text": "This branch looks lovely! I think I’ll sleep here. And you? Don’t you think that’s a splendid idea?",
+        "seconds": 5.92
+      },
+      {
+        "image": "06",
+        "alt": "Bees fly out of a beehive around Mr Sloth!",
+        "text": "Oh no, Mr Sloth! There’s a beehive right there! You’ll never get sleep with those bees everywhere!",
+        "seconds": 5.78
+      },
+      {
+        "image": "07",
+        "alt": "Mr Sloth spots a branch. There is a tail nearby.",
+        "text": "This branch looks lovely! I think I’ll sleep here. And you? Don’t you think that’s a splendid idea?",
+        "seconds": 5.92
+      },
+      {
+        "image": "08",
+        "alt": "Mr Sloth grabs snake by mistake!",
+        "text": "Oh no, Mr Sloth, that’s a snake over there! Not a branch! Poor old snake. You gave him quite a scare.",
+        "seconds": 6.49
+      },
+      {
+        "image": "09",
+        "alt": "Mr Sloth spots a branch. There are feet nearby.",
+        "text": "This branch looks lovely! I think I’ll sleep here. And you? Don’t you think that’s a splendid idea?",
+        "seconds": 5.92
+      },
+      {
+        "image": "10",
+        "alt": "A hadeda is squawking loudly there!",
+        "text": "Oh no, Mr Sloth! There’s a bird squawking there! You’ll never get sleep with that noise in the air!",
+        "seconds": 5.88
+      },
+      {
+        "image": "11",
+        "alt": "Mr Sloth climbs to the top of the tree and smiles.",
+        "text": "Try climb one more branch, Mr Sloth! they all said. And that branch was just the right one for his bed.",
+        "seconds": 6.69
+      },
+      {
+        "image": "12",
+        "alt": "Mr Sloth and the animals are all sleeping nicely in the tree together.",
+        "text": "The bird and the snake, the giraffe and each bee were happy to have Mr Sloth in their tree.",
+        "seconds": 5.48
+      }
+    ]
+  },
+  {
+    "slug": "lory-dory",
+    "title": "Lory Dory",
+    "description": "Lory Dory was born invisible. No one understands that she is real. Until, one day, she finds a way to show them who she is.",
+    "credit": "Sonia Dearling, Brendan O'Neill, Arthur Attwell. Published by Book Dash, 2015.",
+    "source": "https://github.com/bookdash/bookdash-books/tree/gh-pages/lory-dory",
+    "pages": [
+      {
+        "image": "01",
+        "alt": "A little girl lies in bed. Her grandpa sits next to her.",
+        "text": "One night Grandpa was tucking me in. His hands were soft and his hair was thin.",
+        "seconds": 4.8
+      },
+      {
+        "image": "02",
+        "alt": "Grandpa talks to the girl.",
+        "text": "‘I’m going to tell you a special story, about a girl named Lory Dory.’",
+        "seconds": 4.23
+      },
+      {
+        "image": "03",
+        "alt": "There is an empty armchair. Two eyes peek out. This is Lory Dory.",
+        "text": "You couldn’t see Lory Dory at all because she was born invisible.",
+        "seconds": 3.91
+      },
+      {
+        "image": "04",
+        "alt": "The falling rain makes an outline of Lory Dory. There is an outline of Lory Dory underneath the blankets on a bed.",
+        "text": "You’d only see Lory when rain hit her head, or when she was curled under blankets in bed.",
+        "seconds": 5.3
+      },
+      {
+        "image": "05",
+        "alt": "Children are playing in the snow and pointing at the outline of Lory Dory made by the snow.",
+        "text": "Lory was left out of all the kids’ games. They teased her and they called her names. ‘Look, it’s Lory. The Imaginary Friend! She’s not like us, she’s just pretend!’",
+        "seconds": 10.84
+      },
+      {
+        "image": "06",
+        "alt": "A boy sits at his school desk. Lory Dory sits next to him and draws.",
+        "text": "One day at school, a boy wanted to know: ‘How do you look? I only see you in snow.’",
+        "seconds": 5
+      },
+      {
+        "image": "07",
+        "alt": "The boy hands Lory Dory a paint brush.",
+        "text": "‘Can you paint yourself?’ Lory knew that she could. But not in the same way the boy thought she would.",
+        "seconds": 6.01
+      },
+      {
+        "image": "08",
+        "alt": "The picture is filled with paintings of cats and fruit and stars.",
+        "text": "Lory painted her body with all that she loved from the world all around and the sky up above.",
+        "seconds": 5.88
+      },
+      {
+        "image": "09",
+        "alt": "The paint makes footprints on the page.",
+        "text": "She painted herself every day with such pride, to bring out the person who she was inside.",
+        "seconds": 5.52
+      },
+      {
+        "image": "10",
+        "alt": "There is a painting of Lory Dory standing by the trees wearing a beautiful dress and smiling happily.",
+        "text": "I know I’m invisible and hard to see. So I painted these pictures to show the real me.’",
+        "seconds": 5.66
+      },
+      {
+        "image": "11",
+        "alt": "Grandpa stands by the little girl's bed.",
+        "text": "‘Are you making this up, Gramps? Is this story true?’ ‘Lory is real – real as me, real as you.’",
+        "seconds": 6.23
+      },
+      {
+        "image": "12",
+        "alt": "The little girl lies in bed alone. Coloured light twinkles through the open door.",
+        "text": "When Grandpa had left me, I can’t quite be sure, but I think I saw Lory just outside my door.",
+        "seconds": 6.22
+      }
+    ]
+  },
+  {
+    "slug": "sima-and-siza",
+    "title": "Sima and Siza",
+    "description": "Sima wants to be a nurse one day. His favourite game is hospital-hospital. But papa and his friends do not approve. What will change their minds?",
+    "credit": "Lwando Xaso, CClaire Ingram. Published by Book Dash, 2015.",
+    "source": "https://github.com/bookdash/bookdash-books/tree/gh-pages/sima-and-siza",
+    "pages": [
+      {
+        "image": "01",
+        "alt": "A boy has a tea party with his doll. The rest of the toys watch.",
+        "text": "Simamkele loves dolls. Mama buys him lots. They keep his loneliness away. Sima’s favourite doll is Siza. Sima wants to be a nurse when he grows up.",
+        "seconds": 10.63
+      },
+      {
+        "image": "02",
+        "alt": "Sima puts Mama's white skirt around his neck. Siza watches.",
+        "text": "He loves to put on Mama’s skirt, and twirl. Like magic, he suddenly becomes Sima the nurse. He plays hospital-hospital and makes sickly Siza and all his dolls better.",
+        "seconds": 11.89
+      },
+      {
+        "image": "03",
+        "alt": "Sima takes Siza to school. The other children point and whisper.",
+        "text": "Wherever Sima is, Siza is there too.",
+        "seconds": 2.55
+      },
+      {
+        "image": "04",
+        "alt": "A boy sticks Siza in the toilet. Sima watches with horror.",
+        "text": "But Sima’s friends do not like Siza. One day, they took him away and stuck his head in the toilet.",
+        "seconds": 6.23
+      },
+      {
+        "image": "05",
+        "alt": "Sima plays with Siza on the step. Papa stands over them with his hand on his hip.",
+        "text": "When Papa came home, Sima was nursing Siza. ‘What are you doing?’ asked Papa. ‘I’m being a nurse,’ said Sima. ‘Will you play with me?’ ‘Yes. But we will go to the park and play soccer,’ said Papa.",
+        "seconds": 13.22
+      },
+      {
+        "image": "06",
+        "alt": "Papa, Sima and his friends play soccer.",
+        "text": "His friends saw Sima and Papa playing soccer. They joined in. Sima and Papa often play soccer now. But they still haven’t played with dolls.",
+        "seconds": 9.83
+      },
+      {
+        "image": "07",
+        "alt": "Sima wears his nurse outfit. He runs to the house.",
+        "text": "One day, Sima was playing hospital-hospital with his dolls. He heard Mama shout. ‘Sima! Run! Papa is waiting to play with you at the park.’",
+        "seconds": 9.86
+      },
+      {
+        "image": "08",
+        "alt": "Papa shouts at Sima. A tennis ball flies through the air.",
+        "text": "‘Why on earth are you wearing a dress?’ said Papa in an angry voice. Just then a ball flew out of nowhere and ...",
+        "seconds": 7.21
+      },
+      {
+        "image": "09",
+        "alt": "Papa sits on the ground. He is injured. Sima's blanket is tied around his head.",
+        "text": "... knocked Papa down. Everyone panicked. Except Sima. He knelt and tied his blanket around Papa’s bleeding head. ‘Call an ambulance!’ he shouted.",
+        "seconds": 9.92
+      },
+      {
+        "image": "10",
+        "alt": "A male nurse loads Papa into the ambulance. He talks to Sima.",
+        "text": "‘He needs stitches in his head. You did just the right thing,’ said the nurse. Sima was proud.",
+        "seconds": 5.66
+      },
+      {
+        "image": "11",
+        "alt": "Sima and the male nurse high-five each other.",
+        "text": "‘You’re a hero. You’ll make a great doctor one day.’ ‘But I want to be a nurse, just like you,’ said Sima.",
+        "seconds": 6.07
+      },
+      {
+        "image": "12",
+        "alt": "Papa joins Sima and Siza's tea party.",
+        "text": "‘Thank you, Nurse Sima,’ said Papa. Now Sima and Papa play hospital-hospital and soccer – and his friends do too.",
+        "seconds": 7.84
+      }
+    ]
+  },
+  {
+    "slug": "there-must-be-a-rainbow",
+    "title": "There Must be a Rainbow",
+    "description": "In this delightful tale of hope, Jabulile’s dream of helping people comes true after a terrible storm hits the Valley.",
+    "credit": "Thulisizwe Mamba, Sinomonde Ngwane, Nerissa Govender. Published by Book Dash, 2015.",
+    "source": "https://github.com/bookdash/bookdash-books/tree/gh-pages/there-must-be-a-rainbow",
+    "pages": [
+      {
+        "image": "01",
+        "alt": "The sun rises over a small village in the hills.",
+        "text": "Nestled in the Kingdom of the Zulu is a magnificent place called the Valley.",
+        "seconds": 4.74
+      },
+      {
+        "image": "02",
+        "alt": "Jabulile is happy.",
+        "text": "A little girl called Jabulile lives here. Jabulile was always a happy child. She was also curious, and full of questions about life. Everything fascinated her.",
+        "seconds": 11.14
+      },
+      {
+        "image": "03",
+        "alt": "Jabulile and her mom and dad are happy, standing in a field.",
+        "text": "Jabulile’s father was a mielie farmer. Her mother was a teacher. They taught her to dream big dreams. Jabulile’s biggest dream was to help people.",
+        "seconds": 9.64
+      },
+      {
+        "image": "04",
+        "alt": "Jabulile thinks of a rainbow and is happy.",
+        "text": "Everyone in the village was Jabulile’s friend, especially the elders. They taught her about the wise men and women who once lived in the Valley. Jabulile also wanted to be wise.",
+        "seconds": 12.34
+      },
+      {
+        "image": "05",
+        "alt": "Jabulile and a man spot a big storm coming.",
+        "text": "One awful day, the clouds began to gather over the Valley. Everything grew dark and grey. An ugly storm swept over the land.",
+        "seconds": 8.77
+      },
+      {
+        "image": "06",
+        "alt": "The big storm blows the tops off the houses.",
+        "text": "Great gusts of wind blew the roofs off the huts. All the animals lost their homes. It was a very sad day.",
+        "seconds": 7.05
+      },
+      {
+        "image": "07",
+        "alt": "Jabulile cheers up the sad villagers.",
+        "text": "The village folk cried, “What shall we do now?” “All the crops are ruined!” cried the farmers. “Our homes are gone!” said the elders. All hope seemed lost. But Jabulile remembered something her wise father once told her.",
+        "seconds": 14.97
+      },
+      {
+        "image": "08",
+        "alt": "She points to the rainbow behind the clouds.",
+        "text": "Jabulile started speaking to the villagers. “The storm only hurts us,” she said, “because of the way we choose to see it. If you look up the sun is shining again. It is a new day. “After every storm, there must be a rainbow!” she shouted excitedly.",
+        "seconds": 16.71
+      },
+      {
+        "image": "09",
+        "alt": "A huge rainbow comes out.",
+        "text": "Just then a glorious rainbow appeared in the sky.",
+        "seconds": 2.89
+      },
+      {
+        "image": "10",
+        "alt": "The villagers are happy again.",
+        "text": "The villagers saw the rainbow and they began to smile. It stood as a promise that the storm was over.",
+        "seconds": 6.56
+      },
+      {
+        "image": "11",
+        "alt": "Jabulile smiles as the rainbow stretch across the horizon and over the village.",
+        "text": "The villagers rebuilt their homes. Farmers planted new crops. The grass grew greener than ever before.",
+        "seconds": 6.88
+      },
+      {
+        "image": "12",
+        "alt": "The sun rises once again over the village in the peaceful valley.",
+        "text": "Once again there was hope and happiness in the Valley.",
+        "seconds": 2.94
+      }
+    ]
+  },
+  {
+    "slug": "amazing-daisy",
+    "title": "Amazing Daisy",
+    "description": "On a little farm lives Daisy, a little chicken who wishes she could fly. All the other chickens laugh at her daily flying practice. But one day something amazing happens …",
+    "credit": "Nozizwe Herero, Siya Masuku, Leona Ingram. Published by Book Dash, 2015.",
+    "source": "https://github.com/bookdash/bookdash-books/tree/gh-pages/amazing-daisy",
+    "pages": [
+      {
+        "image": "01",
+        "alt": "Daisy stands outside her chicken coop.",
+        "text": "Once upon a time on a little farm near a little village there lived a little chicken called Daisy.",
+        "seconds": 5.82
+      },
+      {
+        "image": "02",
+        "alt": "The other chickens laugh as Daisy tells them her plans.",
+        "text": "“When I grow up, I want to fly high, high into the sky,” Daisy said. But all the other chickens laughed at her.",
+        "seconds": 7.09
+      },
+      {
+        "image": "03",
+        "alt": "The other chickens tease Daisy. Her mother comforts her.",
+        "text": "“You are so weird,” they said. “We won’t play with you anymore.” “Daisy, we can all flap our wings but it’s very difficult for chickens to fly,” Mama told her.",
+        "seconds": 10.31
+      },
+      {
+        "image": "04",
+        "alt": "All alone, Daisy practises flying outside the chicken coop.",
+        "text": "Daisy wouldn’t give up. Every day she practised by herself, flapping her wings. Flap, flap, flap, she would flap her wings but she couldn’t lift off the ground.",
+        "seconds": 10.71
+      },
+      {
+        "image": "05",
+        "alt": "Daisy imagines herself flying.",
+        "text": "While she practised, she imagined herself flying high into the sky and looking at the chickens below. She imagined herself flying past the sparrows and past the swallows. “Wow!” the birds would say. “A chicken that can fly!”",
+        "seconds": 15.15
+      },
+      {
+        "image": "06",
+        "alt": "Daisy flaps her wings. Daisy crashes to the ground.",
+        "text": "So ... Flap, flap, flap, every day Daisy would flap her wings. She would lift off the ground but fall down again.",
+        "seconds": 7.76
+      },
+      {
+        "image": "07",
+        "alt": "Daisy complains to her mother.",
+        "text": "“I’m never going to fly!” Daisy cried to Mama. “The others are right.” “Daisy, you are different from the other chickens. They don’t want to fly but you do! You can do it,” Mama said.",
+        "seconds": 11.94
+      },
+      {
+        "image": "08",
+        "alt": "Daisy climbs the wall of the chicken coop.",
+        "text": "The following day Daisy climbed to the top of the chicken coop and flap, flap, flap, she flapped her wings. She flew into the air and flapped her wings ... and flapped her wings ... and flapped her wings and ...",
+        "seconds": 12.95
+      },
+      {
+        "image": "09",
+        "alt": "Daisy falls on the ground with a thud.",
+        "text": "BAM! The other chickens laughed out loud.“Ha ha ha! We told you! Chickens can’t fly!”",
+        "seconds": 5.81
+      },
+      {
+        "image": "10",
+        "alt": "Daisy flaps her wings and stays in the air.",
+        "text": "But the next day Daisy climbed even higher, right up to the top of the rondavel. Flap, flap, flap, Daisy flapped her wings. She flew into the air and flapped her wings ... and flapped her wings ... and flapped her wings and ...",
+        "seconds": 14.93
+      },
+      {
+        "image": "11",
+        "alt": "Daisy confidently flies alongside a swallow and a sparrow.",
+        "text": "She kept flying! The wind beneath her wings grew stronger and she flew higher and higher! The sparrows and the swallows said, “Amazing! A flying chicken!”",
+        "seconds": 10.72
+      },
+      {
+        "image": "12",
+        "alt": "The other chickens climb to the top of the chicken coop.",
+        "text": "And the other chickens wanted to be just like her. They said, “Oh Daisy, you’re amazing!”",
+        "seconds": 5.33
+      }
+    ]
+  },
+  {
+    "slug": "tortoise-finds-his-home",
+    "title": "Tortoise Finds His Home",
+    "description": "Tortoise sets off in search of his house. Along the way, he meets new friends to help him. But the sky is darkening, and lightning flashes in the distance. Will Tortoise find his house in time?",
+    "credit": "Maya Fowler, Katrin Coetzer, Damian Gibbs. Published by Book Dash, 2014.",
+    "source": "https://github.com/bookdash/bookdash-books/tree/gh-pages/tortoise-finds-his-home",
+    "pages": [
+      {
+        "image": "01",
+        "alt": "Tortoise passes Snail in the veld.",
+        "text": "One day Tortoise was walking through the veld. He was searching and searching. He gazed into the distance and squinted at the grass. “Are you looking for something?” Snail asked. “Yes, I’m looking for my house. Have you seen it?”",
+        "seconds": 14.47
+      },
+      {
+        "image": "02",
+        "alt": "Snail travels on Tortoise's back.",
+        "text": "“No, I haven’t, but I’ll help you look!” She climbed onto Tortoise’s shell. Tortoise walked on with Snail on his back. They looked and looked, but there was no sign of a house.",
+        "seconds": 10.8
+      },
+      {
+        "image": "03",
+        "alt": "Sparrow perches on a branch. Tortoise and Snail pass him.",
+        "text": "“Are you looking for something?” asked Sparrow. “Yes, we're looking for Tortoise's house. Have you seen it?” “No, I haven’t, but I’ll help you look!”",
+        "seconds": 8.71
+      },
+      {
+        "image": "04",
+        "alt": "Snail sits on Tortoise's back. Sparrow flies ahead of them. There is a ladybird on a dandelion in the distance.",
+        "text": "Sparrow flapped his wings and he whizzed away. “You’re going too fast!” called Tortoise. “Alright, then I’ll hop on too.” Tortoise walked on with Snail and Sparrow perched on his shell. They looked and looked, but there was no sign of a house.",
+        "seconds": 15.09
+      },
+      {
+        "image": "05",
+        "alt": "Ladybird sits on a dandelion stem. Tortoise, Snail and Sparrow pass him.",
+        "text": "“Are you looking for something?” asked Ladybird. “Yes, we’re looking for Tortoise’s house. Have you seen it?”",
+        "seconds": 6.33
+      },
+      {
+        "image": "06",
+        "alt": "Snail, Sparrow and Ladybird travel on Snail's back.",
+        "text": "“No, I haven’t, but I’ll help you look!” Ladybird hopped onto Tortoise’s shell. Tortoise walked on with Snail and Sparrow and Ladybird sitting on his back. They looked and looked, but there was no sign of a house. A breeze started to blow.",
+        "seconds": 15.4
+      },
+      {
+        "image": "07",
+        "alt": "The animals find Mouse. He is making a daisy chain.",
+        "text": "“Are you looking for something?” asked Mouse. “Yes, Mouse, I’m looking for my house. Have you seen it?” “No, I haven’t, but I’ll help you look!”",
+        "seconds": 8.46
+      },
+      {
+        "image": "08",
+        "alt": "Mouse climbs on Tortoise's back with the others. The wind blows the leaves and the daisy chain.",
+        "text": "Mouse jumped onto Tortoise’s back. Tortoise walked on with Snail and Sparrow and Ladybird and Mouse on his back. They looked and looked, but there was no sign of a house. The wind swept the leaves off the ground and swirled them around Tortoise.",
+        "seconds": 16.01
+      },
+      {
+        "image": "09",
+        "alt": "Tortoise walks with Mouse, Snail, Sparrow and Ladybird on his back.",
+        "text": "The wind got stronger and stronger. The sky turned dark. “Oh, where is my house?” Tortoise sighed. Thunder roared in the hills. Lightning flashed in the distance. Drip, drip came the rain. “Oh, where is Tortoise’s house?” asked Snail and Sparrow and Ladybird and Mouse.",
+        "seconds": 18.82
+      },
+      {
+        "image": "10",
+        "alt": "The wind gets stronger. The rain threatens. The animals all fly off Tortoise's back.",
+        "text": "The wind whirled and whipped and blew Snail and Sparrow and Ladybird and Mouse right off Tortoise’s back.",
+        "seconds": 6.64
+      },
+      {
+        "image": "11",
+        "alt": "The hail comes down. Tortoise curls up in his shell. The other animals stand nearby.",
+        "text": "“Eek!” squeaked Tortoise with a fright, and he shrank back into his shell. It was warm and cosy inside. “Oh, here is my house!”",
+        "seconds": 8.71
+      },
+      {
+        "image": "12",
+        "alt": "Mouse, Ladybird, Snail and Sparrow take shelter underneath Tortoise's shell.",
+        "text": "“Oh, here is Tortoise’s house!”",
+        "seconds": 1.83
+      }
+    ]
+  },
+  {
+    "slug": "sindiwe-and-the-fireflies",
+    "title": "Sindiwe & the Fireflies",
+    "description": "There once was a girl named Sindiwe Magona. She had a special gift for stories. At night, little Sindiwe’s grandmother told her magical stories about ogres and giants, animals of the forests and the little creatures of the veld. This was Sindiwe’s favourite time. See how she grows up to live out her own adventures and she travels over oceans to change the world with her stories. ",
+    "credit": "Cheréne Pienaar, Jano Strydom, Tess Gadd. Published by Book Dash, 2014.",
+    "source": "https://github.com/bookdash/bookdash-books/tree/gh-pages/sindiwe-and-the-fireflies",
+    "pages": [
+      {
+        "image": "01",
+        "alt": "A young Sindiwe reads a book.",
+        "text": "One day a very clever baby was born in Gungululu in the Eastern Cape. Her name was Sindiwe Magona. She was the oldest of eight children.",
+        "seconds": 9.38
+      },
+      {
+        "image": "02",
+        "alt": "Sindiwe sits on a log. It is dark and there are stars in the sky.",
+        "text": "At night, her grandmother told magical stories about ogres and giants, animals of the forests, great beasts, and little creatures of the veld. It was Sindiwe’s favourite time.",
+        "seconds": 11.89
+      },
+      {
+        "image": "03",
+        "alt": "Young Sindiwe stands by the chalkboard like a teacher.",
+        "text": "Sindiwe loved school and she dreamed about being a teacher.",
+        "seconds": 3.36
+      },
+      {
+        "image": "04",
+        "alt": "Sindiwe is at a party with her family. A man sings to her.",
+        "text": "When Sindiwe became a teenager, her family organised a feast to celebrate. She was given special things to wear and a wise old man sang a praise song to her. (Blessings, long life! May your ancestors guard you!)",
+        "seconds": 14.92
+      },
+      {
+        "image": "05",
+        "alt": "Sindiwe stands outside a classroom packed full of children.",
+        "text": "Sindiwe trained to be a teacher. She was very excited to teach at her first school. But there weren’t enough schools for black children and they had no desks or books to write in. This made Sindiwe feel scared. How could she be a good teacher when the children had nowhere to sit?",
+        "seconds": 17.08
+      },
+      {
+        "image": "06",
+        "alt": "Sindiwe wears a maid's uniform. She dusts and and cleans a house.",
+        "text": "She left the school to work as a cleaner. She worked in four different houses. Sometimes the people there treated her badly and Sindiwe became very unhappy.",
+        "seconds": 10.38
+      },
+      {
+        "image": "07",
+        "alt": "Sindiwe is on an aeroplane with her three children.",
+        "text": "All this time Sindiwe studied. Her hard work paid off! She won a scholarship to study at a university in New York. She and her three small children packed their bags and flew across the sea to the United States of America.",
+        "seconds": 14.82
+      },
+      {
+        "image": "08",
+        "alt": "Sindiwe studies at her desk.",
+        "text": "In New York, Sindiwe studied to become a social worker. She wanted to help families make their lives better.",
+        "seconds": 6.45
+      },
+      {
+        "image": "09",
+        "alt": "Sindiwe carries a suitcase. She stands outside the United Nations building.",
+        "text": "When she finished studying, the United Nations gave Sindiwe a job. Most of the countries in the world meet at the United Nations to talk about their problems.",
+        "seconds": 10.23
+      },
+      {
+        "image": "10",
+        "alt": "Sindiwe holds hands with many people of different cultures.",
+        "text": "Sindiwe told the world about South Africa, and how hard it was for black people living there. The people at the United Nations loved to listen to Sindiwe’s stories. They wanted to learn more and more about South Africans. Perhaps, together, they could help to change things in South Africa.",
+        "seconds": 19.64
+      },
+      {
+        "image": "11",
+        "alt": "Sindiwe packs her suitcase.",
+        "text": "She worked at the United Nations for twenty years while her children grew into adults. But Sindiwe missed the country where she was born. She wanted to tell her stories to the people at home. So she packed her luggage, got on a plane and flew back over the sea to Cape Town.",
+        "seconds": 16.41
+      },
+      {
+        "image": "12",
+        "alt": "An old Sindiwe reads a story to three children.",
+        "text": "Sindiwe’s love for books and stories have helped her write piles and piles of books. And children and grown-ups love to read her stories. Many people call her Nomabali because she’s always writing, telling and reading stories.",
+        "seconds": 14.99
+      }
+    ]
+  },
+  {
+    "slug": "a-tiny-seed",
+    "title": "A Tiny Seed",
+    "description": "In a village on the slopes of Mount Kenya, a little girl worked in the fields with her mother. She worried as she saw the big forests disappearing, but she knew the power of a tiny seed.",
+    "credit": "Nicola Rijsdijk, Maya Marshak, Karen Lilje. Published by Book Dash, 2014.",
+    "source": "https://github.com/bookdash/bookdash-books/tree/gh-pages/a-tiny-seed",
+    "pages": [
+      {
+        "image": "01",
+        "alt": "Wangari and her mother hold hands in a field.",
+        "text": "In a village on the slopes of Mount Kenya in East Africa, a little girl worked in the fields with her mother. Her name was Wangari.",
+        "seconds": 8.48
+      },
+      {
+        "image": "02",
+        "alt": "Wangari sows vegetable seeds into the earth.",
+        "text": "Wangari loved being outside. In her family’s food garden she broke up the soil with her machete. She pressed tiny seeds into the warm earth.",
+        "seconds": 9.79
+      },
+      {
+        "image": "03",
+        "alt": "It is twilight. Wangari carries her vegetables home.",
+        "text": "Her favourite time of day was just after sunset. When it got too dark to see the plants, Wangari knew it was time to go home. She would follow the narrow paths through the fields, crossing rivers as she went.",
+        "seconds": 13.66
+      },
+      {
+        "image": "04",
+        "alt": "Wangari and her brother carry her bags to school.",
+        "text": "Wangari was a clever child and couldn’t wait to go to school. But her mother and father wanted her to stay and help them at home. When she was seven years old, her big brother persuaded her parents to let her go to school.",
+        "seconds": 13.3
+      },
+      {
+        "image": "05",
+        "alt": "A copy book with drawings of the continents lies open on a table.",
+        "text": "She liked to learn! Wangari learnt more and more with every book she read. She did so well at school that she was invited to study in the United States of America. Wangari was excited! She wanted to know more about the world.",
+        "seconds": 14.83
+      },
+      {
+        "image": "06",
+        "alt": "A magnifying glass is held over a yellow flower.",
+        "text": "At the American university Wangari learnt many new things. She studied plants and how they grow. And she remembered how she grew: playing games with her brothers in the shade of the trees in the beautiful Kenyan forests.",
+        "seconds": 14.63
+      },
+      {
+        "image": "07",
+        "alt": "Wangari sits on top of a pile of books and reads.",
+        "text": "The more she learnt, the more she realised that she loved the people of Kenya. She wanted them to be happy and free. The more she learnt, the more she remembered her African home.",
+        "seconds": 11.42
+      },
+      {
+        "image": "08",
+        "alt": "A single buck stands in a barren field.",
+        "text": "When she had finished her studies, she returned to Kenya. But her country had changed. Huge farms stretched across the land. Women had no wood to make cooking fires. The people were poor and the children were hungry.",
+        "seconds": 13.85
+      },
+      {
+        "image": "09",
+        "alt": "Wangari shows an older woman how to plant in the earth.",
+        "text": "Wangari knew what to do. She taught the women how to plant trees from seeds. The women sold the trees and used the money to look after their families. The women were very happy. Wangari had helped them to feel powerful and strong.",
+        "seconds": 15.24
+      },
+      {
+        "image": "10",
+        "alt": "Small seedlings grow into fields of trees.",
+        "text": "As time passed, the new trees grew into forests, and the rivers started flowing again. Wangari’s message spread across Africa. Today, millions of trees have grown from Wangari’s seeds.",
+        "seconds": 13.41
+      },
+      {
+        "image": "11",
+        "alt": "A portrait of Wangari wearing Kenyan headdress is surrounded by trees.",
+        "text": "Wangari had worked hard. People all over the world took notice, and gave her a famous prize. It is called the Nobel Peace Prize, and she was the first African woman ever to receive it.",
+        "seconds": 12.41
+      },
+      {
+        "image": "12",
+        "alt": "A beautiful old tree stands tall and proud in the field.",
+        "text": "Wangari died in 2011, but we can think of her every time we see a beautiful tree.",
+        "seconds": 6.24
+      }
+    ]
+  },
+  {
+    "slug": "a-dancers-tale",
+    "title": "A Dancer’s Tale",
+    "description": "Phyllis Spira was dancing by the age of four. That was just the beginning of her journey towards becoming one of South Africa’s Prima Ballerinas.",
+    "credit": "Samantha Cutler, Thea Nicole De Klerk, Roberto Pita. Published by Book Dash, 2014.",
+    "source": "https://github.com/bookdash/bookdash-books/tree/gh-pages/a-dancers-tale",
+    "pages": [
+      {
+        "image": "01",
+        "alt": "Phyllis's mom and dad cuddle their sweet baby girl. Everyone is smiling and happy.",
+        "text": "Once upon a time, not so far away, a baby called Phyllis was born for ballet. Two people in love, her Mom and her Dad, could not have known yet what a dancer they had.",
+        "seconds": 11.68
+      },
+      {
+        "image": "02",
+        "alt": "Little Phyllis dances with two other young girls for their strict ballet teacher.",
+        "text": "When Phyllis was four she had us transfixed: impressing her teachers with ducky feet flicks. Before school and after, she danced every day. Nothing pleased Phyllis more than ballet.",
+        "seconds": 12.12
+      },
+      {
+        "image": "03",
+        "alt": "Wearing a beautiful yellow dress, a teenage Phyllis twirls around a street sign in London. Big Ben is seen in the background.",
+        "text": "The world would soon see, when, only fifteen, she travelled to London to live out her dream. Far from home and her friends, she was starting afresh. The Royal Ballet school would soon be impressed!",
+        "seconds": 12.49
+      },
+      {
+        "image": "04",
+        "alt": "Phyllis dances on points with a handsome male dancer.",
+        "text": "When she danced Swan Lake it was fit for the Queen! After years pirouetting, it was time to be seen! She took to the stage, leaping, twirling about, with everyone smiling! They clap and they shout!",
+        "seconds": 12.95
+      },
+      {
+        "image": "05",
+        "alt": "Phyllis carries a suitcase and leaps across Earth. She wears a dress fringed with flags from around the world.",
+        "text": "From Mexico to Canada, the US to France, everyone asked her to visit and dance. With the Royal Ballet, and all of her friends, she spread love for dancing so it never would end.",
+        "seconds": 11.8
+      },
+      {
+        "image": "06",
+        "alt": "Phyllis holds a South African flag in her arms. She wears an African-inspired dress and Table Mountain can be seen in the background.",
+        "text": "Still, Phyllis missed home, they’d been too long apart. She longed to return and to make a fresh start. So she leaped and she bounded to her beautiful land, to walk once again on South African sand.",
+        "seconds": 13.47
+      },
+      {
+        "image": "07",
+        "alt": "Phyllis dances with a clock as the backdrop.",
+        "text": "Dance isn’t just fun, as Phyllis well knew: she worked day and night, and with hard work she grew. Always smiling and tireless, through good times and tough,she aimed for her best.‘Good’ was never enough.",
+        "seconds": 13.31
+      },
+      {
+        "image": "08",
+        "alt": "In a beautiful blue costume, Phyllis dances on stage with a strong male dancer. The audience applauds appreciatively.",
+        "text": "Romeo and Juliet, Swan Lake and Giselle. She captured each audience under her spell. With Gary Burne beside her, Eduard Greyling too, her dancing was magic in every review.",
+        "seconds": 12.67
+      },
+      {
+        "image": "09",
+        "alt": "With roses at her feet and a ribbon announcing her new title, Phyllis squeezes her hands with gratitude.",
+        "text": "Reward comes eventually, when you’re put to the test. And one day South Africa would call her the best: ‘Prima Ballerina Assoluta’, greatest dancer of all, her title forever. Phyllis wanted no more.",
+        "seconds": 13.74
+      },
+      {
+        "image": "10",
+        "alt": "Phyllis gazes lovingly into her new husband's eyes as he swoops her into his arms for their wedding dance.",
+        "text": "Soon Phyllis found love when she met Philip Boyd, a dancer himself! They were both overjoyed. In love, they soon married, and together they’d dance. No match could be better when given the chance!",
+        "seconds": 12.93
+      },
+      {
+        "image": "11",
+        "alt": "Phyllis corrects a small girl's arm position during a dance lesson. Two other children practise their steps.",
+        "text": "They didn’t have children but never were sad, for they had a way to help all moms and dads. Their school, Dance For All, would give children a chance, from all walks of life, to learn and love dance.",
+        "seconds": 13.09
+      },
+      {
+        "image": "12",
+        "alt": "Phyllis looks out at the reader, while five other ballerinas dance on the page all around her.",
+        "text": "Her gift to the world and all her success help others to realise they can be their best. They dance for us now, inspired by her feats,inspiring us, too, as we dream in our seats.",
+        "seconds": 12.47
       }
     ]
   }

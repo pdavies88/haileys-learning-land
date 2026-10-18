@@ -9,7 +9,7 @@ A free learning app for young children, with fourteen games, built with Expo (SD
 - **Count & Collect:** feed animals, find numbers up to 20, fill in missing numbers, compare groups (more or fewer), and add and take away within ten.
 - **Art Studio:** crayon, marker, glitter, 20 stamps and eraser, 10 colors plus a rainbow, 3 sizes, undo, a magic mirror for symmetrical drawings, and 100 coloring pages in six category tabs (`src/content/coloring.json`).
 - **Flip & Find:** a memory game that grows from 4 to 10 pairs. Every third board matches big letters to little letters.
-- **Story Shelf:** 11 picture books from Book Dash (CC BY 4.0). "Read to me" narrates each page and lights up each word. "I'll read" lets her read alone and tap a word to hear it.
+- **Story Shelf:** 28 picture books from Book Dash (CC BY 4.0). "Read to me" narrates each page and lights up each word. "I'll read" lets her read alone and tap a word to hear it.
 - **Sound Safari:** pick the picture that starts with a letter's sound, or pick the first letter of a picture.
 - **Puzzle World:** pattern puzzles (AB, AAB, ABC and more), a shape sorter, and 4-, 9- and 16-piece jigsaws.
 - **Make a Friend:** choose a friend and a home, then decorate with stickers.

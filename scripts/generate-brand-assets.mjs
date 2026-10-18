@@ -1,34 +1,56 @@
-// Renders the app icon, splash and web logos: a rainbow and a unicorn on a soft pink-to-purple tile.
-// Run after changing the design:  npm run generate:brand  (run generate:pictures first)
+// Renders the app icon, splash and web logos: a rocket flying over a rainbow, with a star and
+// sparkles, on a sky-blue-to-violet tile. The artwork is Microsoft's Fluent Emoji in its flat
+// "Color" style (MIT), which is vector, so the icon is sharp at every size.
+// Run after changing the design:  npm run generate:brand
 import { Buffer } from 'node:buffer';
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { Resvg } from '@resvg/resvg-js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
-const unicorn = readFileSync(join(root, '.cache', 'noto', 'emoji_u1f984.svg'), 'utf8');
-const unicornData = `data:image/svg+xml;base64,${Buffer.from(unicorn).toString('base64')}`;
+const cacheDir = join(root, '.cache', 'fluent-color');
+const FLUENT = 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets';
+
+async function art(folder, file) {
+  const path = join(cacheDir, file);
+  if (!existsSync(path)) {
+    mkdirSync(cacheDir, { recursive: true });
+    const response = await fetch(`${FLUENT}/${encodeURIComponent(folder)}/Color/${file}`);
+    if (!response.ok) throw new Error(`Fluent Emoji has no ${folder}/Color/${file}`);
+    writeFileSync(path, await response.text());
+  }
+  return `data:image/svg+xml;base64,${Buffer.from(readFileSync(path, 'utf8')).toString('base64')}`;
+}
+
+const rocket = await art('Rocket', 'rocket_color.svg');
+const star = await art('Star', 'star_color.svg');
+const sparkles = await art('Sparkles', 'sparkles_color.svg');
 
 function logo({ corner = 0, background = true } = {}) {
   const tile = background
     ? `<defs>
-        <linearGradient id="sky" x1="0" y1="0" x2="0.4" y2="1">
-          <stop offset="0" stop-color="#FFB3D9"/>
-          <stop offset="1" stop-color="#B79CFF"/>
+        <linearGradient id="sky" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#4FC3F7"/>
+          <stop offset="0.55" stop-color="#6D7CF5"/>
+          <stop offset="1" stop-color="#9B5CF6"/>
         </linearGradient>
+        <radialGradient id="glow" cx="0.3" cy="0.25" r="0.6">
+          <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.45"/>
+          <stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
+        </radialGradient>
       </defs>
-      <rect width="100" height="100" rx="${corner}" fill="url(#sky)"/>`
+      <rect width="100" height="100" rx="${corner}" fill="url(#sky)"/>
+      <rect width="100" height="100" rx="${corner}" fill="url(#glow)"/>`
     : '';
-  const arc = (r, color) => `<path d="M${50 - r} 78 A${r} ${r} 0 0 1 ${50 + r} 78" fill="none" stroke="${color}" stroke-width="5.5" stroke-linecap="round"/>`;
+  const arc = (r, color) => `<path d="M${50 - r} 90 A${r} ${r} 0 0 1 ${50 + r} 90" fill="none" stroke="${color}" stroke-width="5" stroke-linecap="round"/>`;
   return `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 100 100">
     ${tile}
-    ${arc(40, '#FF6B8B')}${arc(34.5, '#FFB347')}${arc(29, '#FFE15C')}${arc(23.5, '#6EDB8F')}${arc(18, '#6BB8FF')}
-    <circle cx="20" cy="20" r="2.4" fill="#FFFFFF" opacity="0.9"/>
-    <circle cx="82" cy="26" r="1.8" fill="#FFFFFF" opacity="0.9"/>
-    <circle cx="74" cy="12" r="1.4" fill="#FFFFFF" opacity="0.8"/>
-    <image x="22" y="16" width="58" height="58" href="${unicornData}"/>
+    <g opacity="0.95">${arc(38, '#FF6B8B')}${arc(32.5, '#FFB347')}${arc(27, '#FFE15C')}${arc(21.5, '#6EDB8F')}${arc(16, '#7FD3FF')}</g>
+    <image x="20" y="12" width="60" height="60" href="${rocket}"/>
+    <image x="10" y="14" width="16" height="16" href="${star}"/>
+    <image x="72" y="52" width="16" height="16" href="${sparkles}"/>
   </svg>`;
 }
 
