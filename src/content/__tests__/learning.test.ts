@@ -4,8 +4,8 @@ import coloring from '../coloring.json';
 import pictures from '../pictures.json';
 import stories from '../stories.json';
 import {
-  BUILDS, FRIENDS, GAMES, GAME_SECTIONS, RHYMES, SPELL_WORDS, JIGSAW_PICTURES, LETTERS, MEMORY_SETS, MISSIONS, PETS, PLACES, RECIPES, SIGHT_WORDS, SORT_FRUIT,
-  SOUND_PICTURES, STICKERS, STORY_HEROES, STORY_OBJECTS, STORY_PLACES, say, spokenLines,
+  BUILDS, CHEF_MAX, CHEF_MIN, FRIENDS, GAMES, PANTRY, GAME_SECTIONS, RHYMES, SPELL_WORDS, JIGSAW_PICTURES, LETTERS, MEMORY_SETS, MISSIONS, PETS, PLACES, RECIPES, SIGHT_WORDS, SORT_FRUIT,
+  SOUND_PICTURES, STICKERS, STORY_FRIENDS, STORY_HEROES, STORY_OBJECTS, STORY_PLACES, say, spokenLines,
 } from '../learning';
 
 const known = new Set(Object.keys(pictures));
@@ -88,13 +88,21 @@ describe('content', () => {
       ...FRIENDS.map(say.picture),
       ...MEMORY_SETS.flatMap((s) => s.pictures.map(say.picture)),
       ...STORY_HEROES.flatMap((h) => [
-        say.storyIntro(h.id), say.storyDrawing(h.id), say.storyEnd(h.id),
+        say.storyIntro(h.id), say.storyEnd(h.id),
+        ...STORY_FRIENDS.map((f) => say.storyMeet(h.id, f)),
         ...Object.keys(STORY_PLACES).map((p) => say.storyHome(h.id, p)),
         ...STORY_OBJECTS.map((o) => say.storyFind(h.id, o.id)),
       ]),
-      ...RECIPES.flatMap((r) => [say.recipe(r.id), say.recipeDone(r.id), ...r.steps.map((_, i) => say.recipeStep(r.id, i))]),
+      ...RECIPES.flatMap((r) => [
+        say.recipe(r.id),
+        say.recipeDone(r.id),
+        ...r.steps.flatMap((step, i) =>
+          step.kind === 'add' ? Array.from({ length: CHEF_MAX - CHEF_MIN + 1 }, (_, n) => say.chefAdd(r.id, i, CHEF_MIN + n)) : [say.recipeStep(r.id, i)],
+        ),
+      ]),
+      ...PANTRY.map(say.picture),
       ...BUILDS.flatMap((b) => [say.build(b.id), say.buildDone(b.id)]),
-      ...PETS.flatMap((p) => (['hello', 'hungry', 'teach', 'toy', 'lovesToy', 'loves', 'giggle'] as const).map((w) => say.pet(p.id, w))),
+      ...PETS.flatMap((p) => (['hello', 'hungry', 'wantsPlay', 'wantsBath', 'wantsSleep', 'yum', 'played', 'clean', 'rested', 'notNow', 'loves', 'giggle'] as const).map((w) => say.pet(p.id, w))),
       ...PETS.flatMap((p) => Array.from({ length: 10 }, (_, i) => say.mission(MISSIONS.find((m) => m.animal === p.mission)!, i + 1))),
     ];
     expect(needed.filter((id) => !(id in lines))).toEqual([]);

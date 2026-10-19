@@ -1,4 +1,7 @@
-"""Generates every sound the app ships with. Nothing is downloaded at runtime.
+"""Generates the letter sounds, the sound effects and the audio map. Nothing is downloaded at runtime.
+
+The narrator's spoken lines come from audio-tools/generate_speech_qwen.py (Qwen3-TTS). This script
+only speaks the letter sounds (lines starting with "/"), which are phonemes that need Kokoro.
 
     .tts/venv/bin/python audio-tools/generate_audio.py            # speech and sound effects
     .tts/venv/bin/python audio-tools/generate_audio.py speech [id ...]
@@ -193,6 +196,24 @@ def sfx_shaker():
     return signal.sosfilt(sos, rng.standard_normal(n)) * np.sin(np.pi * t / t[-1]) ** 0.7
 
 
+def pluck(freq: float, seconds: float = 1.6) -> np.ndarray:
+    """A plucked string (Karplus-Strong): a burst of noise fed through a short, decaying delay loop."""
+    rng = np.random.default_rng(int(freq))
+    period = int(SR / freq)
+    buf = rng.uniform(-1, 1, period)
+    out = np.zeros(int(SR * seconds))
+    for i in range(len(out)):
+        out[i] = buf[i % period]
+        buf[i % period] = 0.996 * 0.5 * (buf[i % period] + buf[(i + 1) % period])
+    return out
+
+
+def sfx_strum():
+    """A friendly guitar strum down a G major chord."""
+    notes = [98.0, 123.47, 146.83, 196.0, 246.94, 392.0]
+    return seq(*[(i * 0.018, pluck(f) * (0.8 + 0.04 * i)) for i, f in enumerate(notes)])
+
+
 def sfx_bell():
     return tone(1318.5, 1.6, 0.6, ((1, 1.0), (2.4, 0.4), (5.95, 0.15)))
 
@@ -231,6 +252,7 @@ SFX = {
     "tada": kenney(JINGLES, "jingles_PIZZI02.ogg"),
     "whoosh": kenney(UI, "minimize_007.ogg"),
     "bloop": sfx_bloop,
+    "strum": sfx_strum,
     "snap": kenney(UI, "drop_001.ogg"),
     "flip": kenney(UI, "drop_003.ogg"),
     "star": kenney(UI, "maximize_009.ogg"),
@@ -245,7 +267,8 @@ def generate_speech(only: list[str]) -> None:
     lines = json.loads(SPEECH_LIST.read_text())
     print(f"Speech: {len(lines)} lines")
     for i, (sid, text) in enumerate(lines.items()):
-        if only and sid not in only:
+        # Words are spoken by generate_speech_qwen.py; only letter sounds (phonemes) are made here.
+        if not text.startswith("/") or (only and sid not in only):
             continue
         out = OUT_SPEECH / f"{sid}.m4a"
         audio = speak(text)

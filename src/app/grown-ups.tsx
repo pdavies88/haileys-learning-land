@@ -18,7 +18,7 @@ const CREDITS = [
   { what: 'Pictures', who: 'Fluent Emoji by Microsoft, MIT License.' },
   { what: 'Coloring pages', who: 'Traced from Noto Emoji by Google, Apache License 2.0.' },
   { what: 'Sound effects and jingles', who: 'Kenney (kenney.nl), Creative Commons CC0.' },
-  { what: 'Voice', who: 'Generated with the open-source Kokoro text-to-speech model, Apache License 2.0.' },
+  { what: 'Voice', who: 'Generated with the open-source Qwen3-TTS model by Alibaba Cloud, Apache License 2.0. Letter sounds: Kokoro, Apache License 2.0.' },
   { what: 'Font', who: 'Fredoka by Milena Brandão, SIL Open Font License.' },
   { what: 'Sight words', who: 'The Dolch word list.' },
 ];
@@ -138,7 +138,7 @@ export default function GrownUps() {
               </View>
             ))}
             <Txt size={16} weight="bold" style={{ marginTop: Spacing.sm }}>
-              Story Shelf books
+              Story shelf books
             </Txt>
             <Txt size={15} weight="regular">
               From Book Dash (bookdash.org), licensed under Creative Commons Attribution 4.0. Pictures were resized and narration

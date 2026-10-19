@@ -13,7 +13,7 @@ import { SPEECH_FILES } from '@/content/audio-files';
 import { say } from '@/content/learning';
 import { STORY_FILES } from '@/content/story-files';
 import STORIES from '@/content/stories.json';
-import { playSfx, speak, stopSpeaking } from '@/lib/audio';
+import { playSfx, speak, speechPosition, stopSpeaking } from '@/lib/audio';
 
 type Story = (typeof STORIES)[number];
 type Mode = 'listen' | 'read';
@@ -57,16 +57,17 @@ export default function Books() {
     const weights = words.map((w) => w.length + 2);
     const total = weights.reduce((a, b) => a + b, 0);
     const seconds = 'seconds' in current && typeof current.seconds === 'number' ? current.seconds : words.length * 0.42;
-    const TICK = 80;
-    let elapsed = 0;
+    // Follow the narrator's real playback position, so the light stays with the voice even if
+    // the clip takes a moment to start.
     const timer = setInterval(() => {
       if (reading.current !== run) return clearInterval(timer);
-      elapsed += TICK;
-      let at = (elapsed / 1000 / seconds) * total;
+      const heard = speechPosition();
+      if (heard <= 0) return;
+      let at = (heard / seconds) * total;
       let i = 0;
       while (i < weights.length - 1 && at > weights[i]) at -= weights[i++];
       setLit(i);
-    }, TICK);
+    }, 80);
     await speak(say.bookPage(s.slug, index));
     clearInterval(timer);
     if (reading.current === run) setLit(-1);
@@ -79,7 +80,10 @@ export default function Books() {
     setLit(-1);
     if (index >= s.pages.length) {
       playSfx('tada');
-      speak(say.line('theEnd')).then(() => celebrate(true));
+      const run = reading.current;
+      speak(say.line('theEnd')).then((finished) => {
+        if (finished && reading.current === run) celebrate(true);
+      });
       return;
     }
     if (readMode === 'listen') readPage(s, index);
@@ -88,9 +92,10 @@ export default function Books() {
   const openBook = (s: Story) => {
     setStory(s);
     setPage(0);
-    reading.current += 1;
-    speak(say.bookTitle(s.slug), say.line(mode === 'listen' ? 'readToMe' : 'youRead')).then(() => {
-      if (mode === 'listen') readPage(s, 0);
+    const run = ++reading.current;
+    // Start reading page one after the title, unless the child has already turned the page.
+    speak(say.bookTitle(s.slug), say.line(mode === 'listen' ? 'readToMe' : 'youRead')).then((finished) => {
+      if (finished && reading.current === run && mode === 'listen') readPage(s, 0);
     });
   };
 
@@ -148,7 +153,7 @@ export default function Books() {
           <Image source={STORY_FILES[`${story.slug}/cover`]} style={styles.endCover} contentFit="cover" />
         </Animated.View>
         <Txt size={40} weight="heavy" color={Colors.purpleDark}>
-          The End
+          The end
         </Txt>
         <View style={styles.endButtons}>
           <Bouncy accessibilityLabel="Read it again" style={[styles.endButton, { backgroundColor: Colors.teal }]} onPress={() => openPage(story, 0)}>
@@ -228,7 +233,7 @@ export default function Books() {
 
   return (
     <GameScreen
-      title={story ? story.title : 'Story Shelf'}
+      title={story ? story.title : 'Story shelf'}
       background="#CDEFEA"
       onRepeat={() => (story && page < story.pages.length ? readPage(story, page) : speak(say.line('shelfIntro')))}>
       {story ? (

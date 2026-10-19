@@ -178,7 +178,7 @@ export default function Art() {
     ) : null;
   const toolStyle = { width: toolSize, height: toolSize, borderRadius: toolSize * 0.32 };
   return (
-    <GameScreen title="Art Studio" background="#EADFFF" onRepeat={() => speak(say.line('artIntro'))}>
+    <GameScreen title="Art studio" background="#EADFFF" onRepeat={() => speak(say.line('artIntro'))}>
       <View style={styles.body}>
         <View style={styles.tools}>
           {TOOLS.map((t) => (

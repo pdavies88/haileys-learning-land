@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import type { ReactNode } from 'react';
+import { useEffect, useRef, type ReactNode } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -7,7 +7,7 @@ import { Bouncy } from '@/components/bouncy';
 import { Pic } from '@/components/pic';
 import { Txt } from '@/components/txt';
 import { Colors, MIN_TAP, Spacing, gradient, raised, shade } from '@/constants/theme';
-import { stopSpeaking } from '@/lib/audio';
+import { abandonSpeech } from '@/lib/audio';
 
 type Props = {
   title: string;
@@ -25,6 +25,12 @@ type Props = {
 /** The frame every game sits in: a big Home button, the title, a "say it again" button and stars. */
 export function GameScreen({ title, background, onRepeat, progress, level, children }: Props) {
   const insets = useSafeAreaInsets();
+  const leaving = useRef(false);
+
+  // When the game closes (Home button or a swipe back), drop anything still waiting on the voice,
+  // so a celebration or the next question can't play after the child has left.
+  useEffect(() => () => abandonSpeech(), []);
+
   return (
     <View style={[styles.screen, gradient(shade(background, 0.35), shade(background, -0.06), 180), { paddingTop: insets.top + Spacing.sm }]}>
       <View style={[styles.bar, { paddingLeft: insets.left + Spacing.md, paddingRight: insets.right + Spacing.md }]}>
@@ -32,7 +38,10 @@ export function GameScreen({ title, background, onRepeat, progress, level, child
           accessibilityLabel="Go home"
           style={styles.round}
           onPress={() => {
-            stopSpeaking();
+            // Ignore extra taps while the screen closes, or a second tap would go back too far.
+            if (leaving.current) return;
+            leaving.current = true;
+            abandonSpeech();
             if (router.canGoBack()) router.back();
             else router.replace('/');
           }}>

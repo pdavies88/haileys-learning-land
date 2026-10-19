@@ -1,10 +1,9 @@
 import { Canvas, LinearGradient, Rect, vec } from '@shopify/react-native-skia';
 import { useEffect, useRef, useState } from 'react';
-import { ScrollView, StyleSheet, View, useWindowDimensions, type LayoutChangeEvent } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View, useWindowDimensions, type GestureResponderEvent, type LayoutChangeEvent } from 'react-native';
 import Animated, { FadeIn, ZoomIn } from 'react-native-reanimated';
 
 import { Bouncy } from '@/components/bouncy';
-import { Draggable } from '@/components/draggable';
 import { GameScreen } from '@/components/game-screen';
 import { Pic } from '@/components/pic';
 import { Txt } from '@/components/txt';
@@ -27,8 +26,8 @@ export default function Friends() {
   const [friend, setFriend] = useState<string | null>(null);
   const [place, setPlace] = useState<Place | null>(null);
   const [stickers, setStickers] = useState<Placed[]>([]);
-  const [scene, setScene] = useState({ x: 0, y: 0, width: 0, height: 0 });
-  const sceneView = useRef<View>(null);
+  const [scene, setScene] = useState({ width: 0, height: 0 });
+  const [chosen, setChosen] = useState(STICKERS[0]);
   const nextId = useRef(1);
 
   useEffect(() => {
@@ -38,18 +37,13 @@ export default function Friends() {
   const step = !friend ? 'friend' : !place ? 'place' : 'decorate';
   const instruction = step === 'friend' ? 'friendIntro' : step === 'place' ? 'pickPlace' : 'addStickers';
 
-  const measureScene = (e: LayoutChangeEvent) => {
-    const { width: w, height: h } = e.nativeEvent.layout;
-    requestAnimationFrame(() => sceneView.current?.measureInWindow((x, y) => setScene({ x, y, width: w, height: h })));
-  };
+  const measureScene = (e: LayoutChangeEvent) => setScene({ width: e.nativeEvent.layout.width, height: e.nativeEvent.layout.height });
 
-  const inScene = (x: number, y: number) => x >= scene.x && x <= scene.x + scene.width && y >= scene.y && y <= scene.y + scene.height;
-
-  const dropNew = (name: string, x: number, y: number) => {
-    if (!inScene(x, y)) return false;
+  /** Puts the chosen sticker right where the picture was tapped. */
+  const place_ = (e: GestureResponderEvent) => {
+    const { locationX, locationY } = e.nativeEvent;
     playSfx('pop');
-    setStickers((s) => [...s, { id: nextId.current++, name, x: x - scene.x, y: y - scene.y }]);
-    return false; // the tray sticker springs back so she can use it again
+    setStickers((s) => [...s, { id: nextId.current++, name: chosen, x: locationX, y: locationY }]);
   };
 
   const startOver = () => {
@@ -65,7 +59,7 @@ export default function Friends() {
   if (step === 'friend' || step === 'place') {
     const options = step === 'friend' ? FRIENDS.map((f) => ({ id: f, picture: f })) : PLACES.map((p) => ({ id: p.id, picture: p.decor[0] }));
     return (
-      <GameScreen title="Make a Friend" background="#FFE3EC" onRepeat={() => speak(say.line(instruction))}>
+      <GameScreen title="Make a friend" background="#FFE3EC" onRepeat={() => speak(say.line(instruction))}>
         <ScrollView contentContainerStyle={styles.options}>
           {options.map((option, i) => {
             const placeInfo = PLACES.find((p) => p.id === option.id);
@@ -87,7 +81,7 @@ export default function Friends() {
                   <Pic name={option.picture} size={tile * 0.62} />
                   {placeInfo ? (
                     <Txt size={18} color={placeInfo.id === 'night' ? Colors.white : Colors.text}>
-                      {placeInfo.name}
+                      {placeInfo.name.charAt(0).toUpperCase() + placeInfo.name.slice(1)}
                     </Txt>
                   ) : null}
                 </Bouncy>
@@ -101,10 +95,10 @@ export default function Friends() {
 
   const friendSize = Math.min(scene.width, scene.height) * 0.5;
   return (
-    <GameScreen title="Make a Friend" background="#FFE3EC" onRepeat={() => speak(say.line(instruction))}>
+    <GameScreen title="Make a friend" background="#FFE3EC" onRepeat={() => speak(say.line(instruction))}>
       <View style={styles.decorate}>
-        <View ref={sceneView} onLayout={measureScene} style={styles.scene}>
-          <Canvas style={StyleSheet.absoluteFill}>
+        <Pressable accessibilityLabel="Picture: tap to add the sticker" onLayout={measureScene} onPress={place_} style={styles.scene}>
+          <Canvas style={StyleSheet.absoluteFill} pointerEvents="none">
             <Rect x={0} y={0} width={scene.width} height={scene.height}>
               <LinearGradient start={vec(0, 0)} end={vec(0, scene.height)} colors={place!.colors} />
             </Rect>
@@ -126,28 +120,29 @@ export default function Friends() {
           {stickers.map((sticker) => {
             const s = Math.max(48, Math.min(scene.width, scene.height) * 0.13);
             return (
-              <View key={sticker.id} style={{ position: 'absolute', left: sticker.x - s / 2, top: sticker.y - s / 2 }}>
-                <Draggable stayWhereDropped onPickUp={() => playSfx('pop')} onDrop={() => true}>
-                  <Animated.View entering={ZoomIn.springify()}>
-                    <Pic name={sticker.name} size={s} />
-                  </Animated.View>
-                </Draggable>
-              </View>
+              <Animated.View
+                key={sticker.id}
+                entering={ZoomIn.duration(160)}
+                pointerEvents="none"
+                style={{ position: 'absolute', left: sticker.x - s / 2, top: sticker.y - s / 2 }}>
+                <Pic name={sticker.name} size={s} />
+              </Animated.View>
             );
           })}
-        </View>
+        </Pressable>
 
         <View style={styles.tray}>
           {STICKERS.map((name) => (
-            <Draggable key={name} onDrop={(x, y) => dropNew(name, x, y)}>
-              <View style={styles.sticker}>
-                <Pic name={name} size={40} />
-              </View>
-            </Draggable>
+            <Bouncy key={name} accessibilityLabel={name} onPress={() => setChosen(name)} style={[styles.sticker, chosen === name && styles.stickerOn]}>
+              <Pic name={name} size={40} />
+            </Bouncy>
           ))}
         </View>
 
         <Animated.View entering={FadeIn} style={styles.actions}>
+          <Bouncy accessibilityLabel="Take the last sticker off" style={styles.action} onPress={() => setStickers((s) => s.slice(0, -1))}>
+            <Pic name="undo" size={30} />
+          </Bouncy>
           <Bouncy accessibilityLabel="Clear stickers" style={styles.action} onPress={() => setStickers([])}>
             <Pic name="trash" size={30} />
           </Bouncy>
@@ -169,7 +164,8 @@ const styles = StyleSheet.create({
   scene: { flex: 1, borderRadius: 28, overflow: 'hidden', ...cardShadow },
   friend: { position: 'absolute' },
   tray: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: Spacing.sm, paddingVertical: Spacing.xs },
-  sticker: { width: 56, height: 56, borderRadius: 18, backgroundColor: Colors.white, alignItems: 'center', justifyContent: 'center', ...cardShadow },
+  sticker: { width: 56, height: 56, borderRadius: 18, backgroundColor: Colors.white, alignItems: 'center', justifyContent: 'center', borderWidth: 3, borderColor: 'transparent', ...cardShadow },
+  stickerOn: { borderColor: Colors.pink, backgroundColor: '#FFF0F6', transform: [{ scale: 1.1 }] },
   actions: { flexDirection: 'row', justifyContent: 'center', gap: Spacing.md },
   action: { height: 56, minWidth: 56, borderRadius: 28, backgroundColor: Colors.white, alignItems: 'center', justifyContent: 'center', paddingHorizontal: Spacing.md, ...cardShadow },
   newFriend: { backgroundColor: Colors.pink },

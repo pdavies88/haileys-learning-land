@@ -237,8 +237,8 @@ export default function Quest() {
                 setMode('build');
               }}>
               <Pic name={b.id} size={tile * 0.45} />
-              <Txt size={20} style={{ textTransform: 'capitalize' }}>
-                {b.name}
+              <Txt size={20}>
+                {b.name.charAt(0).toUpperCase() + b.name.slice(1)}
               </Txt>
             </Bouncy>
           </Animated.View>
@@ -262,7 +262,7 @@ export default function Quest() {
 
   return (
     <GameScreen
-      title="Shape Quest"
+      title="Shape quest"
       background="#D6EEFC"
       onRepeat={() => speak(say.line(mode === 'hunt' ? 'questHunt' : mode === 'menu' ? 'questPick' : mode === 'create' ? 'questCreate' : 'questBuild'))}
       progress={mode === 'hunt' ? { done: round.done, total: round.total } : undefined}

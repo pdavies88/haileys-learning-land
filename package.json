@@ -52,8 +52,9 @@
     "test": "jest",
     "generate:pictures": "node scripts/generate-pictures.mjs",
     "generate:speech-list": "node scripts/build-speech-list.mjs",
-    "generate:audio": ".tts/venv/bin/python audio-tools/generate_audio.py",
-    "generate:brand": "node scripts/generate-brand-assets.mjs"
+    "generate:audio": ".tts/venv/bin/python audio-tools/generate_audio.py && .tts2/venv-qwen/bin/python audio-tools/generate_speech_qwen.py",
+    "generate:brand": "node scripts/generate-brand-assets.mjs",
+    "check:speech": ".tts2/venv-chatterbox/bin/python audio-tools/check_speech.py"
   },
   "private": true,
   "allowScripts": {

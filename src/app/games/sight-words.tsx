@@ -5,11 +5,14 @@ import Animated, { ZoomIn } from 'react-native-reanimated';
 import { useCelebration } from '@/components/celebration';
 import { Choice } from '@/components/choice';
 import { GameScreen } from '@/components/game-screen';
+import { HelpButton } from '@/components/help-button';
 import { Pic } from '@/components/pic';
 import { SpellWord } from '@/components/spell-word';
 import { Txt } from '@/components/txt';
 import { Colors, Radius, Spacing, raised } from '@/constants/theme';
 import { RHYMES, SIGHT_WORDS, SIGHT_WORDS_EASY, SPELL_WORDS, say } from '@/content/learning';
+import { useHelp } from '@/hooks/use-help';
+import { useLock } from '@/hooks/use-lock';
 import { useRound } from '@/hooks/use-round';
 import { pick, playSfx, speak } from '@/lib/audio';
 import { sample, shuffle } from '@/lib/random';
@@ -76,8 +79,9 @@ export default function SightWords() {
   const [question, setQuestion] = useState(() => newQuestion(1));
   const [wiggles, setWiggles] = useState<Record<string, number>>({});
   const [found, setFound] = useState(false);
-  const [hint, setHint] = useState(false);
   const { celebrate, overlay } = useCelebration();
+  const lock = useLock();
+  const help = useHelp<string>();
 
   useEffect(() => {
     speak(say.line('detectiveIntro'), ...promptFor(question));
@@ -90,23 +94,25 @@ export default function SightWords() {
     setQuestion(q);
     setWiggles({});
     setFound(false);
-    setHint(false);
+    help.reset();
+    lock.release();
     speak(...promptFor(q));
   };
 
   const right = async (spoken: string) => {
+    if (!lock.take()) return;
     setFound(true);
     playSfx('chime');
-    await speak(spoken);
-    await round.success(celebrate);
+    // Celebrate straight away; the word is said as part of the cheer.
+    await round.success(celebrate, spoken);
     next();
   };
 
   const wrong = (card: string, spoken: string) => {
     playSfx('bloop');
     setWiggles((w) => ({ ...w, [card]: (w[card] ?? 0) + 1 }));
-    if (round.miss() >= 2) setHint(true);
-    speak(spoken, say.line('tryAgain'), ...promptFor(question));
+    const offer = help.miss(round.miss(), card);
+    speak(spoken, say.line('tryAgain'), ...promptFor(question), ...offer);
   };
 
   const choose = (card: string) => {
@@ -125,8 +131,8 @@ export default function SightWords() {
         decoys={question.decoys}
         onMiss={() => round.miss()}
         onDone={async () => {
-          await speak(say.picture(question.target));
-          await round.success(celebrate);
+          if (!lock.take()) return;
+          await round.success(celebrate, say.picture(question.target));
           next();
         }}
       />
@@ -149,7 +155,7 @@ export default function SightWords() {
                 accessibilityLabel={word}
                 wiggle={wiggles[word] ?? 0}
                 glow={found && word === question.target}
-                hint={hint && word === question.target}
+                gone={help.isGone(word)}
                 style={{ width: cardWidth, height: cardWidth * 0.58 }}
                 onPress={() => choose(word)}>
                 <Txt size={Math.min(60, cardWidth * 0.28)} weight="heavy" color={Colors.purpleDark}>
@@ -159,6 +165,7 @@ export default function SightWords() {
             </Animated.View>
           ))}
         </View>
+        <HelpButton visible={help.canHelp(question.cards, question.target)} onPress={() => help.help(question.cards, question.target)} />
       </View>
     );
   } else {
@@ -187,7 +194,7 @@ export default function SightWords() {
                 accessibilityLabel={picture}
                 wiggle={wiggles[picture] ?? 0}
                 glow={found && picture === question.target}
-                hint={hint && picture === question.target}
+                gone={help.isGone(picture)}
                 style={{ width: size, height: size }}
                 onPress={() => choose(picture)}>
                 <Pic name={picture} size={size * 0.7} />
@@ -195,13 +202,14 @@ export default function SightWords() {
             </Animated.View>
           ))}
         </View>
+        <HelpButton visible={help.canHelp(question.cards, question.target)} onPress={() => help.help(question.cards, question.target)} />
       </View>
     );
   }
 
   return (
     <GameScreen
-      title="Word Detective"
+      title="Word detective"
       background="#DCEBFF"
       onRepeat={() => speak(...promptFor(question))}
       progress={{ done: round.done, total: round.total }}

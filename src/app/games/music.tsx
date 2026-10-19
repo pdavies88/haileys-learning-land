@@ -1,6 +1,9 @@
-import { useEffect, useRef, useState } from 'react';
-import { StyleSheet, View, useWindowDimensions } from 'react-native';
-import Animated, { ZoomIn } from 'react-native-reanimated';
+/* eslint-disable react-hooks/refs -- the flagged code runs in finger handlers handed to a
+ gesture builder, not during render. SwipePad opts out of React Compiler with 'use no memo'. */
+import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { StyleSheet, View, useWindowDimensions, type StyleProp, type ViewStyle } from 'react-native';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import Animated, { ZoomIn, useAnimatedStyle, useSharedValue, withSequence, withSpring, withTiming } from 'react-native-reanimated';
 
 import { Bouncy } from '@/components/bouncy';
 import { useCelebration } from '@/components/celebration';
@@ -13,19 +16,96 @@ import { ABC_SONG, LETTERS, XYLOPHONE, say } from '@/content/learning';
 import { playSfx, speak, stopSpeaking } from '@/lib/audio';
 import { randomInt } from '@/lib/random';
 
-type Tab = 'play' | 'drums' | 'copy' | 'sing';
+type Tab = 'play' | 'band' | 'copy' | 'sing';
 const TABS: { id: Tab; label: string; picture: string }[] = [
   { id: 'play', label: 'Play', picture: 'piano' },
-  { id: 'drums', label: 'Drums', picture: 'drum' },
+  { id: 'band', label: 'Band', picture: 'drum' },
   { id: 'copy', label: 'Copy me', picture: 'music' },
   { id: 'sing', label: 'Sing', picture: 'bell' },
 ];
-const DRUMS: { sfx: SfxName; picture: string; color: string }[] = [
-  { sfx: 'drum', picture: 'drum', color: '#F2545B' },
-  { sfx: 'clap', picture: 'clap', color: '#FFD23F' },
-  { sfx: 'shaker', picture: 'maracas', color: '#3CC47C' },
-  { sfx: 'bell', picture: 'bell', color: '#4D9DE0' },
+// Band instruments are played by swiping across them. `every` is how far (in points) a finger
+// travels between sounds while it keeps swiping: short for a shaker, long for a strum.
+const BAND: { sfx: SfxName; picture: string; color: string; label: string; every: number }[] = [
+  { sfx: 'drum', picture: 'drum', color: '#F2545B', label: 'Drum', every: 90 },
+  { sfx: 'shaker', picture: 'maracas', color: '#3CC47C', label: 'Maracas', every: 45 },
+  { sfx: 'clap', picture: 'clap', color: '#FFB627', label: 'Clapping hands', every: 80 },
+  { sfx: 'bell', picture: 'bell', color: '#4D9DE0', label: 'Bell', every: 110 },
+  { sfx: 'strum', picture: 'guitar', color: '#9B6DE3', label: 'Guitar', every: 120 },
 ];
+
+/**
+ * Plays the moment a finger touches it, not when it lifts, and lets several fingers play several
+ * bars at once. Taps from mashing are all heard.
+ */
+function TouchPad({ onTouch, style, label, children }: { onTouch: () => void; style: StyleProp<ViewStyle>; label: string; children?: ReactNode }) {
+  const scale = useSharedValue(1);
+  const gesture = Gesture.Pan()
+    .runOnJS(true)
+    .minDistance(0)
+    .onBegin(() => {
+      scale.set(withSequence(withTiming(0.92, { duration: 50 }), withSpring(1, { damping: 10 })));
+      onTouch();
+    });
+  const animated = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
+  return (
+    <GestureDetector gesture={gesture}>
+      <Animated.View accessible accessibilityRole="button" accessibilityLabel={label} style={[style, animated]}>
+        {children}
+      </Animated.View>
+    </GestureDetector>
+  );
+}
+
+/** Plays when a finger swipes across it, and again as the finger keeps moving. A plain tap is silent. */
+function SwipePad({ every, onPlay, onTapOnly, style, label, children }: {
+  every: number;
+  onPlay: () => void;
+  onTapOnly: () => void;
+  style: StyleProp<ViewStyle>;
+  label: string;
+  children?: ReactNode;
+}) {
+  'use no memo';
+  const tilt = useSharedValue(0);
+  const travelled = useRef(0);
+  const last = useRef({ x: 0, y: 0 });
+  const played = useRef(false);
+  const hit = () => {
+    played.current = true;
+    tilt.set(withSequence(withTiming(-10, { duration: 60 }), withTiming(10, { duration: 90 }), withSpring(0, { damping: 8 })));
+    onPlay();
+  };
+  const gesture = Gesture.Pan()
+    .runOnJS(true)
+    .minDistance(12)
+    .onBegin(() => {
+      played.current = false;
+    })
+    .onStart((e) => {
+      travelled.current = 0;
+      last.current = { x: e.translationX, y: e.translationY };
+      hit();
+    })
+    .onUpdate((e) => {
+      travelled.current += Math.hypot(e.translationX - last.current.x, e.translationY - last.current.y);
+      last.current = { x: e.translationX, y: e.translationY };
+      if (travelled.current >= every) {
+        travelled.current = 0;
+        hit();
+      }
+    })
+    .onFinalize(() => {
+      if (!played.current) onTapOnly();
+    });
+  const animated = useAnimatedStyle(() => ({ transform: [{ rotate: `${tilt.value}deg` }] }));
+  return (
+    <GestureDetector gesture={gesture}>
+      <Animated.View accessible accessibilityRole="button" accessibilityLabel={label} style={[style, animated]}>
+        {children}
+      </Animated.View>
+    </GestureDetector>
+  );
+}
 const BEAT = 520; // ms
 
 const xylo = (bar: number) => `xylo${bar}` as SfxName;
@@ -63,6 +143,7 @@ export default function Music() {
   const playTune = async (notes: number[]) => {
     const id = ++run.current;
     setListening(true);
+    typed.current = [];
     setEntered([]);
     await wait(500);
     for (const bar of notes) {
@@ -81,22 +162,32 @@ export default function Music() {
     playTune(notes);
   };
 
+  // Copy-me progress lives in a ref too, so notes mashed faster than the screen redraws still count.
+  const typed = useRef<number[]>([]);
+  const busy = useRef(false);
+
   const tapBar = async (bar: number) => {
     playBar(bar);
-    if (tab !== 'copy' || listening || tune.length === 0) return;
-    const now = [...entered, bar];
+    if (tab !== 'copy' || listening || busy.current || tune.length === 0) return;
+    const now = [...typed.current, bar];
     if (tune[now.length - 1] !== bar) {
+      busy.current = true;
+      typed.current = [];
       playSfx('bloop');
       setEntered([]);
       await speak(say.line('listenAgain'));
+      busy.current = false;
       playTune(tune);
       return;
     }
+    typed.current = now;
     setEntered(now);
     if (now.length === tune.length) {
+      busy.current = true;
       setListening(true);
       await wait(400);
       await celebrate(false);
+      busy.current = false;
       newTune(Math.min(tune.length + 1, 8));
     }
   };
@@ -130,7 +221,7 @@ export default function Music() {
     setListening(false);
     setTune([]);
     if (next === 'play') speak(say.line('musicIntro'));
-    if (next === 'drums') speak(say.line('drumsIntro'));
+    if (next === 'band') speak(say.line('drumsIntro'));
     if (next === 'copy') {
       speak(say.line('copyIntro'));
       setTimeout(() => newTune(3), 1800);
@@ -142,11 +233,10 @@ export default function Music() {
   const xylophone = (
     <View style={styles.xylophone}>
       {XYLOPHONE.map((bar, i) => (
-        <Bouncy
+        <TouchPad
           key={i}
-          accessibilityLabel={`Note ${bar.note}`}
-          sound={false}
-          onPress={() => tapBar(i)}
+          label={`Note ${bar.note}`}
+          onTouch={() => tapBar(i)}
           style={[
             styles.bar,
             { width: barWidth, height: tallest * (1 - i * 0.06), backgroundColor: bar.color },
@@ -154,21 +244,27 @@ export default function Music() {
           ]}>
           <View style={styles.peg} />
           <View style={styles.peg} />
-        </Bouncy>
+        </TouchPad>
       ))}
     </View>
   );
 
   let body;
   if (tab === 'play') body = xylophone;
-  else if (tab === 'drums') {
-    const pad = Math.min((width - Spacing.md * 4) / 2, height * 0.26, 220);
+  else if (tab === 'band') {
+    const pad = Math.min((width - Spacing.md * 4) / (width >= 700 ? 3 : 2), height * 0.24, 220);
     body = (
       <View style={styles.drums}>
-        {DRUMS.map((d) => (
-          <Bouncy key={d.sfx} accessibilityLabel={d.sfx} sound={false} onPress={() => playSfx(d.sfx)} style={[styles.pad, { width: pad, height: pad, backgroundColor: d.color }]}>
+        {BAND.map((d) => (
+          <SwipePad
+            key={d.sfx}
+            label={`${d.label}: swipe to play`}
+            every={d.every}
+            onPlay={() => playSfx(d.sfx)}
+            onTapOnly={() => speak(say.line('drumsIntro'))}
+            style={[styles.pad, { width: pad, height: pad, backgroundColor: d.color }]}>
             <Pic name={d.picture} size={pad * 0.5} />
-          </Bouncy>
+          </SwipePad>
         ))}
       </View>
     );
@@ -218,10 +314,10 @@ export default function Music() {
 
   return (
     <GameScreen
-      title="Music Maker"
+      title="Music maker"
       background="#FFE6F2"
       onRepeat={() =>
-        tab === 'copy' && tune.length ? playTune(tune) : speak(say.line(tab === 'drums' ? 'drumsIntro' : tab === 'sing' ? 'singAbc' : 'musicIntro'))
+        tab === 'copy' && tune.length ? playTune(tune) : speak(say.line(tab === 'band' ? 'drumsIntro' : tab === 'sing' ? 'singAbc' : 'musicIntro'))
       }>
       <View style={styles.tabs}>
         {TABS.map((t) => (

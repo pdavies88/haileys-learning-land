@@ -28,17 +28,17 @@ READ AND SPELL
 
 NUMBERS
 - Count & Collect: counting, missing numbers, more or fewer, adding and taking away.
-- Little Chef: count ingredients and follow first, next and last steps.
+- Little chef: find the right ingredients, add the right amount, and follow first, next and last steps.
 
 CREATE
 - Art Studio: crayons, glitter, stamps, a rainbow color, a magic mirror for symmetrical drawings and 100 coloring pages.
-- Build a Story, Make a Friend and Music Maker.
+- Build a story, Make a friend, and Music maker with a band you play by swiping.
 
 THINK AND SOLVE
 - Puzzle World: patterns and jigsaws up to 16 pieces.
-- Flip & Find, Shape Quest and My Little Pet.
+- Flip & find, Shape quest, and My little pet: a pocket pet that tells you what it needs.
 
-Every game adjusts as children play. It moves up after two right answers in a row and eases off after a miss, and wrong answers get a gentle "Let's try again!", never a buzzer.
+Every game adjusts as children play, and a friendly owl offers a clue when they're stuck, without giving the answer away. It moves up after two right answers in a row and eases off after a miss, and wrong answers get a gentle "Let's try again!", never a buzzer.
 
 No ads. No in-app purchases. No accounts. No tracking. Everything works offline. The grown-ups area is behind a simple parental gate.
 

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { StyleSheet, View, useWindowDimensions } from 'react-native';
 import Animated, { ZoomIn, ZoomOut, useAnimatedStyle, useSharedValue, withSequence, withSpring } from 'react-native-reanimated';
 
@@ -7,7 +7,7 @@ import { Pic } from '@/components/pic';
 import { Txt } from '@/components/txt';
 import { Colors, Spacing, cardShadow } from '@/constants/theme';
 import { say, type Mission } from '@/content/learning';
-import { playSfx, speak } from '@/lib/audio';
+import { playSfx, speak, speakAfter } from '@/lib/audio';
 
 /** The hungry animal: it bounces happily every time it gets a treat. */
 function Animal({ name, size, fed }: { name: string; size: number; fed: number }) {
@@ -30,20 +30,23 @@ function Animal({ name, size, fed }: { name: string; size: number; fed: number }
 export function FeedTray({ mission, target, animal, onDone }: { mission: Mission; target: number; animal?: string; onDone: () => void }) {
   const { width, height } = useWindowDimensions();
   const [eaten, setEaten] = useState<number[]>([]);
+  // The true count, updated at once. Fast taps can land before the screen redraws.
+  const count = useRef<number[]>([]);
   const items = Math.min(target + 3, 12);
   const short = Math.min(width, height);
   const itemSize = Math.min(short * 0.16, 90);
 
   const feed = async (item: number) => {
-    if (eaten.length >= target || eaten.includes(item)) return;
-    const now = [...eaten, item];
+    if (count.current.length >= target || count.current.includes(item)) return;
+    const now = [...count.current, item];
+    count.current = now;
     setEaten(now);
     playSfx('pop');
-    if (now.length < target) {
-      speak(say.number(now.length));
-      return;
-    }
-    await speak(say.number(now.length));
+    // The first tap cuts off the instruction. After that, each number queues after the last, so
+    // quick taps are still counted out loud one by one.
+    const counted = now.length === 1 ? speak(say.number(1)) : speakAfter(say.number(now.length));
+    if (now.length < target) return;
+    await counted;
     onDone();
   };
 
