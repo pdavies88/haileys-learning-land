@@ -13,13 +13,13 @@ type Props = {
   wiggle: number;
   /** Glows when this is the right answer and she found it. */
   glow?: boolean;
-  /** Gently pulses to help her find the answer after a few tries. */
-  hint?: boolean;
+  /** Taken away by the Help button: faded and can't be picked. */
+  gone?: boolean;
   style?: StyleProp<ViewStyle>;
 };
 
 /** A big answer card that wiggles for "try again" and glows for "you got it". */
-export function Choice({ onPress, children, accessibilityLabel, wiggle, glow, hint, style }: Props) {
+export function Choice({ onPress, children, accessibilityLabel, wiggle, glow, gone, style }: Props) {
   const rotate = useSharedValue(0);
   const pulse = useSharedValue(1);
 
@@ -35,26 +35,29 @@ export function Choice({ onPress, children, accessibilityLabel, wiggle, glow, hi
   }, [wiggle, rotate]);
 
   useEffect(() => {
-    pulse.value = hint || glow ? withSequence(withSpring(1.12), withSpring(1)) : 1;
-  }, [hint, glow, pulse]);
+    pulse.value = glow ? withSequence(withSpring(1.12), withSpring(1)) : 1;
+  }, [glow, pulse]);
 
   const animated = useAnimatedStyle(() => ({ transform: [{ rotate: `${rotate.value}deg` }, { scale: pulse.value }] }));
+  const fade = useAnimatedStyle(() => ({ opacity: withTiming(gone ? 0.15 : 1, { duration: 250 }) }));
 
   return (
-    <Animated.View style={animated}>
+    <Animated.View style={[animated, fade]} pointerEvents={gone ? 'none' : 'auto'}>
       <Bouncy
         accessibilityLabel={accessibilityLabel}
         onPress={onPress}
+        instant
+        disabled={gone}
         sound={false}
         style={[
           {
             backgroundColor: glow ? '#FFF6CC' : Colors.white,
             borderRadius: Radius.lg,
             borderWidth: 4,
-            borderColor: glow ? Colors.yellow : hint ? Colors.pink : 'transparent',
+            borderColor: glow ? Colors.yellow : 'transparent',
             alignItems: 'center',
             justifyContent: 'center',
-            ...raised(glow ? '#E8B21F' : hint ? '#E0468A' : '#E4DEF5'),
+            ...raised(glow ? '#E8B21F' : '#E4DEF5'),
           },
           style,
         ]}>

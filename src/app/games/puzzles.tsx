@@ -6,12 +6,14 @@ import { useCelebration } from '@/components/celebration';
 import { Choice } from '@/components/choice';
 import { Draggable } from '@/components/draggable';
 import { GameScreen } from '@/components/game-screen';
+import { HelpButton } from '@/components/help-button';
 import { Pic } from '@/components/pic';
 import { Shape } from '@/components/shape';
 import { Txt } from '@/components/txt';
 import { Colors, Spacing, cardShadow } from '@/constants/theme';
 import { COLORS, JIGSAW_PICTURES, SHAPES, say, type ShapeName } from '@/content/learning';
 import { useDropTargets } from '@/hooks/use-drop-targets';
+import { useHelp } from '@/hooks/use-help';
 import { useRound } from '@/hooks/use-round';
 import { pick, playSfx, speak } from '@/lib/audio';
 import { sample, shuffle } from '@/lib/random';
@@ -184,7 +186,7 @@ function Pattern({ level, onSolved, onMiss }: { level: number; onSolved: Solved;
     return { tokens, decoy, row: row.slice(0, length), answer, options };
   });
   const [wiggles, setWiggles] = useState<Record<number, number>>({});
-  const [hint, setHint] = useState(false);
+  const help = useHelp<number>();
   const [done, setDone] = useState(false);
   const tokenOf = (i: number) => (i === -1 ? puzzle.decoy : puzzle.tokens[i]);
   const size = Math.min((width - 60) / (puzzle.row.length + 1) - 6, 64);
@@ -204,8 +206,8 @@ function Pattern({ level, onSolved, onMiss }: { level: number; onSolved: Solved;
     }
     playSfx('bloop');
     setWiggles((w) => ({ ...w, [i]: (w[i] ?? 0) + 1 }));
-    if (onMiss() >= 2) setHint(true);
-    speak(say.line('tryAgain'), say.line('whatNext'));
+    const offer = help.miss(onMiss(), i);
+    speak(say.line('tryAgain'), say.line('whatNext'), ...offer);
   };
 
   return (
@@ -235,13 +237,14 @@ function Pattern({ level, onSolved, onMiss }: { level: number; onSolved: Solved;
             accessibilityLabel={tokenOf(i).shape}
             wiggle={wiggles[i] ?? 0}
             glow={done && i === puzzle.answer}
-            hint={hint && i === puzzle.answer}
+            gone={help.isGone(i)}
             style={{ width: option + 20, height: option + 20 }}
             onPress={() => choose(i)}>
             <Shape shape={tokenOf(i).shape} color={tokenOf(i).color} size={option * 0.8} />
           </Choice>
         ))}
       </View>
+      <HelpButton visible={!done && help.canHelp(puzzle.options, puzzle.answer)} onPress={() => help.help(puzzle.options, puzzle.answer)} />
     </View>
   );
 }
@@ -264,7 +267,7 @@ export default function Puzzles() {
 
   return (
     <GameScreen
-      title="Puzzle World"
+      title="Puzzle world"
       background="#CFF5EF"
       onRepeat={() => speak(say.line(kind === 'sorter' ? 'shapeIntro' : kind === 'pattern' ? 'whatNext' : 'jigsawIntro'))}
       level={round.level}

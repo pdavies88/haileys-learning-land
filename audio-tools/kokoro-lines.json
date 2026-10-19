@@ -1,0 +1,4 @@
+{
+  "_comment": "Single words the Qwen narrator says unclearly (checked with check_speech.py). generate_audio.py speaks these with Kokoro, and generate_speech_qwen.py skips them.",
+  "lines": ["letter-y", "pic-wand", "word-get", "word-our", "word-a"]
+}

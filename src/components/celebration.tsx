@@ -32,14 +32,15 @@ function Particle({ name, angle, distance, delay }: { name: string; angle: numbe
 
 /**
  * A burst of stars, hearts and sparkles, with a sound and spoken praise.
- * `celebrate()` returns a promise that resolves when the praise has been spoken.
+ * `celebrate(big, ...lead)` bursts at once, says any `lead` lines (such as the word she found) and
+ * then the praise, and resolves when it has all been spoken.
  */
 export function useCelebration() {
   const [burst, setBurst] = useState<{ id: number; pieces: { angle: number; distance: number; delay: number }[] } | null>(
     null,
   );
 
-  const celebrate = async (big = false) => {
+  const celebrate = async (big = false, ...lead: string[]) => {
     const pieces = Array.from({ length: 18 }, (_, i) => ({
       angle: (i / 18) * Math.PI * 2 + Math.random() * 0.3,
       distance: 140 + Math.random() * 120,
@@ -47,7 +48,7 @@ export function useCelebration() {
     }));
     setBurst((previous) => ({ id: (previous?.id ?? 0) + 1, pieces }));
     playSfx(big ? 'tada' : 'sparkle');
-    await speak(say.line(big ? 'allDone' : pick(PRAISE)));
+    await speak(...lead, say.line(big ? 'allDone' : pick(PRAISE)));
   };
 
   const overlay = burst ? (

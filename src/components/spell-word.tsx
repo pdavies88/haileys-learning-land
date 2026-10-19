@@ -3,10 +3,12 @@ import { StyleSheet, View, useWindowDimensions } from 'react-native';
 import Animated, { ZoomIn } from 'react-native-reanimated';
 
 import { Choice } from '@/components/choice';
+import { HelpButton } from '@/components/help-button';
 import { Pic } from '@/components/pic';
 import { Txt } from '@/components/txt';
 import { Colors, Radius, Spacing } from '@/constants/theme';
 import { LETTERS, say } from '@/content/learning';
+import { HELP_AFTER } from '@/hooks/use-help';
 import { playSfx, speak } from '@/lib/audio';
 import { shuffle } from '@/lib/random';
 
@@ -33,7 +35,7 @@ export function SpellWord({ word, decoys, onMiss, onDone }: Props) {
   });
   const [used, setUsed] = useState<number[]>([]);
   const [wiggles, setWiggles] = useState<Record<number, number>>({});
-  const [hint, setHint] = useState(false);
+  const [misses, setMisses] = useState(0);
   const typed = used.length;
   const done = typed === word.length;
 
@@ -42,13 +44,14 @@ export function SpellWord({ word, decoys, onMiss, onDone }: Props) {
     if (tile.letter !== word[typed]) {
       playSfx('bloop');
       setWiggles((w) => ({ ...w, [tile.id]: (w[tile.id] ?? 0) + 1 }));
-      if (onMiss() >= 2) setHint(true);
-      speak(say.letterName(letterInfo(tile.letter)), say.line('tryAgain'));
+      const count = onMiss();
+      setMisses(count);
+      speak(say.letterName(letterInfo(tile.letter)), say.line('tryAgain'), ...(count === HELP_AFTER ? [say.line('helpOffer')] : []));
       return;
     }
     const now = [...used, tile.id];
     setUsed(now);
-    setHint(false);
+    setMisses(0);
     playSfx('pop');
     if (now.length === word.length) {
       playSfx('chime');
@@ -60,7 +63,6 @@ export function SpellWord({ word, decoys, onMiss, onDone }: Props) {
 
   const slot = Math.min((width - 60) / word.length - Spacing.sm, height * 0.11, 124);
   const tile = Math.min((width - 60) / Math.min(tiles.length, 5) - Spacing.sm, height * 0.11, 124);
-  const nextTile = tiles.find((t) => !used.includes(t.id) && t.letter === word[typed]);
 
   return (
     <View style={styles.body}>
@@ -89,7 +91,6 @@ export function SpellWord({ word, decoys, onMiss, onDone }: Props) {
               key={t.id}
               accessibilityLabel={`Letter ${t.letter}`}
               wiggle={wiggles[t.id] ?? 0}
-              hint={hint && nextTile?.id === t.id}
               style={{ width: tile, height: tile }}
               onPress={() => tap(t)}>
               <Txt size={tile * 0.55} weight="heavy" color={Colors.blue}>
@@ -99,6 +100,8 @@ export function SpellWord({ word, decoys, onMiss, onDone }: Props) {
           ),
         )}
       </View>
+      {/* Help plays the sound of the next letter, without pointing at the tile. */}
+      <HelpButton visible={!done && misses >= HELP_AFTER} onPress={() => speak(say.line('helpListen'), say.letterSound(letterInfo(word[typed])))} />
     </View>
   );
 }

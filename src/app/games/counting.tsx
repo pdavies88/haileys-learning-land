@@ -6,10 +6,13 @@ import { useCelebration } from '@/components/celebration';
 import { Choice } from '@/components/choice';
 import { FeedTray } from '@/components/feed-tray';
 import { GameScreen } from '@/components/game-screen';
+import { HelpButton } from '@/components/help-button';
 import { Pic } from '@/components/pic';
 import { Txt } from '@/components/txt';
 import { Colors, Radius, Spacing, cardShadow, raised } from '@/constants/theme';
 import { ADDITION, MISSIONS, SUBTRACTION, say, type Mission } from '@/content/learning';
+import { useHelp } from '@/hooks/use-help';
+import { useLock } from '@/hooks/use-lock';
 import { useRound } from '@/hooks/use-round';
 import { pick, playSfx, speak } from '@/lib/audio';
 import { randomInt, shuffle } from '@/lib/random';
@@ -113,8 +116,9 @@ export default function Counting() {
   const [question, setQuestion] = useState<Question>(() => newQuestion(0));
   const [wiggles, setWiggles] = useState<Record<number, number>>({});
   const [found, setFound] = useState(false);
-  const [hint, setHint] = useState(false);
   const { celebrate, overlay } = useCelebration();
+  const lock = useLock();
+  const help = useHelp<number>();
 
   useEffect(() => {
     speak(say.line('countIntro'), ...promptFor(question));
@@ -127,24 +131,26 @@ export default function Counting() {
     setQuestion(q);
     setWiggles({});
     setFound(false);
-    setHint(false);
+    help.reset();
+    lock.release();
     speak(...promptFor(q));
   };
 
   const answer = async (n: number) => {
     if (question.kind === 'feed' || found) return;
     if (n === answerOf(question)) {
+      if (!lock.take()) return;
       setFound(true);
       playSfx('chime');
-      if (question.kind === 'compare') await speak(say.number(question.groups[n]));
-      else await speak(say.number(n));
-      await round.success(celebrate);
+      // Celebrate straight away; the number is said as part of the cheer.
+      await round.success(celebrate, say.number(question.kind === 'compare' ? question.groups[n] : n));
       next();
     } else {
       playSfx('bloop');
       setWiggles((w) => ({ ...w, [n]: (w[n] ?? 0) + 1 }));
-      if (round.miss() >= 2) setHint(true);
-      speak(say.line('tryAgain'), ...promptFor(question));
+      const offer = question.kind === 'compare' ? [] : help.miss(round.miss(), n);
+      if (question.kind === 'compare') round.miss();
+      speak(say.line('tryAgain'), ...promptFor(question), ...offer);
     }
   };
 
@@ -157,6 +163,7 @@ export default function Counting() {
         mission={question.mission}
         target={question.target}
         onDone={async () => {
+          if (!lock.take()) return;
           setFound(true);
           await round.success(celebrate);
           next();
@@ -175,7 +182,6 @@ export default function Counting() {
                 accessibilityLabel={`Group ${i + 1}`}
                 wiggle={wiggles[i] ?? 0}
                 glow={found && i === answerOf(question)}
-                hint={hint && i === answerOf(question)}
                 style={styles.compareCard}
                 onPress={() => answer(i)}>
                 <Group picture={question.picture} count={count} size={size} />
@@ -225,7 +231,7 @@ export default function Counting() {
                 accessibilityLabel={String(n)}
                 wiggle={wiggles[n] ?? 0}
                 glow={found && n === right}
-                hint={hint && n === right}
+                gone={help.isGone(n)}
                 style={{ width: cardSize, height: cardSize }}
                 onPress={() => answer(n)}>
                 <Txt size={cardSize * 0.5} weight="heavy" color={Colors.orange}>
@@ -235,13 +241,14 @@ export default function Counting() {
             </Animated.View>
           ))}
         </View>
+        <HelpButton visible={help.canHelp(question.choices, right)} onPress={() => help.help(question.choices, right)} />
       </View>
     );
   }
 
   return (
     <GameScreen
-      title="Count & Collect"
+      title="Count & collect"
       background="#FFE4D1"
       onRepeat={() => speak(...promptFor(question))}
       progress={{ done: round.done, total: round.total }}

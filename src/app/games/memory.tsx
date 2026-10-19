@@ -81,7 +81,16 @@ export default function Memory() {
   const [matched, setMatched] = useState<Set<number>>(new Set());
   const [area, setArea] = useState({ width: 0, height: 0 });
   const busy = useRef(false);
+  const flipBack = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { celebrate, overlay } = useCelebration();
+
+  // Don't flip cards back (with a sound) after the child has left the game.
+  useEffect(
+    () => () => {
+      if (flipBack.current) clearTimeout(flipBack.current);
+    },
+    [],
+  );
 
   useEffect(() => {
     speak(say.line(isLetterBoard(setIndex) ? 'memoryLetters' : 'memoryIntro'));
@@ -130,7 +139,7 @@ export default function Memory() {
       busy.current = false;
     } else {
       speak(sayCard(b));
-      setTimeout(() => {
+      flipBack.current = setTimeout(() => {
         playSfx('whoosh');
         setOpen([]);
         busy.current = false;
@@ -140,7 +149,7 @@ export default function Memory() {
 
   return (
     <GameScreen
-      title="Flip & Find"
+      title="Flip & find"
       background="#D5F7E4"
       onRepeat={() => speak(say.line(isLetterBoard(setIndex) ? 'memoryLetters' : 'memoryIntro'))}
       level={level}

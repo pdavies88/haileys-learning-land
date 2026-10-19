@@ -6,10 +6,13 @@ import { Bouncy } from '@/components/bouncy';
 import { useCelebration } from '@/components/celebration';
 import { Choice } from '@/components/choice';
 import { GameScreen } from '@/components/game-screen';
+import { HelpButton } from '@/components/help-button';
 import { Pic } from '@/components/pic';
 import { Txt } from '@/components/txt';
 import { Colors, Spacing, raised } from '@/constants/theme';
 import { LETTERS, SAFARI_LETTERS, SOUND_PICTURES, say } from '@/content/learning';
+import { useHelp } from '@/hooks/use-help';
+import { useLock } from '@/hooks/use-lock';
 import { useRound } from '@/hooks/use-round';
 import { pick, playSfx, speak } from '@/lib/audio';
 import { sample, shuffle } from '@/lib/random';
@@ -53,8 +56,9 @@ export default function Sounds() {
   const [question, setQuestion] = useState(() => newQuestion(1));
   const [wiggles, setWiggles] = useState<Record<string, number>>({});
   const [found, setFound] = useState(false);
-  const [hint, setHint] = useState(false);
   const { celebrate, overlay } = useCelebration();
+  const lock = useLock();
+  const help = useHelp<string>();
 
   const promptFor = (q: Question) =>
     q.kind === 'picture' ? [say.safariFind(q.letter), say.letterSound(letterInfo(q.letter))] : [say.picture(q.answer), say.line('whichLetter')];
@@ -69,31 +73,35 @@ export default function Sounds() {
     if (found) return;
     const target = question.kind === 'picture' ? question.answer : question.letter;
     if (choice === target) {
+      if (!lock.take()) return;
       setFound(true);
       playSfx('chime');
-      await speak(say.startsWith(question.answer, question.letter));
-      await round.success(celebrate);
+      // Celebrate straight away; "Apple starts with A!" is said as part of the cheer.
+      await round.success(celebrate, say.startsWith(question.answer, question.letter));
       const next = newQuestion(round.level, question.letter);
       setQuestion(next);
       setWiggles({});
       setFound(false);
-      setHint(false);
+      help.reset();
+      lock.release();
       speak(...promptFor(next));
     } else {
       playSfx('bloop');
       setWiggles((w) => ({ ...w, [choice]: (w[choice] ?? 0) + 1 }));
-      if (round.miss() >= 2) setHint(true);
+      const offer = help.miss(round.miss(), choice);
       const named = question.kind === 'picture' ? say.picture(choice) : say.letterSound(letterInfo(choice));
-      speak(named, say.line('tryAgain'), ...promptFor(question));
+      speak(named, say.line('tryAgain'), ...promptFor(question), ...offer);
     }
   };
 
   const info = letterInfo(question.letter);
+  const choices = question.kind === 'picture' ? question.pictures : question.letters;
+  const target = question.kind === 'picture' ? question.answer : question.letter;
   const count = question.kind === 'picture' ? question.pictures.length : question.letters.length;
   const size = Math.min((width - 80) / Math.min(count, 4), height * 0.26, 190);
   return (
     <GameScreen
-      title="Sound Safari"
+      title="Sound safari"
       background="#FFEFC7"
       onRepeat={() => speak(...promptFor(question))}
       progress={{ done: round.done, total: round.total }}
@@ -122,7 +130,7 @@ export default function Sounds() {
                     accessibilityLabel={picture}
                     wiggle={wiggles[picture] ?? 0}
                     glow={found && picture === question.answer}
-                    hint={hint && picture === question.answer}
+                    gone={help.isGone(picture)}
                     style={{ width: size, height: size }}
                     onPress={() => choose(picture)}>
                     <Pic name={picture} size={size * 0.72} />
@@ -135,7 +143,7 @@ export default function Sounds() {
                     accessibilityLabel={`Letter ${letter}`}
                     wiggle={wiggles[letter] ?? 0}
                     glow={found && letter === question.letter}
-                    hint={hint && letter === question.letter}
+                    gone={help.isGone(letter)}
                     style={{ width: size * 0.8, height: size * 0.8 }}
                     onPress={() => choose(letter)}>
                     <Txt size={size * 0.4} weight="heavy" color={Colors.orange}>
@@ -146,6 +154,10 @@ export default function Sounds() {
                 </Animated.View>
               ))}
         </View>
+        <HelpButton
+          visible={help.canHelp(choices, target)}
+          onPress={() => help.help(choices, target)}
+        />
       </View>
       {overlay}
     </GameScreen>

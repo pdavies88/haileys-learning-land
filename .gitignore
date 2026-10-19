@@ -44,6 +44,7 @@ example
 
 # Text-to-speech model and venv (shared with relaxation-station)
 .tts
+.tts2
 
 # Downloaded source artwork
 .cache

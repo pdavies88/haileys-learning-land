@@ -216,6 +216,9 @@ export const STORY_PLACES: Record<string, { home: string; short: string }> = {
   snow: { home: 'a snowy land where snowflakes danced', short: 'snowy land' },
 };
 
+/** Who the hero meets along the way. */
+export const STORY_FRIENDS = ['owl', 'turtle', 'penguin', 'fox', 'hedgehog', 'frog'];
+
 export const STORY_OBJECTS = [
   { id: 'wand', name: 'magic wand', event: 'With one wave of the magic wand, the whole {place} filled with rainbows!' },
   { id: 'gem', name: 'shiny gem', event: 'The shiny gem sparkled so brightly that everyone in the {place} came to see.' },
@@ -230,7 +233,7 @@ export const STORY_OBJECTS = [
 // ---------------------------------------------------------------------------
 
 export type ChefStep =
-  | { kind: 'add'; item: string; one: string; many: string; count: number }
+  | { kind: 'add'; item: string; one: string; many: string }
   | { kind: 'stir' }
   | { kind: 'bake' }
   | { kind: 'sort' };
@@ -241,8 +244,8 @@ export const RECIPES: { id: string; name: string; result: string; steps: ChefSte
     name: 'fruit salad',
     result: 'salad',
     steps: [
-      { kind: 'add', item: 'apple', one: 'apple', many: 'apples', count: 3 },
-      { kind: 'add', item: 'banana', one: 'banana', many: 'bananas', count: 2 },
+      { kind: 'add', item: 'apple', one: 'apple', many: 'apples' },
+      { kind: 'add', item: 'banana', one: 'banana', many: 'bananas' },
       { kind: 'stir' },
     ],
   },
@@ -251,8 +254,8 @@ export const RECIPES: { id: string; name: string; result: string; steps: ChefSte
     name: 'pizza',
     result: 'pizza',
     steps: [
-      { kind: 'add', item: 'tomato', one: 'tomato', many: 'tomatoes', count: 4 },
-      { kind: 'add', item: 'mushroom', one: 'mushroom', many: 'mushrooms', count: 3 },
+      { kind: 'add', item: 'tomato', one: 'tomato', many: 'tomatoes' },
+      { kind: 'add', item: 'mushroom', one: 'mushroom', many: 'mushrooms' },
       { kind: 'bake' },
     ],
   },
@@ -260,29 +263,46 @@ export const RECIPES: { id: string; name: string; result: string; steps: ChefSte
     id: 'smoothie',
     name: 'smoothie',
     result: 'smoothie',
-    steps: [
-      { kind: 'sort' },
-      { kind: 'add', item: 'strawberry', one: 'strawberry', many: 'strawberries', count: 5 },
-      { kind: 'stir' },
-    ],
+    steps: [{ kind: 'sort' }, { kind: 'add', item: 'strawberry', one: 'strawberry', many: 'strawberries' }, { kind: 'stir' }],
   },
   {
     id: 'pancakes',
     name: 'pancakes',
     result: 'pancakes',
     steps: [
-      { kind: 'add', item: 'egg', one: 'egg', many: 'eggs', count: 2 },
+      { kind: 'add', item: 'egg', one: 'egg', many: 'eggs' },
       { kind: 'stir' },
-      { kind: 'add', item: 'blueberries', one: 'blueberry', many: 'blueberries', count: 6 },
+      { kind: 'add', item: 'blueberries', one: 'blueberry', many: 'blueberries' },
+    ],
+  },
+  {
+    id: 'cake',
+    name: 'birthday cake',
+    result: 'cake',
+    steps: [
+      { kind: 'add', item: 'egg', one: 'egg', many: 'eggs' },
+      { kind: 'add', item: 'cherries', one: 'cherry', many: 'cherries' },
+      { kind: 'bake' },
     ],
   },
 ];
 
+/** Everything on the pantry shelf. The right ingredient sits among a few of these. */
+export const PANTRY = [
+  'apple', 'banana', 'tomato', 'mushroom', 'strawberry', 'egg', 'blueberries', 'cherries', 'carrot', 'lemon', 'pear',
+  'corn', 'cheese', 'grapes', 'orange',
+];
+
+/** How many of an ingredient a recipe can ask for. */
+export const CHEF_MIN = 2;
+export const CHEF_MAX = 9;
+
 /** Fruit for the sorting step, by color. */
 export const SORT_FRUIT: Record<string, string[]> = {
   red: ['apple', 'strawberry', 'cherries'],
-  yellow: ['banana', 'lemon'],
+  yellow: ['banana', 'lemon', 'corn'],
   green: ['green apple', 'pear', 'kiwi'],
+  orange: ['orange', 'carrot', 'peach'],
 };
 
 const ORDER_WORDS = ['First', 'Next', 'Last'];
@@ -389,6 +409,10 @@ export const ABC_SONG: [string, number, number][] = [
 // My Little Pet
 // ---------------------------------------------------------------------------
 
+/** Things a pet can say. */
+export type PetLine =
+  | 'hello' | 'hungry' | 'wantsPlay' | 'wantsBath' | 'wantsSleep' | 'yum' | 'played' | 'clean' | 'rested' | 'notNow' | 'loves' | 'giggle';
+
 export const PETS = [
   { id: 'puppy', name: 'Puppy', mission: 'puppy' },
   { id: 'kitten', name: 'Kitten', mission: 'kitten' },
@@ -402,26 +426,26 @@ export const PETS = [
 
 export const GAME_SECTIONS = [
   { id: 'create', title: 'Create', picture: 'paint' },
-  { id: 'read', title: 'Read & Spell', picture: 'book' },
+  { id: 'read', title: 'Read & spell', picture: 'book' },
   { id: 'numbers', title: 'Numbers', picture: 'abacus' },
-  { id: 'think', title: 'Think & Solve', picture: 'puzzle' },
+  { id: 'think', title: 'Think & solve', picture: 'puzzle' },
 ] as const;
 
 export const GAMES = [
-  { id: 'art', title: 'Art Studio', picture: 'paint', color: '#8B5CF6', section: 'create', skills: 'Draw, color, mirror' },
-  { id: 'story', title: 'Build a Story', picture: 'book', color: '#6366F1', section: 'create', skills: 'Imagine and tell' },
-  { id: 'friends', title: 'Make a Friend', picture: 'teddy bear', color: '#F43F8E', section: 'create', skills: 'Dress up and decorate' },
-  { id: 'music', title: 'Music Maker', picture: 'piano', color: '#EC4899', section: 'create', skills: 'Play and remember tunes' },
-  { id: 'letters', title: 'Magic Letters', picture: 'butterfly', color: '#FF5FA2', section: 'read', skills: 'Trace letters' },
-  { id: 'sight-words', title: 'Word Detective', picture: 'magnifier', color: '#3B8EF0', section: 'read', skills: 'Read, spell, rhyme' },
-  { id: 'sounds', title: 'Sound Safari', picture: 'lion', color: '#F59E0B', section: 'read', skills: 'Letter sounds' },
-  { id: 'books', title: 'Story Shelf', picture: 'books', color: '#0D9488', section: 'read', skills: 'Read picture books' },
-  { id: 'counting', title: 'Count & Collect', picture: 'strawberry', color: '#FF8A3D', section: 'numbers', skills: 'Count, add, take away' },
-  { id: 'chef', title: 'Little Chef', picture: 'chef', color: '#F97316', section: 'numbers', skills: 'Count and follow steps' },
-  { id: 'puzzles', title: 'Puzzle World', picture: 'puzzle', color: '#14B8A6', section: 'think', skills: 'Jigsaws and patterns' },
-  { id: 'memory', title: 'Flip & Find', picture: 'cat', color: '#22C17A', section: 'think', skills: 'Memory and matching' },
-  { id: 'quest', title: 'Shape Quest', picture: 'blue diamond', color: '#0EA5E9', section: 'think', skills: 'Shapes and building' },
-  { id: 'pet', title: 'My Little Pet', picture: 'puppy', color: '#4CAF50', section: 'think', skills: 'Care and share' },
+  { id: 'art', title: 'Art studio', picture: 'paint', color: '#8B5CF6', section: 'create', skills: 'Draw, color, mirror' },
+  { id: 'story', title: 'Build a story', picture: 'book', color: '#6366F1', section: 'create', skills: 'Imagine and tell' },
+  { id: 'friends', title: 'Make a friend', picture: 'teddy bear', color: '#F43F8E', section: 'create', skills: 'Dress up and decorate' },
+  { id: 'music', title: 'Music maker', picture: 'piano', color: '#EC4899', section: 'create', skills: 'Play and remember tunes' },
+  { id: 'letters', title: 'Magic letters', picture: 'butterfly', color: '#FF5FA2', section: 'read', skills: 'Trace letters' },
+  { id: 'sight-words', title: 'Word detective', picture: 'magnifier', color: '#3B8EF0', section: 'read', skills: 'Read, spell, rhyme' },
+  { id: 'sounds', title: 'Sound safari', picture: 'lion', color: '#F59E0B', section: 'read', skills: 'Letter sounds' },
+  { id: 'books', title: 'Story shelf', picture: 'books', color: '#0D9488', section: 'read', skills: 'Read picture books' },
+  { id: 'counting', title: 'Count & collect', picture: 'strawberry', color: '#FF8A3D', section: 'numbers', skills: 'Count, add, take away' },
+  { id: 'chef', title: 'Little chef', picture: 'chef', color: '#F97316', section: 'numbers', skills: 'Count and follow steps' },
+  { id: 'puzzles', title: 'Puzzle world', picture: 'puzzle', color: '#14B8A6', section: 'think', skills: 'Jigsaws and patterns' },
+  { id: 'memory', title: 'Flip & find', picture: 'cat', color: '#22C17A', section: 'think', skills: 'Memory and matching' },
+  { id: 'quest', title: 'Shape quest', picture: 'blue diamond', color: '#0EA5E9', section: 'think', skills: 'Shapes and building' },
+  { id: 'pet', title: 'My little pet', picture: 'puppy', color: '#4CAF50', section: 'think', skills: 'Care and share' },
 ] as const;
 export type GameId = (typeof GAMES)[number]['id'];
 
@@ -465,19 +489,19 @@ export const say = {
   storyHome: (hero: string, place: string) => `story-home-${idOf(hero)}-${place}`,
   storyFind: (hero: string, object: string) => `story-find-${idOf(hero)}-${object}`,
   storyEvent: (object: string, place: string) => `story-event-${object}-${place}`,
-  storyDrawing: (hero: string) => `story-drawing-${idOf(hero)}`,
+  storyMeet: (hero: string, friend: string) => `story-meet-${idOf(hero)}-${friend}`,
   storyEnd: (hero: string) => `story-end-${idOf(hero)}`,
   recipe: (id: string) => `recipe-${id}`,
   recipeDone: (id: string) => `recipe-done-${id}`,
   recipeStep: (id: string, step: number) => `recipe-${id}-step-${step}`,
+  chefAdd: (id: string, step: number, count: number) => `recipe-${id}-step-${step}-${count}`,
   build: (id: string) => `build-${id}`,
   buildDone: (id: string) => `build-done-${id}`,
-  pet: (pet: string, what: 'hungry' | 'teach' | 'toy' | 'lovesToy' | 'loves' | 'giggle' | 'hello') => `pet-${pet}-${what}`,
+  pet: (pet: string, what: PetLine) => `pet-${pet}-${what}`,
 };
 
 /** Fixed lines: instructions, encouragement and celebrations. */
 export const LINES = {
-  welcome: "Hi friend! Welcome to Hailey's Learning Land. What would you like to play?",
   great: 'Great job!',
   youDidIt: 'You did it!',
   wonderful: 'Wonderful!',
@@ -509,7 +533,7 @@ export const LINES = {
   questDone: 'You found them all!',
   friendIntro: 'Make a new friend! Pick a friend to dress up.',
   pickPlace: 'Now pick a home for your friend.',
-  addStickers: 'Now add some sparkle! Drag stickers onto the picture.',
+  addStickers: 'Now add some sparkle! Pick a sticker, then tap the picture to put it there.',
   grownUps: 'This part is for grown-ups.',
   nextLetter: "Let's try the next letter!",
   newWord: "Here's a new word.",
@@ -517,7 +541,7 @@ export const LINES = {
   storyPickHero: "Let's make a story! First, pick who the story is about.",
   storyPickPlace: 'Where does the story happen? Pick a place.',
   storyPickObject: 'What does our friend find? Pick something magical.',
-  storyDraw: "Now draw a picture for the story. Tap the book when you're done.",
+  storyPickFriend: 'Who does our friend meet along the way? Pick a new friend.',
   storyReady: "Here's your story!",
   chefPick: 'What shall we cook today? Pick a recipe.',
   chefStir: 'Move your finger round and round the bowl to stir.',
@@ -528,7 +552,7 @@ export const LINES = {
   questBuild: 'Pick something to build.',
   blastOff: 'Three, two, one, blast off!',
   musicIntro: "Let's make music! Tap the colors to play.",
-  drumsIntro: 'Tap the drums to make a beat!',
+  drumsIntro: 'Swipe your finger across the instruments to play them!',
   copyIntro: 'Listen to my song, then copy it!',
   yourTurn: 'Your turn!',
   listenAgain: "Let's listen again.",
@@ -537,7 +561,7 @@ export const LINES = {
   singCount: "Let's count to ten!",
   countEnd: 'We counted to ten!',
   petPick: 'Pick a pet to take care of!',
-  petDrawDone: "Tap the check when you're done drawing.",
+  petHowTo: 'Drag things onto your pet to take care of it. You can pet it too!',
   missingNumber: 'What number is missing?',
   whichMore: 'Which group has more?',
   whichFewer: 'Which group has fewer?',
@@ -550,6 +574,12 @@ export const LINES = {
   questCreate: 'Make your own picture! Tap a shape, then drag it anywhere you like.',
   mirrorOn: 'Magic mirror! Draw on one side and watch the other side copy you.',
   rainbowOn: 'Rainbow magic!',
+  chefCheck: 'Tap the check when you have the right amount.',
+  helpOffer: 'Need a little help? Tap the owl.',
+  helpRemove: "Let's take one away. Now you try!",
+  helpListen: 'Listen for the next sound.',
+  chefTooMany: "Oops, that's too many! Tap one in the bowl to take it out.",
+  chefMore: 'Not yet! We need some more.',
   shelfIntro: 'Welcome to the story shelf! Pick a book, and we can read it together.',
   readToMe: "I'll read it to you. Tap the arrow to turn the page.",
   youRead: 'Your turn to read! Tap the speaker if you want help.',
@@ -560,7 +590,7 @@ export const LINES = {
 export function spokenLines(): Record<string, string> {
   const lines: Record<string, string> = {};
   for (const [key, text] of Object.entries(LINES)) lines[say.line(key as keyof typeof LINES)] = text;
-  for (const game of GAMES) lines[say.game(game.id)] = game.title.replace('&', 'and');
+  for (const game of GAMES) lines[say.game(game.id)] = `${game.title.replace('&', 'and')}!`;
 
   for (const l of LETTERS) {
     lines[say.letterName(l)] = `${l.upper}.`;
@@ -582,6 +612,7 @@ export function spokenLines(): Record<string, string> {
     ...LETTERS.map((l) => l.word),
     ...SPELL_WORDS.flat(),
     ...RHYMES.flat(),
+    ...PANTRY,
   ]);
   for (const picture of pictureNames) lines[say.picture(picture)] = capitalize(picture === 'queen' ? 'queen' : picture);
 
@@ -617,7 +648,7 @@ export function spokenLines(): Record<string, string> {
     lines[say.storyIntro(hero.id)] = `Once upon a time, there was ${hero.intro}.`;
     for (const [placeId, place] of Object.entries(STORY_PLACES)) lines[say.storyHome(hero.id, placeId)] = `${hero.name} lived in ${place.home}.`;
     for (const object of STORY_OBJECTS) lines[say.storyFind(hero.id, object.id)] = `One day, ${hero.name} found a ${object.name}!`;
-    lines[say.storyDrawing(hero.id)] = `${hero.name} made a special picture, too. Look! It's wonderful.`;
+    for (const friend of STORY_FRIENDS) lines[say.storyMeet(hero.id, friend)] = `Soon, ${hero.name} met a friendly ${friend}, and they became best friends.`;
     lines[say.storyEnd(hero.id)] = `When the day was done, ${hero.name} snuggled up, happy and sleepy. The end!`;
   }
   for (const object of STORY_OBJECTS) {
@@ -628,14 +659,12 @@ export function spokenLines(): Record<string, string> {
     lines[say.recipeDone(recipe.id)] = `Yum! Your ${recipe.name} ${recipe.name.endsWith('s') ? 'are' : 'is'} ready!`;
     recipe.steps.forEach((step, i) => {
       const order = ORDER_WORDS[i];
+      if (step.kind === 'add') {
+        for (let n = CHEF_MIN; n <= CHEF_MAX; n++) lines[say.chefAdd(recipe.id, i, n)] = `${order}, add ${NUMBER_WORDS[n]} ${step.many}.`;
+        return;
+      }
       lines[say.recipeStep(recipe.id, i)] =
-        step.kind === 'add'
-          ? `${order}, add ${NUMBER_WORDS[step.count]} ${step.count === 1 ? step.one : step.many}.`
-          : step.kind === 'stir'
-            ? `${order}, stir it all up!`
-            : step.kind === 'bake'
-              ? `${order}, bake it in the oven!`
-              : `${order}, sort the fruit by color.`;
+        step.kind === 'stir' ? `${order}, stir it all up!` : step.kind === 'bake' ? `${order}, bake it in the oven!` : `${order}, sort the fruit by color.`;
     });
   }
   for (const build of BUILDS) {
@@ -644,10 +673,16 @@ export function spokenLines(): Record<string, string> {
   }
   for (const pet of PETS) {
     lines[say.pet(pet.id, 'hello')] = `Hi! I'm your ${pet.name.toLowerCase()}. Let's play together!`;
+    const name = pet.name.toLowerCase();
     lines[say.pet(pet.id, 'hungry')] = `${pet.name} is hungry!`;
-    lines[say.pet(pet.id, 'teach')] = `${pet.name} wants to learn a new word!`;
-    lines[say.pet(pet.id, 'toy')] = `Draw a toy for ${pet.name.toLowerCase()}!`;
-    lines[say.pet(pet.id, 'lovesToy')] = `${pet.name} loves the toy!`;
+    lines[say.pet(pet.id, 'wantsPlay')] = `${pet.name} wants to play! Can you find the ball?`;
+    lines[say.pet(pet.id, 'wantsBath')] = `Oh no, ${name} is all muddy! Time for a bubble bath.`;
+    lines[say.pet(pet.id, 'wantsSleep')] = `${pet.name} is getting sleepy. Can you find the bed?`;
+    lines[say.pet(pet.id, 'yum')] = `Yum yum! Thank you!`;
+    lines[say.pet(pet.id, 'played')] = `Wheee! ${pet.name} loves playing ball!`;
+    lines[say.pet(pet.id, 'clean')] = `Splish, splash! ${pet.name} is all clean and shiny!`;
+    lines[say.pet(pet.id, 'rested')] = `Good morning! ${pet.name} had a lovely nap.`;
+    lines[say.pet(pet.id, 'notNow')] = `Hmm, ${name} doesn't need that right now.`;
     lines[say.pet(pet.id, 'loves')] = `${pet.name} loves you so much!`;
     lines[say.pet(pet.id, 'giggle')] = `Hee hee! That tickles!`;
   }

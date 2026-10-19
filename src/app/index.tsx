@@ -1,5 +1,4 @@
 import { router, type Href } from 'expo-router';
-import { useEffect } from 'react';
 import { StyleSheet, View, useWindowDimensions } from 'react-native';
 import Animated, { FadeInUp, interpolate, useAnimatedScrollHandler, useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -11,9 +10,6 @@ import { Txt } from '@/components/txt';
 import { Colors, Radius, Spacing, gradient, raised, shade } from '@/constants/theme';
 import { GAMES, GAME_SECTIONS, say } from '@/content/learning';
 import { speak } from '@/lib/audio';
-
-// Say hello once each time the app opens, not every time the child comes back to this screen.
-let welcomed = false;
 
 export default function Home() {
   const { width } = useWindowDimensions();
@@ -35,13 +31,6 @@ export default function Home() {
     opacity: interpolate(scrollY.value, [HERO_HEIGHT - 80, HERO_HEIGHT], [0, 1], 'clamp'),
   }));
 
-  useEffect(() => {
-    if (!welcomed) {
-      welcomed = true;
-      speak(say.line('welcome'));
-    }
-  }, []);
-
   let order = 0;
   return (
     <View style={styles.screen}>
@@ -49,16 +38,8 @@ export default function Home() {
         onScroll={onScroll}
         scrollEventThrottle={16}
         contentContainerStyle={{ paddingBottom: insets.bottom + Spacing.lg }}>
-        <Hero />
-        <View style={[styles.content, { paddingHorizontal: sidePadding }]}>
-          <View style={[styles.heading, { width: contentWidth }]}>
-            <Txt size={width >= 600 ? 40 : 32} weight="heavy" color={Colors.text}>
-              Hi there!
-            </Txt>
-            <Txt size={18} weight="regular" color={Colors.textSoft}>
-              What shall we make, read or solve today?
-            </Txt>
-          </View>
+        <View style={[styles.content, { paddingHorizontal: sidePadding, paddingTop: insets.top + Spacing.sm }]}>
+          <Hero width={contentWidth} />
 
           {GAME_SECTIONS.map((section) => (
             <View key={section.id} style={[styles.section, { width: contentWidth }]}>
@@ -116,7 +97,6 @@ export default function Home() {
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: Colors.background },
   content: { alignItems: 'center' },
-  heading: { marginTop: Spacing.lg, gap: 2 },
   section: { marginTop: Spacing.lg, gap: Spacing.md },
   sectionHeader: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm },
   sectionIcon: {

@@ -16,7 +16,7 @@ import { LETTERS, say } from '@/content/learning';
 import { playSfx, speak } from '@/lib/audio';
 
 const RAINBOW = ['#FF5C8A', '#FF9F43', '#FFD23F', '#3CC47C', '#4D9DE0', '#9B6DE3'];
-const DONE_AT = 0.8; // fraction of the letter she needs to cover
+const DONE_AT = 0.93; // fraction of the letter that must be painted over
 
 type Point = { x: number; y: number };
 
@@ -45,6 +45,8 @@ export default function Letters() {
   const [covered, setCovered] = useState(0);
   const [done, setDone] = useState(false);
   const coveredSet = useRef(new Set<number>());
+  const fractionRef = useRef(0);
+  const lastPoint = useRef<Point | null>(null);
   const nudged = useRef(false);
   const finished = useRef(false);
   const { celebrate, overlay } = useCelebration();
@@ -67,7 +69,9 @@ export default function Letters() {
       targets = samplePoints(glyph, size / 26);
     }
   }
-  const radius = size / 13;
+  // The marker's width. A point only counts as traced once the visible ink actually covers it.
+  const strokeWidth = size / 11;
+  const radius = strokeWidth * 0.55;
 
   useEffect(() => {
     speak(say.line('traceIntro'), instruction);
@@ -82,6 +86,7 @@ export default function Letters() {
     setCovered(0);
     setDone(false);
     coveredSet.current = new Set();
+    fractionRef.current = 0;
     nudged.current = false;
     finished.current = false;
     const l = LETTERS[nextIndex];
@@ -97,15 +102,37 @@ export default function Letters() {
     await celebrate(lower);
   };
 
-  const touch = (x: number, y: number, start: boolean) => {
-    if (done) return;
-    setStrokes((s) => (start ? [...s, [{ x, y }]] : [...s.slice(0, -1), [...(s[s.length - 1] ?? []), { x, y }]]));
+  const cover = (x: number, y: number) => {
     targets.forEach((p, i) => {
       if (!coveredSet.current.has(i) && (p.x - x) ** 2 + (p.y - y) ** 2 < radius * radius) coveredSet.current.add(i);
     });
-    const fraction = targets.length ? coveredSet.current.size / targets.length : 0;
-    setCovered(fraction);
-    if (fraction >= DONE_AT) finish();
+  };
+
+  const touch = (x: number, y: number, start: boolean) => {
+    if (done) return;
+    setStrokes((s) => (start ? [...s, [{ x, y }]] : [...s.slice(0, -1), [...(s[s.length - 1] ?? []), { x, y }]]));
+    // Fill in between touch points, so a quick swipe counts everywhere the line is drawn.
+    const from = start ? null : lastPoint.current;
+    const steps = from ? Math.max(1, Math.ceil(Math.hypot(x - from.x, y - from.y) / (radius * 0.5))) : 1;
+    for (let k = 1; k <= steps; k++) {
+      const t = k / steps;
+      cover(from ? from.x + (x - from.x) * t : x, from ? from.y + (y - from.y) * t : y);
+    }
+    lastPoint.current = { x, y };
+    fractionRef.current = targets.length ? coveredSet.current.size / targets.length : 0;
+    setCovered(fractionRef.current);
+  };
+
+  // The letter is finished only when the finger lifts with nearly all of it painted, never mid-stroke.
+  const lift = () => {
+    lastPoint.current = null;
+    if (done) return;
+    if (fractionRef.current >= DONE_AT) {
+      finish();
+    } else if (!nudged.current && fractionRef.current > 0.25) {
+      nudged.current = true;
+      speak(say.line('traceKeepGoing'));
+    }
   };
 
   const pan = Gesture.Pan()
@@ -113,18 +140,13 @@ export default function Letters() {
     .minDistance(0)
     .onBegin((e) => touch(e.x, e.y, true))
     .onUpdate((e) => touch(e.x, e.y, false))
-    .onEnd(() => {
-      if (!done && !nudged.current && covered > 0.25 && covered < DONE_AT) {
-        nudged.current = true;
-        speak(say.line('traceKeepGoing'));
-      }
-    });
+    .onFinalize(() => lift());
 
   const next = () => (lower ? reset((index + 1) % LETTERS.length, false) : reset(index, true));
   const previous = () => reset((index + LETTERS.length - 1) % LETTERS.length, false);
 
   return (
-    <GameScreen title="Magic Letters" background="#FFE8F3" onRepeat={() => speak(instruction)}>
+    <GameScreen title="Magic letters" background="#FFE8F3" onRepeat={() => speak(instruction)}>
       <View style={[styles.body, portrait && styles.bodyPortrait]}>
         <View style={[styles.side, portrait && styles.hidden]}>
           <Bouncy accessibilityLabel="Previous letter" style={styles.arrow} onPress={previous}>
@@ -158,7 +180,7 @@ export default function Letters() {
                         path={path}
                         color={RAINBOW[i % RAINBOW.length]}
                         style="stroke"
-                        strokeWidth={radius * 1.3}
+                        strokeWidth={strokeWidth}
                         strokeCap="round"
                         strokeJoin="round"
                         opacity={0.9}

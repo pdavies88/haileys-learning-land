@@ -408,7 +408,7 @@ export const COLORING_CATEGORIES: { id: string; title: string; icon: string; pag
   },
   {
     "id": "go",
-    "title": "Things That Go",
+    "title": "Things that go",
     "icon": "car",
     "pages": [
       "car",
