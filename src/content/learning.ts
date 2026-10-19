@@ -590,7 +590,7 @@ export const LINES = {
 export function spokenLines(): Record<string, string> {
   const lines: Record<string, string> = {};
   for (const [key, text] of Object.entries(LINES)) lines[say.line(key as keyof typeof LINES)] = text;
-  for (const game of GAMES) lines[say.game(game.id)] = game.title.replace('&', 'and');
+  for (const game of GAMES) lines[say.game(game.id)] = `${game.title.replace('&', 'and')}!`;
 
   for (const l of LETTERS) {
     lines[say.letterName(l)] = `${l.upper}.`;

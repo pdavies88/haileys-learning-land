@@ -41,6 +41,8 @@ AUDIO_MAP = ROOT / "src" / "content" / "audio-files.ts"
 TTS_DIR = ROOT / ".tts"
 TTS_CACHE = TTS_DIR / "cache"
 
+KOKORO_LINES = set(json.loads((ROOT / "audio-tools" / "kokoro-lines.json").read_text())["lines"])
+
 SR = 24000  # Kokoro's own rate; plenty for speech and simple effects
 # The narrator: Kokoro voice "Heart" (American English), warm and clear, a little slower for kids.
 VOICE = "af_heart"
@@ -267,8 +269,9 @@ def generate_speech(only: list[str]) -> None:
     lines = json.loads(SPEECH_LIST.read_text())
     print(f"Speech: {len(lines)} lines")
     for i, (sid, text) in enumerate(lines.items()):
-        # Words are spoken by generate_speech_qwen.py; only letter sounds (phonemes) are made here.
-        if not text.startswith("/") or (only and sid not in only):
+        # Words are spoken by generate_speech_qwen.py. Kokoro makes the letter sounds (phonemes)
+        # and the few single words listed in kokoro-lines.json.
+        if not (text.startswith("/") or sid in KOKORO_LINES) or (only and sid not in only):
             continue
         out = OUT_SPEECH / f"{sid}.m4a"
         audio = speak(text)

@@ -44,6 +44,8 @@ REFERENCE_TEXT = (
     "When I grow up, I want to fly high, high into the sky, Daisy said."
 )
 MODEL = "Qwen/Qwen3-TTS-12Hz-0.6B-Base"
+# A few single words Qwen says unclearly stay with Kokoro (see generate_audio.py).
+KOKORO_LINES = set(json.loads((ROOT / "audio-tools" / "kokoro-lines.json").read_text())["lines"])
 SEED = 42
 
 
@@ -81,7 +83,7 @@ def main() -> None:
         seed = SEED + int(args[1])
         args = list(json.loads((ROOT / ".cache" / "speech-check.json").read_text()))
     lines = json.loads(SPEECH_LIST.read_text())
-    todo = [(sid, text) for sid, text in lines.items() if not text.startswith("/") and (not args or sid in args)]
+    todo = [(sid, text) for sid, text in lines.items() if not text.startswith("/") and sid not in KOKORO_LINES and (not args or sid in args)]
     CACHE.mkdir(parents=True, exist_ok=True)
     OUT.mkdir(parents=True, exist_ok=True)
 
