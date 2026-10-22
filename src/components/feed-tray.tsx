@@ -2,8 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import { StyleSheet, View, useWindowDimensions } from 'react-native';
 import Animated, { ZoomIn, ZoomOut, useAnimatedStyle, useSharedValue, withSequence, withSpring } from 'react-native-reanimated';
 
-import { Bouncy } from '@/components/bouncy';
 import { Pic } from '@/components/pic';
+import { TouchPad } from '@/components/touch-pad';
 import { Txt } from '@/components/txt';
 import { Colors, Spacing, cardShadow } from '@/constants/theme';
 import { say, type Mission } from '@/content/learning';
@@ -66,9 +66,9 @@ export function FeedTray({ mission, target, animal, onDone }: { mission: Mission
             <View key={i} style={{ width: itemSize + 8, height: itemSize + 8 }} />
           ) : (
             <Animated.View key={i} entering={ZoomIn.delay(i * 40)} exiting={ZoomOut}>
-              <Bouncy accessibilityLabel={mission.foodOne} onPress={() => feed(i)} sound={false} style={{ padding: 4 }}>
+              <TouchPad label={mission.foodOne} onTouch={() => feed(i)} style={{ padding: 4 }}>
                 <Pic name={mission.food} size={itemSize} />
-              </Bouncy>
+              </TouchPad>
             </Animated.View>
           ),
         )}

@@ -3,10 +3,8 @@ import { StyleSheet, View } from 'react-native';
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withDelay, withTiming } from 'react-native-reanimated';
 
 import { Pic } from '@/components/pic';
-import { say } from '@/content/learning';
-import { pick, playSfx, speak } from '@/lib/audio';
+import { pause, playSfx } from '@/lib/audio';
 
-const PRAISE = ['great', 'youDidIt', 'wonderful', 'amazing', 'sparkly', 'superStar', 'yay'] as const;
 const CONFETTI = ['star', 'heart', 'sparkles', 'rainbow', 'star', 'flower', 'heart', 'gem', 'butterfly', 'star'];
 
 function Particle({ name, angle, distance, delay }: { name: string; angle: number; distance: number; delay: number }) {
@@ -31,16 +29,16 @@ function Particle({ name, angle, distance, delay }: { name: string; angle: numbe
 }
 
 /**
- * A burst of stars, hearts and sparkles, with a sound and spoken praise.
- * `celebrate(big, ...lead)` bursts at once, says any `lead` lines (such as the word she found) and
- * then the praise, and resolves when it has all been spoken.
+ * A burst of stars, hearts and sparkles with a success sound. Nothing is spoken: a child who moves
+ * on quickly would otherwise hear praise for one game on the next screen. `celebrate(big)` bursts
+ * at once and resolves once the burst has mostly played, so the next question doesn't land on top.
  */
 export function useCelebration() {
   const [burst, setBurst] = useState<{ id: number; pieces: { angle: number; distance: number; delay: number }[] } | null>(
     null,
   );
 
-  const celebrate = async (big = false, ...lead: string[]) => {
+  const celebrate = async (big = false) => {
     const pieces = Array.from({ length: 18 }, (_, i) => ({
       angle: (i / 18) * Math.PI * 2 + Math.random() * 0.3,
       distance: 140 + Math.random() * 120,
@@ -48,7 +46,7 @@ export function useCelebration() {
     }));
     setBurst((previous) => ({ id: (previous?.id ?? 0) + 1, pieces }));
     playSfx(big ? 'tada' : 'sparkle');
-    await speak(...lead, say.line(big ? 'allDone' : pick(PRAISE)));
+    await pause(big ? 1400 : 800);
   };
 
   const overlay = burst ? (

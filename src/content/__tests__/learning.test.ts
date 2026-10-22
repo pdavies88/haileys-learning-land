@@ -4,7 +4,7 @@ import coloring from '../coloring.json';
 import pictures from '../pictures.json';
 import stories from '../stories.json';
 import {
-  BUILDS, CHEF_MAX, CHEF_MIN, FRIENDS, GAMES, PANTRY, GAME_SECTIONS, RHYMES, SPELL_WORDS, JIGSAW_PICTURES, LETTERS, MEMORY_SETS, MISSIONS, PETS, PLACES, RECIPES, SIGHT_WORDS, SORT_FRUIT,
+  BUILDS, CHEF_MAX, CHEF_MIN, FRIENDS, GAMES, PANTRY, GAME_SECTIONS, RHYMES, SPELL_WORDS, JIGSAW_PICTURES, LETTERS, MEMORY_SETS, MISSIONS, PETS, PLACES, RECIPES, SIGHT_WORDS, SORT_FRUIT, TRACE_NUMBERS, TRACE_WORDS,
   SOUND_PICTURES, STICKERS, STORY_FRIENDS, STORY_HEROES, STORY_OBJECTS, STORY_PLACES, say, spokenLines,
 } from '../learning';
 
@@ -83,6 +83,8 @@ describe('content', () => {
     const needed = [
       ...LETTERS.flatMap((l) => [say.letterName(l), say.letterSound(l), say.letterIsFor(l), say.traceUpper(l), say.traceLower(l)]),
       ...SIGHT_WORDS.flatMap((w) => [say.word(w), say.findWord(w)]),
+      ...TRACE_NUMBERS.flatMap((n) => [say.traceNumber(n), say.number(n)]),
+      ...TRACE_WORDS.flatMap((w) => [say.traceWord(w), say.word(w)]),
       ...MISSIONS.flatMap((m) => Array.from({ length: 10 }, (_, i) => say.mission(m, i + 1))),
       ...Object.entries(SOUND_PICTURES).flatMap(([letter, names]) => [say.safariFind(letter), ...names.map((n) => say.startsWith(n, letter))]),
       ...FRIENDS.map(say.picture),
@@ -95,14 +97,13 @@ describe('content', () => {
       ]),
       ...RECIPES.flatMap((r) => [
         say.recipe(r.id),
-        say.recipeDone(r.id),
         ...r.steps.flatMap((step, i) =>
           step.kind === 'add' ? Array.from({ length: CHEF_MAX - CHEF_MIN + 1 }, (_, n) => say.chefAdd(r.id, i, CHEF_MIN + n)) : [say.recipeStep(r.id, i)],
         ),
       ]),
       ...PANTRY.map(say.picture),
-      ...BUILDS.flatMap((b) => [say.build(b.id), say.buildDone(b.id)]),
-      ...PETS.flatMap((p) => (['hello', 'hungry', 'wantsPlay', 'wantsBath', 'wantsSleep', 'yum', 'played', 'clean', 'rested', 'notNow', 'loves', 'giggle'] as const).map((w) => say.pet(p.id, w))),
+      ...BUILDS.flatMap((b) => [say.build(b.id)]),
+      ...PETS.flatMap((p) => (['hello', 'hungry', 'wantsPlay', 'wantsBath', 'wantsSleep', 'yum', 'played', 'clean', 'rested', 'notNow', 'giggle'] as const).map((w) => say.pet(p.id, w))),
       ...PETS.flatMap((p) => Array.from({ length: 10 }, (_, i) => say.mission(MISSIONS.find((m) => m.animal === p.mission)!, i + 1))),
     ];
     expect(needed.filter((id) => !(id in lines))).toEqual([]);

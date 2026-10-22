@@ -60,11 +60,7 @@ function Builder({ build, onBuilt }: { build: Build; onBuilt: () => void }) {
     setFilled(now);
     setUsedTray((u) => [...u, trayIndex]);
     if (now.length === build.pieces.length) {
-      (async () => {
-        if (build.id === 'rocket') await speak(say.buildDone(build.id), say.line('blastOff'));
-        else await speak(say.buildDone(build.id));
-        onBuilt();
-      })();
+      onBuilt();
     }
     return true;
   };

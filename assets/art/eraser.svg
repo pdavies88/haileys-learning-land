@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="pinkTop" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFB3C7"/>
+      <stop offset="1" stop-color="#FF7FA3"/>
+    </linearGradient>
+    <linearGradient id="pinkSide" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#F0628C"/>
+      <stop offset="1" stop-color="#D9467A"/>
+    </linearGradient>
+    <linearGradient id="blueTop" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#8CC8FF"/>
+      <stop offset="1" stop-color="#4C8DF0"/>
+    </linearGradient>
+    <linearGradient id="blueSide" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3D74DB"/>
+      <stop offset="1" stop-color="#2E5BC0"/>
+    </linearGradient>
+    <radialGradient id="shadow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#5A3A6E" stop-opacity="0.28"/>
+      <stop offset="1" stop-color="#5A3A6E" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <ellipse cx="132" cy="206" rx="104" ry="22" fill="url(#shadow)"/>
+  <g transform="rotate(-28 128 128)">
+    <!-- pink rubber end: side face, then top face -->
+    <path d="M30 132 h86 v34 a14 14 0 0 1 -14 14 h-58 a14 14 0 0 1 -14 -14 z" fill="url(#pinkSide)"/>
+    <rect x="30" y="86" width="86" height="64" rx="18" fill="url(#pinkTop)"/>
+    <!-- blue paper sleeve -->
+    <path d="M110 132 h116 v34 a14 14 0 0 1 -14 14 h-102 z" fill="url(#blueSide)"/>
+    <path d="M110 86 h102 a14 14 0 0 1 14 14 v36 a14 14 0 0 1 -14 14 h-102 z" fill="url(#blueTop)"/>
+    <!-- highlights -->
+    <rect x="42" y="94" width="58" height="12" rx="6" fill="#FFFFFF" opacity="0.55"/>
+    <rect x="124" y="94" width="84" height="10" rx="5" fill="#FFFFFF" opacity="0.4"/>
+    <rect x="132" y="116" width="62" height="8" rx="4" fill="#FFFFFF" opacity="0.25"/>
+  </g>
+</svg>

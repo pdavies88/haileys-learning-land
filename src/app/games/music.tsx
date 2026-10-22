@@ -9,11 +9,12 @@ import { Bouncy } from '@/components/bouncy';
 import { useCelebration } from '@/components/celebration';
 import { GameScreen } from '@/components/game-screen';
 import { Pic } from '@/components/pic';
+import { TouchPad } from '@/components/touch-pad';
 import { Txt } from '@/components/txt';
 import { Colors, Spacing, cardShadow } from '@/constants/theme';
 import type { SfxName } from '@/content/audio-files';
 import { ABC_SONG, LETTERS, XYLOPHONE, say } from '@/content/learning';
-import { playSfx, speak, stopSpeaking } from '@/lib/audio';
+import { pause, playSfx, speak, stopSpeaking } from '@/lib/audio';
 import { randomInt } from '@/lib/random';
 
 type Tab = 'play' | 'band' | 'copy' | 'sing';
@@ -32,29 +33,6 @@ const BAND: { sfx: SfxName; picture: string; color: string; label: string; every
   { sfx: 'bell', picture: 'bell', color: '#4D9DE0', label: 'Bell', every: 110 },
   { sfx: 'strum', picture: 'guitar', color: '#9B6DE3', label: 'Guitar', every: 120 },
 ];
-
-/**
- * Plays the moment a finger touches it, not when it lifts, and lets several fingers play several
- * bars at once. Taps from mashing are all heard.
- */
-function TouchPad({ onTouch, style, label, children }: { onTouch: () => void; style: StyleProp<ViewStyle>; label: string; children?: ReactNode }) {
-  const scale = useSharedValue(1);
-  const gesture = Gesture.Pan()
-    .runOnJS(true)
-    .minDistance(0)
-    .onBegin(() => {
-      scale.set(withSequence(withTiming(0.92, { duration: 50 }), withSpring(1, { damping: 10 })));
-      onTouch();
-    });
-  const animated = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
-  return (
-    <GestureDetector gesture={gesture}>
-      <Animated.View accessible accessibilityRole="button" accessibilityLabel={label} style={[style, animated]}>
-        {children}
-      </Animated.View>
-    </GestureDetector>
-  );
-}
 
 /** Plays when a finger swipes across it, and again as the finger keeps moving. A plain tap is silent. */
 function SwipePad({ every, onPlay, onTapOnly, style, label, children }: {
@@ -109,7 +87,6 @@ function SwipePad({ every, onPlay, onTapOnly, style, label, children }: {
 const BEAT = 520; // ms
 
 const xylo = (bar: number) => `xylo${bar}` as SfxName;
-const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export default function Music() {
   const { width, height } = useWindowDimensions();
@@ -145,11 +122,11 @@ export default function Music() {
     setListening(true);
     typed.current = [];
     setEntered([]);
-    await wait(500);
+    await pause(500);
     for (const bar of notes) {
       if (run.current !== id) return;
       playBar(bar);
-      await wait(BEAT + 120);
+      await pause(BEAT + 120);
     }
     if (run.current !== id) return;
     setListening(false);
@@ -185,7 +162,7 @@ export default function Music() {
     if (now.length === tune.length) {
       busy.current = true;
       setListening(true);
-      await wait(400);
+      await pause(400);
       await celebrate(false);
       busy.current = false;
       newTune(Math.min(tune.length + 1, 8));
@@ -205,7 +182,7 @@ export default function Music() {
       setSinging(step.word);
       playBar(step.bar);
       speak(step.line);
-      await wait(BEAT * step.beats);
+      await pause(BEAT * step.beats);
     }
     if (run.current !== id) return;
     setSinging(null);
@@ -224,7 +201,10 @@ export default function Music() {
     if (next === 'band') speak(say.line('drumsIntro'));
     if (next === 'copy') {
       speak(say.line('copyIntro'));
-      setTimeout(() => newTune(3), 1800);
+      const id = run.current;
+      pause(1800).then(() => {
+        if (run.current === id) newTune(3);
+      });
     }
   };
 

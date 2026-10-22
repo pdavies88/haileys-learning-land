@@ -21,7 +21,7 @@ import { Txt } from '@/components/txt';
 import { Colors, Radius, Spacing, cardShadow, raised } from '@/constants/theme';
 import { MISSIONS, PETS, say, type PetLine } from '@/content/learning';
 import { useDropTargets } from '@/hooks/use-drop-targets';
-import { playSfx, speak, speakAfter } from '@/lib/audio';
+import { pause, playSfx, speak, speakAfter } from '@/lib/audio';
 import { randomInt } from '@/lib/random';
 
 type Pet = (typeof PETS)[number];
@@ -189,7 +189,7 @@ export default function PetGame() {
     if (need === 'sleep') {
       setAsleep(true);
       act('sleep');
-      await new Promise((resolve) => setTimeout(resolve, 3000));
+      await pause(3000);
       setAsleep(false);
     }
     playSfx('star');
@@ -198,7 +198,6 @@ export default function PetGame() {
     const now = hearts + 1;
     if (now >= HEARTS) {
       setHearts(HEARTS);
-      await speak(say.pet(pet.id, 'loves'));
       await celebrate(true);
       setHearts(0);
     } else {

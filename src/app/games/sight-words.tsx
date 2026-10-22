@@ -99,12 +99,11 @@ export default function SightWords() {
     speak(...promptFor(q));
   };
 
-  const right = async (spoken: string) => {
+  const right = async () => {
     if (!lock.take()) return;
     setFound(true);
     playSfx('chime');
-    // Celebrate straight away; the word is said as part of the cheer.
-    await round.success(celebrate, spoken);
+    await round.success(celebrate);
     next();
   };
 
@@ -118,7 +117,7 @@ export default function SightWords() {
   const choose = (card: string) => {
     if (found || question.kind === 'spell') return;
     const spoken = question.kind === 'find' ? say.word(card) : say.picture(card);
-    if (card === question.target) right(spoken);
+    if (card === question.target) right();
     else wrong(card, spoken);
   };
 
@@ -132,7 +131,7 @@ export default function SightWords() {
         onMiss={() => round.miss()}
         onDone={async () => {
           if (!lock.take()) return;
-          await round.success(celebrate, say.picture(question.target));
+          await round.success(celebrate);
           next();
         }}
       />

@@ -97,6 +97,10 @@ export const SIGHT_WORDS_MORE = [
 
 export const SIGHT_WORDS = [...SIGHT_WORDS_EASY, ...SIGHT_WORDS_MORE];
 
+/** Numbers and short sight words to trace in Magic letters. */
+export const TRACE_NUMBERS = Array.from({ length: 20 }, (_, i) => i + 1);
+export const TRACE_WORDS = SIGHT_WORDS.filter((w) => w.length >= 2 && w.length <= 3);
+
 /** Words to spell from a picture, shortest first. Each has a picture of the same name. */
 export const SPELL_WORDS = [
   ['cat', 'dog', 'pig', 'sun', 'hat', 'van', 'fox', 'bus', 'bed', 'web', 'map', 'bat', 'log', 'ant', 'egg', 'cow', 'bee'],
@@ -411,7 +415,7 @@ export const ABC_SONG: [string, number, number][] = [
 
 /** Things a pet can say. */
 export type PetLine =
-  | 'hello' | 'hungry' | 'wantsPlay' | 'wantsBath' | 'wantsSleep' | 'yum' | 'played' | 'clean' | 'rested' | 'notNow' | 'loves' | 'giggle';
+  | 'hello' | 'hungry' | 'wantsPlay' | 'wantsBath' | 'wantsSleep' | 'yum' | 'played' | 'clean' | 'rested' | 'notNow' | 'giggle';
 
 export const PETS = [
   { id: 'puppy', name: 'Puppy', mission: 'puppy' },
@@ -464,6 +468,8 @@ export const say = {
   letterIsFor: (l: Letter) => `isfor-${l.lower}`,
   traceUpper: (l: Letter) => `trace-upper-${l.lower}`,
   traceLower: (l: Letter) => `trace-lower-${l.lower}`,
+  traceNumber: (n: number) => `trace-num-${n}`,
+  traceWord: (word: string) => `trace-word-${idOf(word)}`,
   safariFind: (letter: string) => `safari-find-${letter}`,
   startsWith: (picture: string, letter: string) => `starts-${idOf(picture)}-${letter}`,
   picture: (picture: string) => `pic-${idOf(picture)}`,
@@ -492,30 +498,23 @@ export const say = {
   storyMeet: (hero: string, friend: string) => `story-meet-${idOf(hero)}-${friend}`,
   storyEnd: (hero: string) => `story-end-${idOf(hero)}`,
   recipe: (id: string) => `recipe-${id}`,
-  recipeDone: (id: string) => `recipe-done-${id}`,
   recipeStep: (id: string, step: number) => `recipe-${id}-step-${step}`,
   chefAdd: (id: string, step: number, count: number) => `recipe-${id}-step-${step}-${count}`,
   build: (id: string) => `build-${id}`,
-  buildDone: (id: string) => `build-done-${id}`,
   pet: (pet: string, what: PetLine) => `pet-${pet}-${what}`,
 };
 
 /** Fixed lines: instructions, encouragement and celebrations. */
 export const LINES = {
-  great: 'Great job!',
-  youDidIt: 'You did it!',
-  wonderful: 'Wonderful!',
-  amazing: 'Amazing!',
-  sparkly: 'Sparkly!',
-  superStar: "You're a super star!",
-  yay: 'Yay!',
   tryAgain: "Let's try again!",
   almost: 'Almost! Try another one.',
   together: "Let's try together.",
   oops: 'Oops! That one is not it.',
-  allDone: 'All done! You earned a star!',
   traceIntro: 'Use your finger to trace the letter.',
-  traceKeepGoing: 'Keep going! Fill in the whole letter.',
+  traceKeepGoing: 'Keep going! Fill it all in.',
+  tracePickLetter: 'Pick a letter to trace.',
+  tracePickNumber: 'Pick a number to trace.',
+  tracePickWord: 'Pick a word to trace.',
   detectiveIntro: "Hi, I'm Detective Fox! Help me find the hidden words.",
   countIntro: "Let's count! Tap the treats to feed our hungry friend.",
   countTooMany: "Oops, that's enough! Let's count them again.",
@@ -524,7 +523,6 @@ export const LINES = {
   artColoring: 'Pick a picture to color.',
   artBlank: 'A fresh new page!',
   memoryIntro: 'Flip two cards. Can you find the ones that match?',
-  memoryMatch: "It's a match!",
   memoryNope: 'Not a match. Remember where they are!',
   safariIntro: "Welcome to Sound Safari! Let's listen for sounds.",
   puzzleIntro: "Welcome to Puzzle World! Let's solve some puzzles.",
@@ -537,7 +535,6 @@ export const LINES = {
   grownUps: 'This part is for grown-ups.',
   nextLetter: "Let's try the next letter!",
   newWord: "Here's a new word.",
-  levelUp: "You're getting so good at this! Let's make it a little harder.",
   storyPickHero: "Let's make a story! First, pick who the story is about.",
   storyPickPlace: 'Where does the story happen? Pick a place.',
   storyPickObject: 'What does our friend find? Pick something magical.',
@@ -550,7 +547,6 @@ export const LINES = {
   questPick: 'Do you want to hunt for shapes, or build something?',
   questHunt: "Let's hunt for shapes!",
   questBuild: 'Pick something to build.',
-  blastOff: 'Three, two, one, blast off!',
   musicIntro: "Let's make music! Tap the colors to play.",
   drumsIntro: 'Swipe your finger across the instruments to play them!',
   copyIntro: 'Listen to my song, then copy it!',
@@ -581,9 +577,6 @@ export const LINES = {
   chefTooMany: "Oops, that's too many! Tap one in the bowl to take it out.",
   chefMore: 'Not yet! We need some more.',
   shelfIntro: 'Welcome to the story shelf! Pick a book, and we can read it together.',
-  readToMe: "I'll read it to you. Tap the arrow to turn the page.",
-  youRead: 'Your turn to read! Tap the speaker if you want help.',
-  theEnd: 'The end!',
 };
 
 /** Every spoken line, as id -> text. Lines starting with "/" are phonemes, not words. */
@@ -599,6 +592,8 @@ export function spokenLines(): Record<string, string> {
     lines[say.traceUpper(l)] = `Let's trace a big ${l.upper}.`;
     lines[say.traceLower(l)] = `Now let's trace a little ${l.lower}.`;
   }
+  for (const n of TRACE_NUMBERS) lines[say.traceNumber(n)] = `Let's trace the number ${NUMBER_WORDS[n]}.`;
+  for (const word of TRACE_WORDS) lines[say.traceWord(word)] = `Let's trace the word, ${word}.`;
   for (const [letter, pictures] of Object.entries(SOUND_PICTURES)) {
     const upper = letter.toUpperCase();
     lines[say.safariFind(letter)] = `Which one starts with the letter ${upper}?`;
@@ -656,7 +651,6 @@ export function spokenLines(): Record<string, string> {
   }
   for (const recipe of RECIPES) {
     lines[say.recipe(recipe.id)] = `Let's make ${recipe.name}!`;
-    lines[say.recipeDone(recipe.id)] = `Yum! Your ${recipe.name} ${recipe.name.endsWith('s') ? 'are' : 'is'} ready!`;
     recipe.steps.forEach((step, i) => {
       const order = ORDER_WORDS[i];
       if (step.kind === 'add') {
@@ -669,7 +663,6 @@ export function spokenLines(): Record<string, string> {
   }
   for (const build of BUILDS) {
     lines[say.build(build.id)] = `Let's build a ${build.name}! Drag each shape into place.`;
-    lines[say.buildDone(build.id)] = `You built a ${build.name}!`;
   }
   for (const pet of PETS) {
     lines[say.pet(pet.id, 'hello')] = `Hi! I'm your ${pet.name.toLowerCase()}. Let's play together!`;
@@ -683,7 +676,6 @@ export function spokenLines(): Record<string, string> {
     lines[say.pet(pet.id, 'clean')] = `Splish, splash! ${pet.name} is all clean and shiny!`;
     lines[say.pet(pet.id, 'rested')] = `Good morning! ${pet.name} had a lovely nap.`;
     lines[say.pet(pet.id, 'notNow')] = `Hmm, ${name} doesn't need that right now.`;
-    lines[say.pet(pet.id, 'loves')] = `${pet.name} loves you so much!`;
     lines[say.pet(pet.id, 'giggle')] = `Hee hee! That tickles!`;
   }
   return lines;

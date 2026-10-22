@@ -5,6 +5,8 @@
 //                                  flat Noto Emoji artwork (Apache 2.0), which traces cleanly
 //   - assets/coloring/<name>.png   small previews of the coloring pages, for the page picker
 //   - src/content/picture-files.ts the static require() map Metro needs to bundle them
+// A picture with no emoji (such as the eraser) is drawn by hand in assets/art/<name>.svg and listed
+// in pictures.json as "art:<name>".
 //
 // Run after editing src/content/pictures.json:  npm run generate:pictures
 // Noto SVGs are downloaded once from github.com/googlefonts/noto-emoji into .cache/noto/. Fluent
@@ -68,7 +70,8 @@ for (const dir of readdirSync(join(fluentDir, 'assets'))) {
   // People emoji keep their default (yellow) skin tone in a Default folder.
   fluentByCode.set(codeKey(meta.unicode), join('assets', dir, meta.unicodeSkintones ? 'Default' : '', '3D'));
 }
-const fluentFolders = Object.values(pictures).map((code) => {
+const isArt = (code) => code.startsWith('art:');
+const fluentFolders = Object.values(pictures).filter((code) => !isArt(code)).map((code) => {
   const folder = fluentByCode.get(codeKey(code));
   if (!folder) throw new Error(`Fluent Emoji has no ${code}`);
   return folder;
@@ -82,6 +85,11 @@ for (const dir of [cacheDir, picsDir, coloringDir]) mkdirSync(dir, { recursive: 
 const written = new Map();
 for (const [name, code] of Object.entries(pictures)) {
   if (written.has(code)) continue;
+  if (isArt(code)) {
+    render(readFileSync(join(root, 'assets', 'art', `${code.slice(4)}.svg`), 'utf8'), 256, join(picsDir, `${slug(name)}.png`));
+    written.set(code, slug(name));
+    continue;
+  }
   const folder = join(fluentDir, fluentByCode.get(codeKey(code)));
   const image = readdirSync(folder).find((file) => file.endsWith('.png'));
   copyFileSync(join(folder, image), join(picsDir, `${slug(name)}.png`));

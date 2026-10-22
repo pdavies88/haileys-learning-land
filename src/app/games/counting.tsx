@@ -143,7 +143,7 @@ export default function Counting() {
       setFound(true);
       playSfx('chime');
       // Celebrate straight away; the number is said as part of the cheer.
-      await round.success(celebrate, say.number(question.kind === 'compare' ? question.groups[n] : n));
+      await round.success(celebrate);
       next();
     } else {
       playSfx('bloop');

@@ -77,7 +77,7 @@ export default function Sounds() {
       setFound(true);
       playSfx('chime');
       // Celebrate straight away; "Apple starts with A!" is said as part of the cheer.
-      await round.success(celebrate, say.startsWith(question.answer, question.letter));
+      await round.success(celebrate);
       const next = newQuestion(round.level, question.letter);
       setQuestion(next);
       setWiggles({});

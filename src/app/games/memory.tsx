@@ -124,7 +124,6 @@ export default function Memory() {
       setOpen([]);
       playSfx('chime');
       if (nowMatched.size === cards.length) {
-        await speak(sayCard(b), say.line('memoryMatch'));
         await celebrate(true);
         const nextLevel = Math.min(level + 1, LEVELS.length - 1);
         const nextSet = setIndex + 1;
@@ -134,7 +133,7 @@ export default function Memory() {
         setMatched(new Set());
         speak(say.line(isLetterBoard(nextSet) ? 'memoryLetters' : 'memoryIntro'));
       } else {
-        speak(sayCard(b), say.line('memoryMatch'));
+        speak(sayCard(b));
       }
       busy.current = false;
     } else {

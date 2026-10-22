@@ -27,6 +27,8 @@ let endTimerClip = -1;
 let position = 0;
 let replacedAt = 0;
 let watchdog: ReturnType<typeof setTimeout> | null = null;
+// Goes up each time a game screen closes, so pauses started on that screen never finish.
+let screen = 0;
 const START_TIMEOUT_MS = 4000;
 // Events within this long after switching clips can belong to the clip that was just replaced.
 const STALE_EVENT_MS = 150;
@@ -147,7 +149,21 @@ export function stopSpeaking() {
  */
 export function abandonSpeech() {
   waiters = [];
+  screen += 1;
   stopSpeaking();
+}
+
+/**
+ * Waits `ms` milliseconds. Like the voice, it never resolves if the game screen closes first, so
+ * code waiting on it (the next question, the next page) can't run after the child has left.
+ */
+export function pause(ms: number): Promise<void> {
+  const on = screen;
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      if (screen === on) resolve();
+    }, ms);
+  });
 }
 
 function makeVoice(source: number): Voice {

@@ -1,5 +1,6 @@
 /* eslint-disable react-hooks/refs -- the flagged code runs in finger handlers handed to a
  gesture builder, not during render. The component opts out of React Compiler with 'use no memo'. */
+import { Canvas, LinearGradient, Oval, Path as SkiaPath, Skia, vec } from '@shopify/react-native-skia';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { StyleSheet, View, useWindowDimensions } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
@@ -23,12 +24,13 @@ import { useCelebration } from '@/components/celebration';
 import { Draggable } from '@/components/draggable';
 import { GameScreen } from '@/components/game-screen';
 import { Pic } from '@/components/pic';
+import { TouchPad } from '@/components/touch-pad';
 import { Txt } from '@/components/txt';
 import { Colors, Radius, Spacing, cardShadow, raised } from '@/constants/theme';
 import { CHEF_MAX, CHEF_MIN, COLORS, PANTRY, RECIPES, SORT_FRUIT, say, type ChefStep } from '@/content/learning';
 import { useDropTargets } from '@/hooks/use-drop-targets';
 import { useLock } from '@/hooks/use-lock';
-import { playSfx, speak, speakAfter } from '@/lib/audio';
+import { pause, playSfx, speak, speakAfter } from '@/lib/audio';
 import { randomInt, sample, shuffle } from '@/lib/random';
 
 type Recipe = (typeof RECIPES)[number];
@@ -125,6 +127,7 @@ function AddStep({
   };
 
   const takeOut = (id: number) => {
+    if (!bowl.current.includes(id)) return;
     const now = bowl.current.filter((i) => i !== id);
     bowl.current = now;
     setInBowl(now);
@@ -166,9 +169,9 @@ function AddStep({
           <View style={[styles.inBowl, { width: bowlSize * 0.62 }]}>
             {inBowl.map((id) => (
               <Animated.View key={id} entering={BounceInDown.duration(500)} exiting={ZoomOut}>
-                <Bouncy accessibilityLabel={`Take out a ${step.one}`} sound={false} onPress={() => takeOut(id)}>
+                <TouchPad label={`Take out a ${step.one}`} onTouch={() => takeOut(id)}>
                   <Pic name={step.item} size={bowlSize * 0.15} />
-                </Bouncy>
+                </TouchPad>
               </Animated.View>
             ))}
           </View>
@@ -181,9 +184,9 @@ function AddStep({
           ) : (
             <Animated.View key={food.id} entering={ZoomIn.delay(food.id * 25)} exiting={FadeOutUp.duration(250)}>
               <Wiggle times={wrong[food.id] ?? 0}>
-                <Bouncy accessibilityLabel={food.name} sound={false} onPress={() => put(food)} style={styles.ingredient}>
+                <TouchPad label={food.name} onTouch={() => put(food)} style={styles.ingredient}>
                   <Pic name={food.name} size={item} />
-                </Bouncy>
+                </TouchPad>
               </Wiggle>
             </Animated.View>
           ),
@@ -209,7 +212,52 @@ function Wiggle({ times, children }: { times: number; children: ReactNode }) {
   return <Animated.View style={style}>{children}</Animated.View>;
 }
 
-/** Stir by moving a finger round and round the bowl. The spoon follows the finger; two turns finish it. */
+/**
+ * An empty mixing bowl seen from the side, drawn in two layers so the spoon can dip inside it: the
+ * rim and batter go behind the spoon, the front of the bowl goes in front of it.
+ */
+function MixingBowl({ box, swirl, children }: { box: number; swirl: number; children: ReactNode }) {
+  const cx = box / 2;
+  const rimY = box * 0.4;
+  const rx = box * 0.42;
+  const ry = box * 0.13;
+  const depth = box * 0.4;
+  const rim = Skia.XYWHRect(cx - rx, rimY - ry, rx * 2, ry * 2);
+  const batter = Skia.XYWHRect(cx - rx + 8, rimY - ry + 6, rx * 2 - 16, ry * 2 - 12);
+  const streak = Skia.XYWHRect(cx - rx * 0.55, rimY - ry * 0.45, rx * 1.1, ry * 0.9);
+  // The batter swirls round as she stirs.
+  const swirls = Skia.PathBuilder.Make().addArc(streak, swirl, 70).addArc(streak, swirl + 180, 70).build();
+  const front = Skia.PathBuilder.Make()
+    .moveTo(cx + rx, rimY)
+    .arcToOval(rim, 0, 180, false)
+    .cubicTo(cx - rx, rimY + depth * 0.6, cx - rx * 0.7, rimY + depth, cx - rx * 0.45, rimY + depth)
+    .lineTo(cx + rx * 0.45, rimY + depth)
+    .cubicTo(cx + rx * 0.7, rimY + depth, cx + rx, rimY + depth * 0.6, cx + rx, rimY)
+    .close()
+    .build();
+  const lip = Skia.PathBuilder.Make().addArc(rim, 0, 180).build();
+  return (
+    <View style={{ width: box, height: box }}>
+      <Canvas style={StyleSheet.absoluteFill}>
+        <Oval rect={rim} color="#3F6FD8" />
+        <Oval rect={batter} color="#FFE2A6" />
+        <SkiaPath path={swirls} color="rgba(255,255,255,0.8)" style="stroke" strokeWidth={5} strokeCap="round" />
+      </Canvas>
+      {children}
+      <Canvas style={StyleSheet.absoluteFill} pointerEvents="none">
+        <SkiaPath path={front}>
+          <LinearGradient start={vec(0, rimY)} end={vec(0, rimY + depth)} colors={['#5B9BFF', '#3A63D6']} />
+        </SkiaPath>
+        <SkiaPath path={lip} color="#8FC0FF" style="stroke" strokeWidth={6} strokeCap="round" />
+      </Canvas>
+    </View>
+  );
+}
+
+/**
+ * Stir by moving a finger round and round the bowl; two turns finish it. The bowl stays still and
+ * the spoon circles inside it, leaning and turning as it goes like a real spoon mixing batter.
+ */
 function StirStep({ bowlSize, onDone }: { bowlSize: number; onDone: () => void }) {
   'use no memo';
   const [turned, setTurned] = useState(0);
@@ -218,16 +266,17 @@ function StirStep({ bowlSize, onDone }: { bowlSize: number; onDone: () => void }
   const total = useRef(0);
   const finished = useRef(false);
   const goal = Math.PI * 4;
-  const box = bowlSize * 1.2;
+  const box = bowlSize * 1.3;
+  const center = { x: box / 2, y: box * 0.42 };
 
   const pan = Gesture.Pan()
     .runOnJS(true)
     .minDistance(0)
     .onBegin((e) => {
-      last.current = Math.atan2(e.y - box / 2, e.x - box / 2);
+      last.current = Math.atan2(e.y - center.y, e.x - center.x);
     })
     .onUpdate((e) => {
-      const a = Math.atan2(e.y - box / 2, e.x - box / 2);
+      const a = Math.atan2(e.y - center.y, e.x - center.x);
       setAngle(a);
       if (last.current !== null) {
         let delta = a - last.current;
@@ -244,17 +293,31 @@ function StirStep({ bowlSize, onDone }: { bowlSize: number; onDone: () => void }
       }
     });
 
-  const r = bowlSize * 0.28;
+  // The spoon's head follows a flat circle inside the bowl. In the picture the head sits up and to
+  // the left, so it turns 225 degrees to point down into the batter, then leans out and turns
+  // as it goes round.
+  const spoon = box * 0.46;
+  const head = spoon * 0.27;
+  const hx = center.x + Math.cos(angle) * box * 0.2;
+  const hy = center.y + Math.sin(angle) * box * 0.055;
   return (
     <View style={styles.stepBody}>
       <GestureDetector gesture={pan}>
-        <View style={{ width: box, height: box, alignItems: 'center', justifyContent: 'center' }}>
-          <View style={{ transform: [{ rotate: `${(turned * 180) / Math.PI}deg` }] }}>
-            <Pic name="bowl" size={bowlSize} />
-          </View>
-          <View pointerEvents="none" style={[styles.spoon, { transform: [{ translateX: Math.cos(angle) * r }, { translateY: Math.sin(angle) * r - bowlSize * 0.12 }, { rotate: `${(angle * 180) / Math.PI + 90}deg` }] }]}>
-            <Pic name="spoon" size={bowlSize * 0.38} />
-          </View>
+        <View style={{ width: box, height: box }}>
+          <MixingBowl box={box} swirl={(turned * 180) / Math.PI}>
+            <View
+              pointerEvents="none"
+              style={{
+                position: 'absolute',
+                left: hx - head,
+                top: hy - head,
+                transformOrigin: [head, head, 0],
+                // A flat squeeze stands in for turning: a real 3D turn would lift the spoon above the bowl's front.
+                transform: [{ rotate: `${225 + Math.cos(angle) * 18}deg` }, { scaleX: 0.7 + 0.3 * Math.abs(Math.sin(angle)) }],
+              }}>
+              <Pic name="spoon" size={spoon} />
+            </View>
+          </MixingBowl>
           <View pointerEvents="none" style={styles.sparkle}>
             <Pic name="sparkles" size={bowlSize * 0.22} style={{ opacity: Math.min(1, turned / goal) }} />
           </View>
@@ -420,14 +483,13 @@ export default function Chef() {
     if (!recipe || !finishing.take()) return;
     const next = stepIndex + 1;
     if (next < recipe.steps.length) {
-      await speak(say.line('great'));
+      await pause(700);
       setStepIndex(next);
       finishing.release();
       speak(...instruction(recipe, next));
     } else {
       setDone(true);
       setLevel((l) => Math.min(MAX_LEVEL, l + 1));
-      await speak(say.recipeDone(recipe.id));
       await celebrate(true);
     }
   };
@@ -521,8 +583,7 @@ const styles = StyleSheet.create({
   tray: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: Spacing.sm, maxWidth: 460 },
   ingredient: { padding: 6, backgroundColor: Colors.white, borderRadius: 20, ...cardShadow },
   checkButton: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm, backgroundColor: Colors.green, borderRadius: 999, paddingHorizontal: Spacing.xl, paddingVertical: Spacing.sm, ...raised('#169a5f', 5) },
-  spoon: { position: 'absolute' },
-  sparkle: { position: 'absolute' },
+  sparkle: { position: 'absolute', top: 0, right: 0 },
   meter: { width: '70%', height: 14, borderRadius: 7, backgroundColor: 'rgba(255,159,67,0.2)', overflow: 'hidden' },
   meterFill: { height: '100%', backgroundColor: Colors.orange, borderRadius: 7 },
   steam: { position: 'absolute', top: -40, zIndex: 2 },

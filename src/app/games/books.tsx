@@ -6,35 +6,30 @@ import Animated, { FadeIn, FadeInRight, ZoomIn } from 'react-native-reanimated';
 import { Bouncy } from '@/components/bouncy';
 import { useCelebration } from '@/components/celebration';
 import { GameScreen } from '@/components/game-screen';
-import { Pic } from '@/components/pic';
 import { Txt } from '@/components/txt';
 import { Colors, Radius, Spacing, cardShadow, raised } from '@/constants/theme';
-import { SPEECH_FILES } from '@/content/audio-files';
 import { say } from '@/content/learning';
 import { STORY_FILES } from '@/content/story-files';
 import STORIES from '@/content/stories.json';
-import { playSfx, speak, speechPosition, stopSpeaking } from '@/lib/audio';
+import { pause, speak, speechPosition, stopSpeaking } from '@/lib/audio';
 
 type Story = (typeof STORIES)[number];
-type Mode = 'listen' | 'read';
 
 const wordsOf = (text: string) => text.split(' ').filter(Boolean);
-/** The spoken line for a word she taps, if the app has one (sight words and many picture words). */
-const lineForWord = (word: string) => {
-  const clean = word.toLowerCase().replace(/[^a-z']/g, '').replace(/'s$/, '');
-  return [`word-${clean}`, `pic-${clean}`].find((id) => id in SPEECH_FILES);
-};
+// A short rest after each page, to look at the picture before the page turns.
+const PAGE_REST_MS = 1200;
+// How long a page with no words stays up.
+const PICTURE_PAGE_MS = 3500;
 
 /**
- * Story Shelf: picture books from Book Dash (CC BY 4.0). In "Read to me" the narrator reads each
- * page and lights up each word as it goes. In "I'll read" she reads on her own, can tap a word to
- * hear it, and can tap the speaker for help.
+ * Story Shelf: picture books from Book Dash (CC BY 4.0). The narrator reads each page, lights up
+ * each word as it goes and turns the page by itself, so there is nothing to tap once the book is
+ * open. The speaker button reads the current page again and carries on from there.
  */
 export default function Books() {
   const { width, height } = useWindowDimensions();
   const [story, setStory] = useState<Story | null>(null);
   const [page, setPage] = useState(0);
-  const [mode, setMode] = useState<Mode>('listen');
   const [lit, setLit] = useState(-1);
   const reading = useRef(0);
   const { celebrate, overlay } = useCelebration();
@@ -47,12 +42,17 @@ export default function Books() {
     };
   }, []);
 
-  /** Reads a page aloud, lighting each word in turn. Word timing is spread by word length. */
-  const readPage = async (s: Story, index: number) => {
-    const run = ++reading.current;
+  /**
+   * Reads one page aloud, lighting each word in turn. Word timing is spread by word length.
+   * Resolves `true` once the page has been read, or `false` if the reading was stopped.
+   */
+  const readPage = async (s: Story, index: number, run: number) => {
     setLit(-1);
     const current = s.pages[index];
-    if (!current?.text) return;
+    if (!current?.text) {
+      await pause(PICTURE_PAGE_MS);
+      return reading.current === run;
+    }
     const words = wordsOf(current.text);
     const weights = words.map((w) => w.length + 2);
     const total = weights.reduce((a, b) => a + b, 0);
@@ -68,34 +68,33 @@ export default function Books() {
       while (i < weights.length - 1 && at > weights[i]) at -= weights[i++];
       setLit(i);
     }, 80);
-    await speak(say.bookPage(s.slug, index));
+    const finished = await speak(say.bookPage(s.slug, index));
     clearInterval(timer);
     if (reading.current === run) setLit(-1);
+    return finished && reading.current === run;
   };
 
-  const openPage = (s: Story, index: number, readMode = mode) => {
-    reading.current += 1;
+  /** Reads from `index` to the end of the book, turning each page after it has been read. */
+  const readFrom = async (s: Story, index: number) => {
+    const run = ++reading.current;
     stopSpeaking();
-    setPage(index);
-    setLit(-1);
-    if (index >= s.pages.length) {
-      playSfx('tada');
-      const run = reading.current;
-      speak(say.line('theEnd')).then((finished) => {
-        if (finished && reading.current === run) celebrate(true);
-      });
-      return;
+    for (let i = index; i < s.pages.length; i++) {
+      setPage(i);
+      if (!(await readPage(s, i, run))) return;
+      await pause(PAGE_REST_MS);
+      if (reading.current !== run) return;
     }
-    if (readMode === 'listen') readPage(s, index);
+    setPage(s.pages.length);
+    celebrate(true);
   };
 
   const openBook = (s: Story) => {
     setStory(s);
     setPage(0);
+    setLit(-1);
     const run = ++reading.current;
-    // Start reading page one after the title, unless the child has already turned the page.
-    speak(say.bookTitle(s.slug), say.line(mode === 'listen' ? 'readToMe' : 'youRead')).then((finished) => {
-      if (finished && reading.current === run && mode === 'listen') readPage(s, 0);
+    speak(say.bookTitle(s.slug)).then((finished) => {
+      if (finished && reading.current === run) readFrom(s, 0);
     });
   };
 
@@ -112,23 +111,6 @@ export default function Books() {
     const cover = Math.min((width - Spacing.md * (columns + 1)) / columns, 220);
     body = (
       <ScrollView contentContainerStyle={styles.shelf}>
-        <View style={styles.modes}>
-          {(['listen', 'read'] as const).map((m) => (
-            <Bouncy
-              key={m}
-              accessibilityLabel={m === 'listen' ? 'Read to me' : "I'll read"}
-              style={[styles.mode, mode === m && styles.modeOn]}
-              onPress={() => {
-                setMode(m);
-                speak(say.line(m === 'listen' ? 'readToMe' : 'youRead'));
-              }}>
-              <Pic name={m === 'listen' ? 'speaker' : 'book'} size={26} />
-              <Txt size={17} color={mode === m ? Colors.white : Colors.text}>
-                {m === 'listen' ? 'Read to me' : "I'll read"}
-              </Txt>
-            </Bouncy>
-          ))}
-        </View>
         <View style={[styles.covers, { gap: Spacing.md }]}>
           {STORIES.map((s, i) => (
             <Animated.View key={s.slug} entering={ZoomIn.delay(i * 40).springify()}>
@@ -156,7 +138,7 @@ export default function Books() {
           The end
         </Txt>
         <View style={styles.endButtons}>
-          <Bouncy accessibilityLabel="Read it again" style={[styles.endButton, { backgroundColor: Colors.teal }]} onPress={() => openPage(story, 0)}>
+          <Bouncy accessibilityLabel="Read it again" style={[styles.endButton, { backgroundColor: Colors.teal }]} onPress={() => readFrom(story, 0)}>
             <Txt size={20} color={Colors.white}>
               Read again
             </Txt>
@@ -191,40 +173,18 @@ export default function Books() {
         </Animated.View>
         <View style={styles.textSide}>
           <Animated.View key={`text-${page}`} entering={FadeInRight.duration(300)} style={styles.words}>
-            {words.map((word, i) => {
-              const line = mode === 'read' ? lineForWord(word) : undefined;
-              const text = (
+            {words.map((word, i) => (
+              <View key={i} style={[styles.word, i === lit && styles.wordLit]}>
                 <Txt size={textSize} weight={i === lit ? 'heavy' : 'bold'} color={i === lit ? Colors.purpleDark : Colors.text}>
                   {word}
                 </Txt>
-              );
-              return (
-                <View key={i} style={[styles.word, i === lit && styles.wordLit]}>
-                  {line ? (
-                    <Bouncy accessibilityLabel={word} sound={false} onPress={() => speak(line)}>
-                      {text}
-                    </Bouncy>
-                  ) : (
-                    text
-                  )}
-                </View>
-              );
-            })}
+              </View>
+            ))}
           </Animated.View>
-          <View style={styles.turns}>
-            <Bouncy accessibilityLabel="Previous page" style={[styles.turn, page === 0 && styles.turnOff]} disabled={page === 0} onPress={() => openPage(story, page - 1)}>
-              <Txt size={40} weight="heavy" color={Colors.teal}>
-                ‹
-              </Txt>
-            </Bouncy>
-            <Txt size={16} weight="regular" color={Colors.textSoft}>
-              {page + 1} / {story.pages.length}
-            </Txt>
-            <Bouncy accessibilityLabel="Next page" style={[styles.turn, styles.turnNext]} onPress={() => openPage(story, page + 1)}>
-              <Txt size={40} weight="heavy" color={Colors.white}>
-                ›
-              </Txt>
-            </Bouncy>
+          <View style={styles.progress}>
+            {story.pages.map((_, i) => (
+              <View key={i} style={[styles.dot, i <= page && styles.dotOn]} />
+            ))}
           </View>
         </View>
       </View>
@@ -235,7 +195,7 @@ export default function Books() {
     <GameScreen
       title={story ? story.title : 'Story shelf'}
       background="#CDEFEA"
-      onRepeat={() => (story && page < story.pages.length ? readPage(story, page) : speak(say.line('shelfIntro')))}>
+      onRepeat={() => (story && page < story.pages.length ? readFrom(story, page) : speak(say.line('shelfIntro')))}>
       {story ? (
         <Bouncy accessibilityLabel="Back to the shelf" style={styles.back} onPress={closeBook}>
           <Txt size={16} color={Colors.textSoft}>
@@ -251,9 +211,6 @@ export default function Books() {
 
 const styles = StyleSheet.create({
   shelf: { padding: Spacing.md, gap: Spacing.lg, alignItems: 'center' },
-  modes: { flexDirection: 'row', gap: Spacing.sm, backgroundColor: 'rgba(255,255,255,0.6)', padding: 6, borderRadius: 999 },
-  mode: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: Spacing.md, paddingVertical: 10, borderRadius: 999 },
-  modeOn: { backgroundColor: Colors.teal },
   covers: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center' },
   book: { backgroundColor: Colors.white, borderRadius: Radius.md, overflow: 'hidden', ...raised('#A9D9D2') },
   bookTitle: { padding: Spacing.sm, minHeight: 52 },
@@ -266,10 +223,9 @@ const styles = StyleSheet.create({
   words: { flexDirection: 'row', flexWrap: 'wrap', alignContent: 'center', justifyContent: 'center', flex: 1, columnGap: 2, rowGap: 4 },
   word: { paddingHorizontal: 4, borderRadius: 10 },
   wordLit: { backgroundColor: '#FFF1A8' },
-  turns: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  turn: { width: 72, height: 72, borderRadius: 36, backgroundColor: Colors.white, alignItems: 'center', justifyContent: 'center', ...raised('#B9DDD7', 5) },
-  turnNext: { backgroundColor: Colors.teal, ...raised('#0B7268', 5) },
-  turnOff: { opacity: 0.35 },
+  progress: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 6 },
+  dot: { width: 10, height: 10, borderRadius: 5, backgroundColor: 'rgba(14,140,128,0.2)' },
+  dotOn: { backgroundColor: Colors.teal },
   end: { alignItems: 'center', padding: Spacing.lg, gap: Spacing.md },
   endCover: { width: 180, height: 180, borderRadius: Radius.lg },
   endButtons: { flexDirection: 'row', gap: Spacing.md, flexWrap: 'wrap', justifyContent: 'center' },

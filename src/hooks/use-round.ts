@@ -1,8 +1,5 @@
 import { useRef, useState } from 'react';
 
-import { say } from '@/content/learning';
-import { speak } from '@/lib/audio';
-
 /**
  * Tracks a round of questions and adjusts the difficulty as she plays.
  *
@@ -24,11 +21,8 @@ export function useRound({ total, maxLevel, start = 0 }: { total: number; maxLev
     return misses.current;
   };
 
-  /**
-   * Call on a right answer. Celebrates straight away (saying `lead` lines first, such as the
-   * word she found), and says so when the level goes up.
-   */
-  const success = async (celebrate: (big?: boolean, ...lead: string[]) => Promise<void>, ...lead: string[]) => {
+  /** Call on a right answer. Celebrates straight away with a sound and confetti. */
+  const success = async (celebrate: (big?: boolean) => Promise<void>) => {
     const firstTry = misses.current === 0;
     misses.current = 0;
     streak.current = firstTry ? streak.current + 1 : 0;
@@ -39,12 +33,11 @@ export function useRound({ total, maxLevel, start = 0 }: { total: number; maxLev
     }
     if (done + 1 >= total) {
       setDone(0);
-      await celebrate(true, ...lead);
+      await celebrate(true);
     } else {
       setDone(done + 1);
-      await celebrate(false, ...lead);
+      await celebrate(false);
     }
-    if (levelUp) await speak(say.line('levelUp'));
   };
 
   return { level, done, total, miss, success };

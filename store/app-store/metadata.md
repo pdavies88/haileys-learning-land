@@ -21,9 +21,9 @@ Fourteen learning games for every young child: reading, spelling, sums, puzzles,
 Hailey's Learning Land is a free, offline learning app for young children. A friendly voice reads every instruction aloud, so children who can't read yet can play on their own.
 
 READ AND SPELL
-- Story Shelf: 28 narrated picture books. "Read to me" lights up each word as it is read. "I'll read" lets children read alone and tap a word to hear it.
+- Story Shelf: 28 narrated picture books. Each word lights up as it is read, and the pages turn by themselves.
 - Word Detective: sight words, reading words to pictures, spelling with letter tiles, and rhymes.
-- Magic Letters: trace every capital and lowercase letter.
+- Magic Letters: trace every capital and lowercase letter, the numbers 1 to 20 and short sight words.
 - Sound Safari: match letters to the sounds that start each word.
 
 NUMBERS
