@@ -10,39 +10,41 @@ import { SFX_FILES, SPEECH_FILES, type SfxName } from '@/content/audio-files';
  * counting out loud while a child taps quickly. Sound effects have their own players and can
  * overlap the voice.
  *
- * Children tap fast and leave screens mid-sentence, so the queue is defensive: events left over
- * from the previous clip are ignored, a clip that never starts or never reports finishing is
- * skipped by a timer, and `abandonSpeech` (called when a game screen closes) drops pending
- * promises so nothing waiting on them runs after the child has left.
+ * Each line gets its own player, kept loaded for a while (most recently used first). Lines that
+ * are queued, or `prepare`d ahead, load while the line before them plays, so they start the moment
+ * it ends. Swapping files in and out of one shared player made lines start late, cut off or stay
+ * silent when children tapped quickly.
+ *
+ * Children tap fast and leave screens mid-sentence, so the queue is defensive: only the current
+ * line's player is listened to, a line that never starts or never reports finishing is skipped by
+ * a timer, and `abandonSpeech` (called when a game screen closes) drops pending promises so nothing
+ * waiting on them runs after the child has left.
  */
 
-let narrator: AudioPlayer | null = null;
 let queue: string[] = [];
 let waiters: ((finished: boolean) => void)[] = [];
-// Each clip gets a number. Status events only count once the current clip has started playing.
+// Loaded line players, least recently used first.
+const lines = new Map<string, AudioPlayer>();
+const MAX_LOADED = 24;
+let current: AudioPlayer | null = null;
+// Each line played gets a number. Status events only count once the current line has started.
 let clip = 0;
 let startedClip = -1;
-let endTimerClip = -1;
-// How far into the current clip the narrator is, in seconds, for following along word by word.
+// How far into the current line the narrator is, in seconds, for following along word by word.
 let position = 0;
-let replacedAt = 0;
 let watchdog: ReturnType<typeof setTimeout> | null = null;
 // Goes up each time a game screen closes, so pauses started on that screen never finish.
 let screen = 0;
 const START_TIMEOUT_MS = 4000;
-// Events within this long after switching clips can belong to the clip that was just replaced.
-const STALE_EVENT_MS = 150;
 // Each sound effect has a few players, so the same sound can play again before it has finished
 // (a child mashing a drum). A player rewinds itself as soon as it finishes, ready for the next tap.
 type Voice = { player: AudioPlayer; ready: boolean; usedAt: number };
 const effects = new Map<SfxName, Voice[]>();
-const INSTRUMENTS = /^(xylo\d|drum|clap|shaker|bell|strum)$/;
+const INSTRUMENTS = /^(xylo\d+|piano\d+|string\d|drum|kick|snare|hihat|tomhi|tomlo|crash|clap|shaker|bell|strum)$/;
 
 export async function setUpAudio() {
   // Play even when the phone's silent switch is on: this is a game, and the voice is essential.
   await setAudioModeAsync({ playsInSilentMode: true, interruptionMode: 'mixWithOthers', shouldPlayInBackground: false });
-  narrator = createAudioPlayer(null, { updateInterval: 100 });
-  narrator.addListener('playbackStatusUpdate', onStatus);
   for (const name of Object.keys(SFX_FILES) as SfxName[]) {
     const count = INSTRUMENTS.test(name) ? 4 : 2;
     effects.set(
@@ -52,21 +54,53 @@ export async function setUpAudio() {
   }
 }
 
+/** The player for a line, loading it if needed. Returns null for a line the app doesn't have. */
+function playerFor(id: string): AudioPlayer | null {
+  const loaded = lines.get(id);
+  if (loaded) {
+    lines.delete(id);
+    lines.set(id, loaded);
+    return loaded;
+  }
+  const source = SPEECH_FILES[id];
+  if (source === undefined) {
+    if (__DEV__) console.warn(`No spoken line "${id}"`);
+    return null;
+  }
+  const player = createAudioPlayer(source, { updateInterval: 100 });
+  player.addListener('playbackStatusUpdate', (status) => {
+    if (player === current) onStatus(status);
+  });
+  lines.set(id, player);
+  // Unload the least recently used lines, but never one that is playing or waiting to play.
+  for (const [oldId, old] of lines) {
+    if (lines.size <= MAX_LOADED) break;
+    if (old === current || queue.includes(oldId)) continue;
+    old.remove();
+    lines.delete(oldId);
+  }
+  return player;
+}
+
+/** Loads lines ahead of time, so they start the moment they're spoken. */
+export function prepare(...ids: string[]) {
+  ids.forEach(playerFor);
+}
+
 function onStatus(status: AudioStatus) {
-  if (Date.now() - replacedAt < STALE_EVENT_MS) return;
   if (status.playing && startedClip !== clip) {
     // It started: cancel the "never started" timer.
     startedClip = clip;
-    if (watchdog) clearTimeout(watchdog);
-    watchdog = null;
   }
-  // If the player never reports the end of this clip, move on shortly after it should have ended.
-  if (startedClip === clip && endTimerClip !== clip && status.duration > 0) {
-    endTimerClip = clip;
-    armWatchdog((status.duration - status.currentTime) * 1000 + 1200);
+  if (startedClip !== clip) return;
+  position = status.currentTime;
+  if (status.didJustFinish) {
+    playNext();
+    return;
   }
-  if (startedClip === clip) position = status.currentTime;
-  if (status.didJustFinish && startedClip === clip) playNext();
+  // If the player never reports the end of this line, move on shortly after it should have ended.
+  // Re-armed on every update, so a line that is still playing is never cut off.
+  if (status.playing && status.duration > 0) armWatchdog((status.duration - status.currentTime) * 1000 + 1500);
 }
 
 /** Seconds into the line being spoken right now (0 before it starts). */
@@ -91,23 +125,33 @@ function finish(finished: boolean) {
 function playNext() {
   if (watchdog) clearTimeout(watchdog);
   watchdog = null;
+  current?.pause();
+  current = null;
   clip += 1;
   position = 0;
   const next = queue.shift();
-  if (!narrator) return;
   if (!next) {
     finish(true);
     return;
   }
-  const source = SPEECH_FILES[next];
-  if (source === undefined) {
-    if (__DEV__) console.warn(`No spoken line "${next}"`);
+  const player = playerFor(next);
+  if (!player) {
     playNext();
     return;
   }
-  replacedAt = Date.now();
-  narrator.replace(source);
-  narrator.play();
+  current = player;
+  const forClip = clip;
+  if (player.currentTime > 0.05) {
+    // Played before: rewind first.
+    player
+      .seekTo(0)
+      .catch(() => undefined)
+      .finally(() => {
+        if (clip === forClip) player.play();
+      });
+  } else {
+    player.play();
+  }
   // A line that never starts playing (for example, a file that failed to load) is skipped.
   armWatchdog(START_TIMEOUT_MS);
 }
@@ -121,6 +165,7 @@ const speaking = () => waiters.length > 0 || queue.length > 0;
 export function speak(...ids: string[]): Promise<boolean> {
   stopSpeaking();
   queue = [...ids];
+  prepare(...ids.slice(1));
   return new Promise((resolve) => {
     waiters.push(resolve);
     playNext();
@@ -131,6 +176,7 @@ export function speak(...ids: string[]): Promise<boolean> {
 export function speakAfter(...ids: string[]): Promise<boolean> {
   if (!speaking()) return speak(...ids);
   queue.push(...ids);
+  prepare(...ids);
   return new Promise((resolve) => waiters.push(resolve));
 }
 
@@ -139,7 +185,8 @@ export function stopSpeaking() {
   watchdog = null;
   clip += 1;
   queue = [];
-  narrator?.pause();
+  current?.pause();
+  current = null;
   finish(false);
 }
 

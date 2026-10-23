@@ -176,6 +176,8 @@ export const PICTURE_FILES: Record<string, number> = {
   'ring': require('../../assets/pics/ring.png'),
   'sheep': require('../../assets/pics/sheep.png'),
   'books': require('../../assets/pics/books.png'),
+  'mirror': require('../../assets/pics/mirror.png'),
+  'frame': require('../../assets/pics/frame.png'),
 };
 
 export const COLORING_FILES: Record<string, number> = {

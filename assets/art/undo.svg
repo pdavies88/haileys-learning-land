@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="arrow" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFB86B"/>
+      <stop offset="1" stop-color="#FF7A45"/>
+    </linearGradient>
+    <radialGradient id="shadow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#5A3A6E" stop-opacity="0.25"/>
+      <stop offset="1" stop-color="#5A3A6E" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <ellipse cx="132" cy="222" rx="92" ry="16" fill="url(#shadow)"/>
+  <!-- a thick curved arrow that loops back to the left -->
+  <path d="M96 70 H150 a66 66 0 0 1 0 132 H110" fill="none" stroke="#E25F2A" stroke-width="44" stroke-linecap="round" stroke-linejoin="round" transform="translate(0 6)"/>
+  <path d="M96 70 H150 a66 66 0 0 1 0 132 H110" fill="none" stroke="url(#arrow)" stroke-width="44" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M20 70 L100 14 V126 Z" fill="#E25F2A" stroke="#E25F2A" stroke-width="16" stroke-linejoin="round" transform="translate(0 6)"/>
+  <path d="M20 70 L100 14 V126 Z" fill="url(#arrow)" stroke="#FF9A55" stroke-width="16" stroke-linejoin="round"/>
+  <path d="M118 62 H150 a74 74 0 0 1 60 30" fill="none" stroke="#FFFFFF" stroke-width="10" stroke-linecap="round" opacity="0.55"/>
+</svg>

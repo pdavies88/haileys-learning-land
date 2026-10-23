@@ -32,7 +32,7 @@ NUMBERS
 
 CREATE
 - Art Studio: crayons, glitter, stamps, a rainbow color, a magic mirror for symmetrical drawings and 100 coloring pages.
-- Build a story, Make a friend, and Music maker with a band you play by swiping.
+- Build a story, Make a friend, and Music maker with a xylophone, drum kit, piano and guitar.
 
 THINK AND SOLVE
 - Puzzle World: patterns and jigsaws up to 16 pieces.

@@ -69,7 +69,6 @@ export default function Friends() {
                   accessibilityLabel={option.id}
                   style={[styles.option, { width: tile, height: tile, backgroundColor: placeInfo ? placeInfo.colors[0] : Colors.white }]}
                   onPress={() => {
-                    playSfx('sparkle');
                     if (step === 'friend') {
                       setFriend(option.id);
                       speak(say.picture(option.id), say.line('pickPlace'));

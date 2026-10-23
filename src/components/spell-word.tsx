@@ -57,7 +57,7 @@ export function SpellWord({ word, decoys, onMiss, onDone }: Props) {
       playSfx('chime');
       onDone();
     } else {
-      speak(say.letterSound(letterInfo(tile.letter)));
+      speak(say.letterName(letterInfo(tile.letter)));
     }
   };
 
@@ -101,7 +101,7 @@ export function SpellWord({ word, decoys, onMiss, onDone }: Props) {
         )}
       </View>
       {/* Help plays the sound of the next letter, without pointing at the tile. */}
-      <HelpButton visible={!done && misses >= HELP_AFTER} onPress={() => speak(say.line('helpListen'), say.letterSound(letterInfo(word[typed])))} />
+      <HelpButton visible={!done && misses >= HELP_AFTER} onPress={() => speak(say.line('helpListen'), say.letterName(letterInfo(word[typed])))} />
     </View>
   );
 }

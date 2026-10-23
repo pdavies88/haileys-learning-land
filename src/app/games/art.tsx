@@ -166,9 +166,10 @@ export default function Art() {
     speak(name ? say.line('artColoring') : say.line('artBlank'));
   };
 
-  const swatch = Math.min(46, (width - 200) / (PALETTE.length + 1));
-  // Eight tool buttons and a divider fit on one row, even on a phone.
-  const toolSize = Math.min(56, (width - 32 - 8 * 6 - 14) / 8);
+  // Eleven colors in two rows of six, as big as the screen allows.
+  const swatch = Math.min(60, (width - 32 - 5 * Spacing.sm) / 6);
+  // Six tool buttons and a divider fit on one row, even on a phone.
+  const toolSize = Math.min(60, (width - 32 - 6 * 6 - 14) / 6);
   const flip = [{ translateX: paper.width }, { scaleX: -1 }];
   const drawMark = (mark: Mark, key: string) =>
     mark.kind === 'line' ? (
@@ -180,6 +181,16 @@ export default function Art() {
   return (
     <GameScreen title="Art studio" background="#EADFFF" onRepeat={() => speak(say.line('artIntro'))}>
       <View style={styles.body}>
+        <View style={styles.topRow}>
+          <Bouncy accessibilityLabel="Undo" style={styles.topButton} onPress={() => setMarks((m) => m.slice(0, -1))}>
+            <Pic name="undo" size={30} />
+            <Txt size={17}>Undo</Txt>
+          </Bouncy>
+          <Bouncy accessibilityLabel="Pictures to color" style={styles.topButton} onPress={() => setChoosing(true)}>
+            <Pic name="frame" size={30} />
+            <Txt size={17}>Pictures</Txt>
+          </Bouncy>
+        </View>
         <View style={styles.tools}>
           {TOOLS.map((t) => (
             <Bouncy key={t.id} accessibilityLabel={t.label} style={[styles.tool, toolStyle, tool === t.id && styles.selected]} onPress={() => setTool(t.id)}>
@@ -194,13 +205,7 @@ export default function Art() {
               if (!mirror) speak(say.line('mirrorOn'));
               setMirror(!mirror);
             }}>
-            <Pic name="butterfly" size={toolSize * 0.6} />
-          </Bouncy>
-          <Bouncy accessibilityLabel="Undo" style={[styles.tool, toolStyle]} onPress={() => setMarks((m) => m.slice(0, -1))}>
-            <Pic name="undo" size={toolSize * 0.54} />
-          </Bouncy>
-          <Bouncy accessibilityLabel="Pictures to color" style={[styles.tool, toolStyle]} onPress={() => setChoosing(true)}>
-            <Pic name="paper" size={toolSize * 0.58} />
+            <Pic name="mirror" size={toolSize * 0.62} />
           </Bouncy>
         </View>
 
@@ -244,7 +249,7 @@ export default function Art() {
               ))}
             </ScrollView>
           ) : (
-            <View style={styles.row}>
+            <View style={[styles.row, styles.palette, { maxWidth: swatch * 6 + Spacing.sm * 5 + Spacing.sm * 2 }]}>
               <Bouncy
                 accessibilityLabel="Rainbow"
                 style={[styles.swatch, styles.rainbow, { width: swatch, height: swatch }, color === RAINBOW && styles.swatchOn]}
@@ -325,6 +330,8 @@ export default function Art() {
 
 const styles = StyleSheet.create({
   body: { flex: 1, padding: Spacing.sm, gap: Spacing.sm },
+  topRow: { flexDirection: 'row', justifyContent: 'center', gap: Spacing.md },
+  topButton: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: Spacing.md, height: 50, borderRadius: 25, backgroundColor: Colors.white, ...cardShadow },
   tools: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 6 },
   tool: { width: 56, height: 56, borderRadius: 18, backgroundColor: Colors.white, alignItems: 'center', justifyContent: 'center', ...cardShadow },
   selected: { backgroundColor: '#FFF3B0', borderWidth: 3, borderColor: Colors.yellow },
@@ -333,6 +340,7 @@ const styles = StyleSheet.create({
   paper: { flex: 1, backgroundColor: Colors.white, borderRadius: 28, overflow: 'hidden', ...cardShadow },
   bottom: { gap: Spacing.sm, alignItems: 'center' },
   row: { flexDirection: 'row', gap: Spacing.sm, alignItems: 'center', justifyContent: 'center', paddingHorizontal: Spacing.sm },
+  palette: { flexWrap: 'wrap' },
   swatch: { borderRadius: 99, borderWidth: 3, borderColor: Colors.white, ...cardShadow },
   swatchOn: { borderColor: Colors.text, transform: [{ scale: 1.15 }] },
   rainbow: gradient('#F2545B', '#9B6DE3', 135),

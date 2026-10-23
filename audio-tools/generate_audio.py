@@ -5,7 +5,7 @@ only speaks the letter sounds (lines starting with "/"), which are phonemes that
 
     .tts/venv/bin/python audio-tools/generate_audio.py            # speech and sound effects
     .tts/venv/bin/python audio-tools/generate_audio.py speech [id ...]
-    .tts/venv/bin/python audio-tools/generate_audio.py sfx
+    .tts/venv/bin/python audio-tools/generate_audio.py sfx [name ...]
 
 Speech comes from audio-tools/speech.json (run `node scripts/build-speech-list.mjs` first), spoken
 by the Kokoro open-source voice model (Apache 2.0). Lines starting with "/" are phonemes, used for
@@ -216,6 +216,73 @@ def sfx_strum():
     return seq(*[(i * 0.018, pluck(f) * (0.8 + 0.04 * i)) for i, f in enumerate(notes)])
 
 
+# Piano: C4 to C5, every half step, so the keyboard has black keys too.
+PIANO_FREQS = [261.63 * 2 ** (i / 12) for i in range(13)]
+
+
+def piano(freq: float) -> np.ndarray:
+    """A soft piano note: bright overtones that fade faster than the fundamental, and a hammer tap."""
+    t = np.arange(int(SR * 2.2)) / SR
+    out = np.zeros_like(t)
+    for k, amp in ((1, 1.0), (2, 0.55), (3, 0.3), (4, 0.18), (5, 0.1), (6, 0.06)):
+        # Real strings are a little stretched: each overtone sits slightly sharp.
+        f = freq * k * (1 + 0.0004 * k * k)
+        out += amp * np.sin(2 * np.pi * f * t) * np.exp(-t * (1.6 + 0.9 * k))
+    rng = np.random.default_rng(int(freq))
+    hammer = rng.standard_normal(len(t)) * np.exp(-t / 0.004) * 0.15
+    return (out + hammer) * np.minimum(1, t / 0.003)
+
+
+def drum_hit(start: float, end: float, decay: float, seconds: float, noise: float, seed: int) -> np.ndarray:
+    """A tuned drum: a pitch that drops quickly from `start` to `end` Hz, plus a little stick noise."""
+    t = np.arange(int(SR * seconds)) / SR
+    pitch = end + (start - end) * np.exp(-t / 0.03)
+    body = np.sin(2 * np.pi * np.cumsum(pitch) / SR) * np.exp(-t / decay)
+    rng = np.random.default_rng(seed)
+    return body + rng.standard_normal(len(t)) * np.exp(-t / 0.008) * noise
+
+
+def sfx_kick():
+    return drum_hit(150, 48, 0.22, 0.6, 0.2, 21)
+
+
+def sfx_tomhi():
+    return drum_hit(330, 200, 0.2, 0.6, 0.15, 22)
+
+
+def sfx_tomlo():
+    return drum_hit(200, 110, 0.28, 0.8, 0.15, 23)
+
+
+def sfx_snare():
+    rng = np.random.default_rng(24)
+    n = int(SR * 0.35)
+    t = np.arange(n) / SR
+    sos = signal.butter(2, [1500, 8000], btype="bandpass", fs=SR, output="sos")
+    rattle = signal.sosfilt(sos, rng.standard_normal(n)) * np.exp(-t / 0.08)
+    return rattle + 0.6 * drum_hit(260, 180, 0.06, 0.35, 0, 24)
+
+
+def sfx_hihat():
+    rng = np.random.default_rng(25)
+    n = int(SR * 0.15)
+    t = np.arange(n) / SR
+    sos = signal.butter(4, 7000, btype="highpass", fs=SR, output="sos")
+    return signal.sosfilt(sos, rng.standard_normal(n)) * np.exp(-t / 0.03)
+
+
+def sfx_crash():
+    rng = np.random.default_rng(26)
+    n = int(SR * 1.8)
+    t = np.arange(n) / SR
+    sos = signal.butter(2, 4000, btype="highpass", fs=SR, output="sos")
+    return signal.sosfilt(sos, rng.standard_normal(n)) * np.exp(-t / 0.5) * np.minimum(1, t / 0.002)
+
+
+# Guitar strings in standard tuning, low E to high E.
+GUITAR_FREQS = [82.41, 110.0, 146.83, 196.0, 246.94, 329.63]
+
+
 def sfx_bell():
     return tone(1318.5, 1.6, 0.6, ((1, 1.0), (2.4, 0.4), (5.95, 0.15)))
 
@@ -260,6 +327,9 @@ SFX = {
     "star": kenney(UI, "maximize_009.ogg"),
     "drum": sfx_drum, "clap": sfx_clap, "shaker": sfx_shaker, "bell": sfx_bell,
     **{f"xylo{i}": (lambda f=f: xylo(f)) for i, f in enumerate(XYLO_FREQS)},
+    **{f"piano{i}": (lambda f=f: piano(f)) for i, f in enumerate(PIANO_FREQS)},
+    **{f"string{i}": (lambda f=f: pluck(f, 2.4)) for i, f in enumerate(GUITAR_FREQS)},
+    "kick": sfx_kick, "snare": sfx_snare, "hihat": sfx_hihat, "tomhi": sfx_tomhi, "tomlo": sfx_tomlo, "crash": sfx_crash,
 }
 
 
@@ -284,9 +354,11 @@ def generate_speech(only: list[str]) -> None:
             old.unlink()
 
 
-def generate_sfx() -> None:
+def generate_sfx(only: list[str]) -> None:
     print("Sound effects")
     for name, make in SFX.items():
+        if only and name not in only:
+            continue
         encode(make(), OUT_SFX / f"{name}.m4a", 64000)
 
 
@@ -317,5 +389,5 @@ if __name__ == "__main__":
     if target in ("all", "speech"):
         generate_speech(args[1:] if target == "speech" else [])
     if target in ("all", "sfx"):
-        generate_sfx()
+        generate_sfx(args[1:] if target == "sfx" else [])
     write_audio_map()

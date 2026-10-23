@@ -14,7 +14,7 @@ import { RHYMES, SIGHT_WORDS, SIGHT_WORDS_EASY, SPELL_WORDS, say } from '@/conte
 import { useHelp } from '@/hooks/use-help';
 import { useLock } from '@/hooks/use-lock';
 import { useRound } from '@/hooks/use-round';
-import { pick, playSfx, speak } from '@/lib/audio';
+import { pick, playSfx, prepare, speak } from '@/lib/audio';
 import { sample, shuffle } from '@/lib/random';
 
 /**
@@ -89,8 +89,19 @@ export default function SightWords() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const next = () => {
+  // Load what a tap on each card will say, so it plays the moment she touches it.
+  useEffect(() => {
+    if ('cards' in question) prepare(...question.cards.map((c) => (question.kind === 'find' ? say.word(c) : say.picture(c))), say.line('tryAgain'));
+  }, [question]);
+
+  /** Picks the next question and loads its prompt while the celebration plays. */
+  const upcoming = () => {
     const q = newQuestion(round.level, 'target' in question ? question.target : undefined);
+    prepare(...promptFor(q));
+    return q;
+  };
+
+  const next = (q = upcoming()) => {
     setQuestion(q);
     setWiggles({});
     setFound(false);
@@ -103,8 +114,9 @@ export default function SightWords() {
     if (!lock.take()) return;
     setFound(true);
     playSfx('chime');
+    const q = upcoming();
     await round.success(celebrate);
-    next();
+    next(q);
   };
 
   const wrong = (card: string, spoken: string) => {
@@ -131,8 +143,9 @@ export default function SightWords() {
         onMiss={() => round.miss()}
         onDone={async () => {
           if (!lock.take()) return;
+          const q = upcoming();
           await round.success(celebrate);
-          next();
+          next(q);
         }}
       />
     );

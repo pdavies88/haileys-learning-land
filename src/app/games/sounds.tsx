@@ -61,7 +61,7 @@ export default function Sounds() {
   const help = useHelp<string>();
 
   const promptFor = (q: Question) =>
-    q.kind === 'picture' ? [say.safariFind(q.letter), say.letterSound(letterInfo(q.letter))] : [say.picture(q.answer), say.line('whichLetter')];
+    q.kind === 'picture' ? [say.safariFind(q.letter)] : [say.picture(q.answer), say.line('whichLetter')];
 
   useEffect(() => {
     speak(say.line('safariIntro'), ...promptFor(question));
@@ -89,7 +89,7 @@ export default function Sounds() {
       playSfx('bloop');
       setWiggles((w) => ({ ...w, [choice]: (w[choice] ?? 0) + 1 }));
       const offer = help.miss(round.miss(), choice);
-      const named = question.kind === 'picture' ? say.picture(choice) : say.letterSound(letterInfo(choice));
+      const named = question.kind === 'picture' ? say.picture(choice) : say.letterName(letterInfo(choice));
       speak(named, say.line('tryAgain'), ...promptFor(question), ...offer);
     }
   };

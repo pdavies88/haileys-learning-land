@@ -464,7 +464,6 @@ export const say = {
   line: (key: keyof typeof LINES) => `line-${key}`,
   game: (id: GameId) => `game-${id}`,
   letterName: (l: Letter) => `letter-${l.lower}`,
-  letterSound: (l: Letter) => `sound-${l.lower}`,
   letterIsFor: (l: Letter) => `isfor-${l.lower}`,
   traceUpper: (l: Letter) => `trace-upper-${l.lower}`,
   traceLower: (l: Letter) => `trace-lower-${l.lower}`,
@@ -515,11 +514,11 @@ export const LINES = {
   tracePickLetter: 'Pick a letter to trace.',
   tracePickNumber: 'Pick a number to trace.',
   tracePickWord: 'Pick a word to trace.',
-  detectiveIntro: "Hi, I'm Detective Fox! Help me find the hidden words.",
+  detectiveIntro: "Let's find words!",
   countIntro: "Let's count! Tap the treats to feed our hungry friend.",
   countTooMany: "Oops, that's enough! Let's count them again.",
   howMany: 'How many altogether?',
-  artIntro: 'Welcome to the art studio! Pick a color and start drawing.',
+  artIntro: 'Pick a color and draw!',
   artColoring: 'Pick a picture to color.',
   artBlank: 'A fresh new page!',
   memoryIntro: 'Flip two cards. Can you find the ones that match?',
@@ -529,16 +528,16 @@ export const LINES = {
   shapeIntro: 'Drag each shape to its home.',
   jigsawIntro: 'Drag the pieces to finish the picture.',
   questDone: 'You found them all!',
-  friendIntro: 'Make a new friend! Pick a friend to dress up.',
-  pickPlace: 'Now pick a home for your friend.',
-  addStickers: 'Now add some sparkle! Pick a sticker, then tap the picture to put it there.',
+  friendIntro: 'Pick a friend.',
+  pickPlace: 'Now pick a home.',
+  addStickers: 'Pick a sticker. Then tap to stick it.',
   grownUps: 'This part is for grown-ups.',
   nextLetter: "Let's try the next letter!",
   newWord: "Here's a new word.",
-  storyPickHero: "Let's make a story! First, pick who the story is about.",
-  storyPickPlace: 'Where does the story happen? Pick a place.',
-  storyPickObject: 'What does our friend find? Pick something magical.',
-  storyPickFriend: 'Who does our friend meet along the way? Pick a new friend.',
+  storyPickHero: 'Who is the story about?',
+  storyPickPlace: 'Where does it happen?',
+  storyPickObject: 'What do they find?',
+  storyPickFriend: 'Who do they meet?',
   storyReady: "Here's your story!",
   chefPick: 'What shall we cook today? Pick a recipe.',
   chefStir: 'Move your finger round and round the bowl to stir.',
@@ -547,9 +546,11 @@ export const LINES = {
   questPick: 'Do you want to hunt for shapes, or build something?',
   questHunt: "Let's hunt for shapes!",
   questBuild: 'Pick something to build.',
-  musicIntro: "Let's make music! Tap the colors to play.",
-  drumsIntro: 'Swipe your finger across the instruments to play them!',
-  copyIntro: 'Listen to my song, then copy it!',
+  musicIntro: 'Tap the bars to play.',
+  drumsIntro: 'Tap the drums!',
+  pianoIntro: 'Play the piano keys!',
+  guitarIntro: 'Swipe across the strings!',
+  copyIntro: 'Listen, then copy me!',
   yourTurn: 'Your turn!',
   listenAgain: "Let's listen again.",
   singAbc: "Let's sing the alphabet song!",
@@ -561,19 +562,19 @@ export const LINES = {
   missingNumber: 'What number is missing?',
   whichMore: 'Which group has more?',
   whichFewer: 'Which group has fewer?',
-  readPicture: 'Read the word. Which picture is it?',
-  spellIt: 'Tap the letters in order to spell the word.',
+  readPicture: 'Read it. Find the picture.',
+  spellIt: 'Tap the letters to spell it.',
   whichLetter: 'Which letter does it start with?',
   whatNext: 'What comes next in the pattern?',
   patternIntro: 'Look at the pattern. Can you figure it out?',
   memoryLetters: 'Match each big letter with its little letter!',
   questCreate: 'Make your own picture! Tap a shape, then drag it anywhere you like.',
-  mirrorOn: 'Magic mirror! Draw on one side and watch the other side copy you.',
+  mirrorOn: 'Magic mirror! Draw on one side.',
   rainbowOn: 'Rainbow magic!',
   chefCheck: 'Tap the check when you have the right amount.',
-  helpOffer: 'Need a little help? Tap the owl.',
-  helpRemove: "Let's take one away. Now you try!",
-  helpListen: 'Listen for the next sound.',
+  helpOffer: 'Need help? Tap the owl.',
+  helpRemove: 'One is gone. Try again!',
+  helpListen: 'The next letter is',
   chefTooMany: "Oops, that's too many! Tap one in the bowl to take it out.",
   chefMore: 'Not yet! We need some more.',
   shelfIntro: 'Welcome to the story shelf! Pick a book, and we can read it together.',
@@ -587,7 +588,6 @@ export function spokenLines(): Record<string, string> {
 
   for (const l of LETTERS) {
     lines[say.letterName(l)] = `${l.upper}.`;
-    lines[say.letterSound(l)] = `/${l.sound}`;
     lines[say.letterIsFor(l)] = l.upper === 'X' ? `X is in ${l.word}!` : `${l.upper} is for ${l.word}!`;
     lines[say.traceUpper(l)] = `Let's trace a big ${l.upper}.`;
     lines[say.traceLower(l)] = `Now let's trace a little ${l.lower}.`;
@@ -613,7 +613,7 @@ export function spokenLines(): Record<string, string> {
 
   for (const word of SIGHT_WORDS) {
     lines[say.word(word)] = word === 'I' ? 'I.' : `${word}.`;
-    lines[say.findWord(word)] = `Can you find the word, ${word}?`;
+    lines[say.findWord(word)] = `Find the word, ${word}.`;
   }
   for (let n = 0; n <= 20; n++) {
     lines[say.number(n)] = `${capitalize(NUMBER_WORDS[n])}!`;
@@ -625,8 +625,8 @@ export function spokenLines(): Record<string, string> {
     }
   }
   for (const [a, b] of SUBTRACTION) lines[say.subtraction(a, b)] = `${capitalize(NUMBER_WORDS[a])} take away ${NUMBER_WORDS[b]}. How many are left?`;
-  for (const word of SPELL_WORDS.flat()) lines[say.spell(word)] = `Can you spell ${word}?`;
-  for (const word of RHYMES.flat()) lines[say.rhyme(word)] = `Which one rhymes with ${word}?`;
+  for (const word of SPELL_WORDS.flat()) lines[say.spell(word)] = `Spell ${word}.`;
+  for (const word of RHYMES.flat()) lines[say.rhyme(word)] = `What rhymes with ${word}?`;
   for (const [a, b] of ADDITION) lines[say.addition(a, b)] = `${capitalize(NUMBER_WORDS[a])} plus ${NUMBER_WORDS[b]}. How many altogether?`;
   for (const shape of SHAPES) {
     lines[say.shape(shape)] = capitalize(shape);

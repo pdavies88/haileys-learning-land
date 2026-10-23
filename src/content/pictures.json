@@ -118,7 +118,7 @@
   "speaker": "1f50a",
   "eraser": "art:eraser",
   "trash": "1f5d1",
-  "undo": "21a9",
+  "undo": "art:undo",
   "pencil": "270f",
   "crayon": "1f58d",
   "brush": "1f58c",
@@ -173,5 +173,7 @@
   "boat": "26f5",
   "ring": "1f48d",
   "sheep": "1f411",
-  "books": "1f4da"
+  "books": "1f4da",
+  "mirror": "1fa9e",
+  "frame": "1f5bc"
 }

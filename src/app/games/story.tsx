@@ -10,7 +10,7 @@ import { Pic } from '@/components/pic';
 import { Txt } from '@/components/txt';
 import { Colors, Spacing, cardShadow } from '@/constants/theme';
 import { PLACES, STORY_FRIENDS, STORY_HEROES, STORY_OBJECTS, say, spokenLines } from '@/content/learning';
-import { playSfx, speak, stopSpeaking } from '@/lib/audio';
+import { prepare, speak, stopSpeaking } from '@/lib/audio';
 
 const TEXT = spokenLines();
 type Step = 'hero' | 'place' | 'friend' | 'object' | 'story';
@@ -39,6 +39,7 @@ export default function Story() {
 
   useEffect(() => {
     speak(prompts.hero);
+    prepare(prompts.place, prompts.friend, prompts.object, prompts.story);
     return () => {
       reading.current += 1;
     };
@@ -60,7 +61,9 @@ export default function Story() {
   const read = async (chosen = object) => {
     const lines = linesFor(chosen);
     const run = ++reading.current;
-    await speak(say.line('storyReady'));
+    // Load every sentence now, so each one starts the moment the last one ends.
+    prepare(...lines);
+    if (!(await speak(say.line('storyReady')))) return;
     for (let i = 0; i < lines.length; i++) {
       if (reading.current !== run) return;
       setReached(i);
@@ -73,9 +76,10 @@ export default function Story() {
     }
   };
 
-  const go = (next: Step) => {
+  /** Moves to the next step, saying what she picked (`lead`) and then the next question as one queue. */
+  const go = (next: Step, ...lead: string[]) => {
     setStep(next);
-    speak(prompts[next]);
+    speak(...lead, prompts[next]);
   };
 
   const startOver = () => {
@@ -89,11 +93,11 @@ export default function Story() {
   const tile = Math.min((width - Spacing.md * (columns + 2)) / columns, 170);
   const choices =
     step === 'hero'
-      ? STORY_HEROES.map((h) => ({ id: h.id, picture: h.id, label: h.name, bg: Colors.white, pick: () => { setHero(h); speak(say.picture(h.id)); go('place'); } }))
+      ? STORY_HEROES.map((h) => ({ id: h.id, picture: h.id, label: h.name, bg: Colors.white, pick: () => { setHero(h); go('place', say.picture(h.id)); } }))
       : step === 'place'
-        ? PLACES.map((p) => ({ id: p.id, picture: p.decor[0], label: sentence(p.name), bg: p.colors[0], pick: () => { setPlace(p); speak(say.place(p.id)); go('friend'); } }))
+        ? PLACES.map((p) => ({ id: p.id, picture: p.decor[0], label: sentence(p.name), bg: p.colors[0], pick: () => { setPlace(p); go('friend', say.place(p.id)); } }))
         : step === 'friend'
-          ? STORY_FRIENDS.map((f) => ({ id: f, picture: f, label: sentence(f), bg: Colors.white, pick: () => { setFriend(f); speak(say.picture(f)); go('object'); } }))
+          ? STORY_FRIENDS.map((f) => ({ id: f, picture: f, label: sentence(f), bg: Colors.white, pick: () => { setFriend(f); go('object', say.picture(f)); } }))
           : STORY_OBJECTS.map((o) => ({ id: o.id, picture: o.id, label: sentence(o.name), bg: Colors.white, pick: () => { setObject(o); setStep('story'); read(o); } }));
 
   let body;
@@ -105,10 +109,7 @@ export default function Story() {
             <Bouncy
               accessibilityLabel={c.label}
               style={[styles.option, { width: tile, height: tile, backgroundColor: c.bg }]}
-              onPress={() => {
-                playSfx('sparkle');
-                c.pick();
-              }}>
+              onPress={c.pick}>
               <Pic name={c.picture} size={tile * 0.55} />
               <Txt size={Math.max(18, tile * 0.13)} weight="heavy" color={c.id === 'night' ? Colors.white : Colors.text} numberOfLines={1} adjustsFontSizeToFit>
                 {c.label}
