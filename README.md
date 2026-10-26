@@ -76,6 +76,16 @@ EAS asks for your Apple ID the first time and manages the signing certificates. 
 
 Store listing text, privacy answers and screenshots (6.9-inch iPhone and 13-inch iPad) are in `store/app-store/`. Retake the screenshots after visible design changes.
 
+## Releasing to the Amazon Appstore
+
+Fire tablets get the app from the Amazon Appstore. The `production` profile builds an Android App Bundle (`.aab`) and increments the Android `versionCode` on each build, tracked by EAS.
+
+```bash
+npx eas-cli@latest build --platform android --profile production
+```
+
+EAS Submit doesn't support Amazon, so upload the `.aab` by hand in the Amazon Developer Console. `store/amazon/listing.md` lists every console field with its value, including Live App Testing for testers before release. The icons, promotional image and 1600 × 2560 screenshots in `store/amazon/` are built from the iPad screenshots by `.art-venv/bin/python scripts/amazon-store-assets.py`.
+
 ## Website
 
 `docs/` is the GitHub Pages site with the privacy policy and support page that the app and store listings link to.
