@@ -68,7 +68,9 @@ export default function Balance() {
 
   const boardWidth = Math.min(width - Spacing.md * 2, 900);
   const gap = (boardWidth / 2 - 40) / PEGS;
-  const frogSize = (w: number) => 44 + w * 16;
+  // Frogs grow with the space between pegs, so on a narrow phone a big frog on the far peg stays
+  // on the screen and doesn't hide the spot next to it. On a tablet they reach full size.
+  const frogSize = (w: number) => Math.min(44 + w * 16, gap * (0.8 + w * 0.3));
   const swing = useAnimatedStyle(() => ({ transform: [{ rotate: `${tilt.value}deg` }] }));
 
   const frogsOn = (side: Side) =>
