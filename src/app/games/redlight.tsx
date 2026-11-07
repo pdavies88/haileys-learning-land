@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Pressable, StyleSheet, View, type LayoutChangeEvent } from 'react-native';
+import { Pressable, StyleSheet, View, useWindowDimensions, type LayoutChangeEvent } from 'react-native';
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withRepeat, withSequence, withTiming } from 'react-native-reanimated';
 
 import { useCelebration } from '@/components/celebration';
@@ -12,14 +12,15 @@ import { pause, playSfx, speak } from '@/lib/audio';
 
 type Light = 'green' | 'yellow' | 'red';
 
-// Who walks, and what waits at the end of the path. A new pair each time she gets there.
+// Who walks, and what waits at the end of the path. A new pair each time she gets there. Pictures
+// of animals drawn facing left are mirrored so they walk forward.
 const RACES = [
-  { runner: 'turtle', prize: 'strawberry' },
-  { runner: 'bunny', prize: 'carrot' },
-  { runner: 'puppy', prize: 'bone' },
-  { runner: 'mouse', prize: 'cheese' },
-  { runner: 'kitten', prize: 'fish' },
-  { runner: 'snail', prize: 'leaf' },
+  { runner: 'turtle', prize: 'strawberry', facesLeft: true },
+  { runner: 'bunny', prize: 'carrot', facesLeft: false },
+  { runner: 'puppy', prize: 'bone', facesLeft: false },
+  { runner: 'mouse', prize: 'cheese', facesLeft: false },
+  { runner: 'kitten', prize: 'fish', facesLeft: false },
+  { runner: 'snail', prize: 'leaf', facesLeft: true },
 ];
 
 const TICK_MS = 100;
@@ -43,9 +44,10 @@ function timing(level: number) {
 
 const LIGHT_COLORS: Record<Light, string> = { green: '#22C17A', yellow: '#FFC93C', red: '#F2545B' };
 
-function TrafficLight({ light, size }: { light: Light; size: number }) {
+/** A traffic light, upright, or on its side where the screen is short. */
+function TrafficLight({ light, size, sideways }: { light: Light; size: number; sideways: boolean }) {
   return (
-    <View style={[styles.lightBox, { width: size, paddingVertical: size * 0.12, gap: size * 0.1 }]}>
+    <View style={[styles.lightBox, sideways ? { flexDirection: 'row', height: size, paddingHorizontal: size * 0.12 } : { width: size, paddingVertical: size * 0.12 }, { gap: size * 0.1 }]}>
       {(['red', 'yellow', 'green'] as const).map((l) => (
         <View
           key={l}
@@ -77,7 +79,9 @@ export default function RedLight() {
   const progress = useSharedValue(0);
   const bob = useSharedValue(0);
   const { celebrate, overlay } = useCelebration();
-  const { runner, prize } = RACES[race % RACES.length];
+  const { runner, prize, facesLeft } = RACES[race % RACES.length];
+  // On a short screen (a phone held sideways) everything shrinks so the road and button still fit.
+  const short = useWindowDimensions().height < 600;
 
   const changeLight = (next: Light) => {
     state.current.light = next;
@@ -86,7 +90,9 @@ export default function RedLight() {
     if (next === 'green') {
       playSfx('chime');
       speak(say.line('rlGo'));
-    } else if (next === 'red') {
+    } else if (next === 'yellow') {
+      speak(say.line('rlSlow'));
+    } else {
       speak(say.line('rlStop'));
     }
   };
@@ -174,23 +180,26 @@ export default function RedLight() {
     setHolding(down);
   };
 
-  const runnerSize = Math.min(110, track * 0.12 || 90);
-  const walk = useAnimatedStyle(() => ({ transform: [{ translateX: progress.value * Math.max(0, track - runnerSize * 1.6) }, { translateY: bob.value }] }));
+  // Big enough to see on a phone, not too big on a tablet.
+  const runnerSize = Math.min(110, Math.max(56, track * 0.12));
+  const walk = useAnimatedStyle(() => ({
+    transform: [{ translateX: progress.value * Math.max(0, track - runnerSize * 1.6) }, { translateY: bob.value }, { scaleX: facesLeft ? -1 : 1 }],
+  }));
   const color = LIGHT_COLORS[light];
 
   return (
     <GameScreen title="Red light, green light" background="#E6F6EC" level={level} onRepeat={() => speak(say.line('rlIntro'))}>
       <View style={styles.body}>
         <View style={styles.top}>
-          <TrafficLight light={light} size={84} />
-          <Txt size={64} weight="heavy" color={color} style={styles.sign}>
+          <TrafficLight light={light} size={short ? 46 : 84} sideways={short} />
+          <Txt size={short ? 40 : 64} weight="heavy" color={color} style={[styles.sign, short && { minWidth: 140 }]}>
             {light === 'green' ? 'GO' : light === 'yellow' ? 'SLOW' : 'STOP'}
           </Txt>
         </View>
 
-        <View style={styles.trackArea} onLayout={(e: LayoutChangeEvent) => setTrack(e.nativeEvent.layout.width)}>
+        <View style={[styles.trackArea, short && { height: 100 }]} onLayout={(e: LayoutChangeEvent) => setTrack(e.nativeEvent.layout.width)}>
           <View style={styles.road}>
-            {Array.from({ length: 14 }, (_, i) => (
+            {Array.from({ length: Math.max(3, Math.floor((track - 60) / 46)) }, (_, i) => (
               <View key={i} style={styles.dash} />
             ))}
           </View>
@@ -208,7 +217,7 @@ export default function RedLight() {
           disabled={won}
           onPressIn={() => hold(true)}
           onPressOut={() => hold(false)}
-          style={[styles.button, { backgroundColor: color }, holding && styles.buttonDown]}>
+          style={[styles.button, short && styles.buttonShort, { backgroundColor: color }, holding && styles.buttonDown]}>
           <Txt size={30} weight="heavy" color={light === 'yellow' ? Colors.text : Colors.white}>
             {holding ? (light === 'red' ? 'Let go!' : 'Walking…') : 'Hold to go'}
           </Txt>
@@ -226,11 +235,12 @@ const styles = StyleSheet.create({
   lamp: {},
   sign: { minWidth: 220, textAlign: 'center' },
   trackArea: { alignSelf: 'stretch', height: 160, justifyContent: 'center', marginHorizontal: Spacing.lg },
-  road: { position: 'absolute', left: 0, right: 0, height: 70, borderRadius: 35, backgroundColor: '#D8CFC2', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly', paddingHorizontal: 30 },
+  road: { position: 'absolute', left: 0, right: 0, height: 70, borderRadius: 35, backgroundColor: '#D8CFC2', overflow: 'hidden', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly', paddingHorizontal: 30 },
   dash: { width: 26, height: 6, borderRadius: 3, backgroundColor: Colors.white },
   prize: { position: 'absolute' },
   runner: { position: 'absolute', left: 0 },
   button: { width: 340, maxWidth: '90%', height: 120, borderRadius: 60, alignItems: 'center', justifyContent: 'center', ...cardShadow },
+  buttonShort: { height: 64, width: 260 },
   buttonDown: { transform: [{ scale: 0.96 }], opacity: 0.9 },
 });
 

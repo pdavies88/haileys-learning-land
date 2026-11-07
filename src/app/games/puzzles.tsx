@@ -40,7 +40,7 @@ function Sorter({ level, onSolved }: { level: number; onSolved: Solved }) {
   }, []);
 
   const drop = (piece: { shape: ShapeName; color: { name: string } }, x: number, y: number) => {
-    if (targets.hit(x, y) !== piece.shape) {
+    if (targets.hit(x, y, 56) !== piece.shape) {
       playSfx('bloop');
       return false;
     }
@@ -121,7 +121,8 @@ function Jigsaw({ level, onSolved }: { level: number; onSolved: Solved }) {
   const trayScale = Math.min(1, (wide ? width * 0.4 : width - 40) / ((tile + 12) * Math.min(grid * grid, wide ? 3 : 4)));
 
   const drop = (i: number, x: number, y: number) => {
-    if (targets.hit(x, y, 10) !== String(i)) {
+    // A generous drop zone: close to the right spot counts, so small fingers aren't told no.
+    if (targets.hit(x, y, 48) !== String(i)) {
       playSfx('bloop');
       return false;
     }

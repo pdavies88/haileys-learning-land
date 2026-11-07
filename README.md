@@ -1,6 +1,6 @@
 # Hailey's Learning Land
 
-A free learning app for young children, with twenty games, built with Expo (SDK 58) and React Native. It runs on iPhone, iPad and Android, including Amazon Fire tablets. Everything works offline: no accounts, ads, purchases, tracking or saved data.
+A free learning app for young children, with nineteen games, built with Expo (SDK 58) and React Native. It runs on iPhone, iPad and Android, including Amazon Fire tablets. Everything works offline: no accounts, ads, purchases, tracking or saved data.
 
 ## Games
 
@@ -19,11 +19,10 @@ A free learning app for young children, with twenty games, built with Expo (SDK 
 - **Music maker:** four instruments that play the moment they're touched, with several fingers at once: a xylophone, a drum kit drawn like a real one (crash and hi-hat cymbals, two toms, snare, floor tom and bass drum), a piano with black keys, and a guitar you strum by swiping across the strings. Songs (Hot Cross Buns, Mary Had a Little Lamb, Twinkle Twinkle and Row Row Row Your Boat) are played on the xylophone a note at a time: the next bar glows and the words light up, so the child sets the pace. "Hear it" plays the song first.
 - **Follow me:** pads light up in a pattern, each with its own note, and the child taps them back in order. Colors mode has four colored pads; Shapes mode has shape pads, six once patterns get long. Each right answer adds a step; two misses make the next pattern shorter.
 - **Red light, green light:** hold the big button to walk an animal to its prize, and let go when the light turns red. Yellow warns first; holding on after red slides the animal back a little. Each win brings a new animal and a shorter warning, and from level 4 the light sometimes skips yellow. Practises stopping on cue.
-- **Breathe with me:** hold the balloon to breathe in while it fills, let go to breathe out while it shrinks. Five slow breaths fill a jar with stars.
+- **Breathe with me:** box breathing. The narrator guides four equal steps, counting to four in each: breathe in, hold, breathe out, hold. A dot travels round a square and the balloon grows, holds and shrinks with it. Four boxes fill a jar with stars.
 - **Snail trail:** drag the snail along a winding path to its house. Going too fast makes it hide in its shell, so slow and steady is the only way home.
 - **I spy:** find every star, heart or ladybug hidden among a busy jumble of pictures. Each round hides more among more.
-- **First, then:** pick what to play first and what comes next. The plan opens the first game, and on coming back it's time for the second, which helps with moving from one thing to another.
-- **My little pet:** a pocket pet that gets hungry, bored, muddy and sleepy. A thought bubble shows what it wants; drag food (counting out the treats it asks for), a ball, bubbles or a bed onto it and it eats, plays, splashes or naps. Tap it for a cuddle. Five happy moments fill the love meter.
+- **My little pet:** look after a pet by following its care routine, the same steps in the same order every time (a puppy eats, goes for a walk, plays, then sleeps). The list at the top shows what's done and what's next, the pet asks for it, and only the next step works, so caring for it becomes a habit. Finishing the list ends the day with a celebration.
 
 Every instruction is spoken aloud, and the speaker button repeats it. A right answer gets a success sound and confetti, with no spoken praise that could carry over into the next screen. Wrong answers get a gentle wiggle and "Let's try again!", never a buzzer, and after two misses an owl Help button offers a clue (it takes away a wrong choice, or plays the next letter's sound) without giving the answer. Games start at a level pitched for a five-year-old, move up after two first-try answers in a row, and ease off after two misses on one question. The current level shows next to the game's title. Answers respond the moment they're touched, treats and ingredients count every finger even when several tap at once, extra taps are ignored while a right answer is celebrated, and leaving a game cancels anything it was about to say.
 

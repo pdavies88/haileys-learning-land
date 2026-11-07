@@ -14,7 +14,7 @@ Copy these into App Store Connect. Screenshots are in `store/app-store/screensho
 
 ## Promotional text (170 characters max)
 
-Twenty learning games for every young child: reading, spelling, sums, puzzles, art and 28 narrated picture books. No ads, no accounts and no internet needed.
+Nineteen learning games for every young child: reading, spelling, sums, puzzles, art and 28 narrated picture books. No ads, no accounts and no internet needed.
 
 ## Description
 

@@ -1,6 +1,5 @@
 import { createAudioPlayer, setAudioModeAsync, type AudioPlayer, type AudioStatus } from 'expo-audio';
 import { useSyncExternalStore } from 'react';
-import { Platform } from 'react-native';
 
 import { SFX_FILES, SPEECH_FILES, type SfxName } from '@/content/audio-files';
 
@@ -22,22 +21,23 @@ import { SFX_FILES, SPEECH_FILES, type SfxName } from '@/content/audio-files';
  * a timer, and `abandonSpeech` (called when a game screen closes) drops pending promises so nothing
  * waiting on them runs after the child has left.
  *
- * Android gives every player its own ExoPlayer, audio track and media session, and caps how many
- * one app may hold. The 170 players iOS takes in its stride made Android refuse new ones, so the
- * voice stayed silent and games crashed as they opened. On Android the app keeps a budget: fewer
- * lines stay loaded, each sound effect has fewer players, instrument notes load only when a game
- * asks for them (`prepareSfx`), and the least recently used players switch to new sounds.
- * A player that still can't be created is skipped rather than crashing the game.
+ * Players are kept to a small budget on every platform. Android gives each one its own media
+ * session and caps how many an app may hold, so 170 players made it refuse new ones (silent voice,
+ * games crashing as they opened). On iOS the same 170 players each sent their status to JavaScript
+ * many times a second, which swamped it until the app froze. So: a few lines stay loaded, each
+ * sound effect has one or two players, instrument notes load only when a game asks for them
+ * (`prepareSfx`), the least recently used players switch to new sounds, and sound effects report
+ * their status only a few times a second. A player that can't be created is skipped rather than
+ * crashing the game.
  */
 
-const ANDROID = Platform.OS === 'android';
 let queue: string[] = [];
 let waiters: ((finished: boolean) => void)[] = [];
 // The lines of the latest `speak`, so mashing the button that said them doesn't start them over.
 let spoken: string[] = [];
 // Loaded line players, least recently used first.
 const lines = new Map<string, AudioPlayer>();
-const MAX_LOADED = ANDROID ? 8 : 24;
+const MAX_LOADED = 10;
 let current: AudioPlayer | null = null;
 // Each line played gets a number. Status events only count once the current line has started.
 let clip = 0;
@@ -53,7 +53,9 @@ const START_TIMEOUT_MS = 4000;
 type Voice = { player: AudioPlayer; ready: boolean; usedAt: number };
 const effects = new Map<SfxName, Voice[]>();
 const INSTRUMENTS = /^(xylo\d+|piano\d+|string\d|drum|kick|snare|hihat|tomhi|tomlo|crash|clap|shaker|bell|strum)$/;
-const MAX_EFFECT_PLAYERS = ANDROID ? 28 : Infinity;
+const MAX_EFFECT_PLAYERS = 28;
+// Sound effects only need to hear that they finished, so they report a few times a second.
+const EFFECT_UPDATE_MS = 250;
 let effectPlayers = 0;
 // Mashed taps fire interface sounds faster than anyone can hear them. A repeat of the same sound
 // within a moment, or a fourth sound in half a second, is dropped so they don't pile up into noise.
@@ -82,16 +84,15 @@ const subscribeTalking = (listener: () => void) => {
 export const useTalking = () => useSyncExternalStore(subscribeTalking, () => talking);
 
 /** How many players a sound effect gets, so it can overlap itself. */
-const voicesFor = (name: SfxName) => (INSTRUMENTS.test(name) ? (ANDROID ? 2 : 4) : ANDROID ? 1 : 2);
+const voicesFor = (name: SfxName) => (INSTRUMENTS.test(name) ? 2 : 1);
 
 export async function setUpAudio() {
   // Play even when the phone's silent switch is on: this is a game, and the voice is essential.
   await setAudioModeAsync({ playsInSilentMode: true, interruptionMode: 'mixWithOthers', shouldPlayInBackground: false });
   for (const name of Object.keys(SFX_FILES) as SfxName[]) {
     effects.set(name, []);
-    // iOS loads every sound up front. Android loads only the interface sounds, one player each.
-    if (!ANDROID) Array.from({ length: voicesFor(name) }, () => addVoice(name));
-    else if (!INSTRUMENTS.test(name)) addVoice(name);
+    // Only the interface sounds load up front, one player each. Instruments load with their game.
+    if (!INSTRUMENTS.test(name)) addVoice(name);
   }
 }
 
@@ -293,7 +294,7 @@ function addVoice(name: SfxName): Voice | null {
 }
 
 function newVoice(name: SfxName): Voice | null {
-  const player = newPlayer(SFX_FILES[name], 50);
+  const player = newPlayer(SFX_FILES[name], EFFECT_UPDATE_MS);
   if (!player) return null;
   const voice: Voice = { player, ready: true, usedAt: 0 };
   player.addListener('playbackStatusUpdate', (status) => {
@@ -336,10 +337,11 @@ function rewind(voice: Voice) {
 }
 
 /** Plays a sound effect at once, even if the same sound is still playing. */
-export function playSfx(name: SfxName) {
+export function playSfx(name: SfxName, { always = false } = {}) {
   const pool = effects.get(name);
   if (!pool) return;
-  if (!INSTRUMENTS.test(name)) {
+  // `always` skips the mash filter, for games where fast tapping is the point (bubble wrap).
+  if (!always && !INSTRUMENTS.test(name)) {
     const now = Date.now();
     recentEffects = recentEffects.filter((at) => now - at < EFFECT_BURST.ms);
     if (now - (lastEffect.get(name) ?? 0) < SAME_EFFECT_MS || recentEffects.length >= EFFECT_BURST.count) return;
@@ -351,6 +353,14 @@ export function playSfx(name: SfxName) {
     ready.ready = false;
     ready.usedAt = Date.now();
     ready.player.play();
+    // Ready again the moment it ends. Waiting for the next status report (a few times a second)
+    // left fast taps finding every player busy, and the restart that follows plays a beat late.
+    const ms = (ready.player.duration || 1) * 1000 + 30;
+    const playedAt = ready.usedAt;
+    setTimeout(() => {
+      // Only if nothing has played on it since; a restarted note mustn't be cut off.
+      if (!ready.ready && ready.usedAt === playedAt) rewind(ready);
+    }, ms);
     return;
   }
   if (pool.length === 0) return;

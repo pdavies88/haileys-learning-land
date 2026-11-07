@@ -162,7 +162,8 @@ export default function Snail() {
                 <View pointerEvents="none" style={[styles.at, { left: end.x - snailSize * 0.6, top: end.y - snailSize * 1.1 }]}>
                   <Pic name="house" size={snailSize * 1.2} />
                 </View>
-                <View pointerEvents="none" style={[styles.at, { left: snail.x - snailSize / 2, top: snail.y - snailSize * 0.75, opacity: hiding ? 0.35 : 1, transform: [{ scale: hiding ? 0.7 : 1 }] }]}>
+                {/* The snail picture faces left; mirrored, it crawls forward along the path. */}
+                <View pointerEvents="none" style={[styles.at, { left: snail.x - snailSize / 2, top: snail.y - snailSize * 0.75, opacity: hiding ? 0.35 : 1, transform: [{ scale: hiding ? 0.7 : 1 }, { scaleX: -1 }] }]}>
                   <Pic name="snail" size={snailSize} />
                 </View>
               </>

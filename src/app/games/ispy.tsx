@@ -11,36 +11,39 @@ import { Colors, Spacing, cardShadow } from '@/constants/theme';
 import { SPY_TARGETS, say } from '@/content/learning';
 import { pause, playSfx, speak } from '@/lib/audio';
 
-const DECOYS = ['flower', 'apple', 'bee', 'butterfly', 'cat', 'dog', 'ball', 'gift', 'leaf', 'cloud', 'sun', 'balloon', 'house', 'snail'];
+// Busy, colourful things to hide the one target among, including look-alikes (a sun near a star,
+// apples near a strawberry). Whatever is being looked for is left out.
+const DECOYS = ['flower', 'apple', 'bee', 'butterfly', 'cat', 'dog', 'ball', 'gift', 'leaf', 'cloud', 'sun', 'balloon', 'house', 'snail', 'star', 'heart', 'ladybug', 'strawberry', 'fish', 'cherries', 'lemon', 'rose', 'frog', 'crab'];
 
 type Item = { id: number; name: string; target: boolean; col: number; row: number; dx: number; dy: number; turn: number; size: number };
 
-/** A busy picture: the targets hidden among other things, each in its own cell of a loose grid. */
+/**
+ * A busy picture, every cell of a loose grid filled and overlapping its neighbours, with the one
+ * target hidden somewhere among the rest.
+ */
 function scene(round: number, cols: number, rows: number): Item[] {
   const target = SPY_TARGETS[round % SPY_TARGETS.length].name;
-  const targets = Math.min(3 + round, 6);
-  const decoys = Math.min(12 + round * 2, cols * rows - targets);
-  const cells = Array.from({ length: cols * rows }, (_, i) => i).sort(() => Math.random() - 0.5);
-  const names = [
-    ...Array.from({ length: targets }, () => target),
-    ...Array.from({ length: decoys }, () => DECOYS[Math.floor(Math.random() * DECOYS.length)]),
-  ];
-  return names.map((name, i) => ({
+  const decoys = DECOYS.filter((d) => d !== target);
+  const cells = cols * rows;
+  const hideAt = Math.floor(Math.random() * cells);
+  return Array.from({ length: cells }, (_, i) => ({
     id: i,
-    name,
-    target: i < targets,
-    col: cells[i] % cols,
-    row: Math.floor(cells[i] / cols),
+    name: i === hideAt ? target : decoys[Math.floor(Math.random() * decoys.length)],
+    target: i === hideAt,
+    col: i % cols,
+    row: Math.floor(i / cols),
     dx: Math.random() - 0.5,
     dy: Math.random() - 0.5,
-    turn: (Math.random() - 0.5) * 40,
-    size: 0.75 + Math.random() * 0.35,
+    turn: (Math.random() - 0.5) * 60,
+    // Things overlap a little; the target is no bigger than anything else.
+    size: i === hideAt ? 1 : 0.95 + Math.random() * 0.4,
   }));
 }
 
 /**
- * I spy: find every star (or heart, or ladybug) hidden in a busy picture. Picking something else
- * just wiggles it. Each round hides a few more among more things, building steady attention.
+ * I spy: like Where's Waldo, find the one star (or heart, or ladybug) hidden in a busy, crowded
+ * picture. Picking something else just wiggles it. Each round the crowd gets bigger, building
+ * careful, steady looking.
  */
 export default function ISpy() {
   const [round, setRound] = useState(0);
@@ -49,27 +52,26 @@ export default function ISpy() {
   const [area, setArea] = useState({ width: 0, height: 0 });
   const { celebrate, overlay } = useCelebration();
 
-  const cols = area.width > area.height ? 7 : 5;
-  const rows = area.width > area.height ? 4 : 6;
+  // The crowd grows each round.
+  const grow = Math.min(round, 4);
+  const cols = (area.width > area.height ? 11 : 7) + grow;
+  const rows = (area.width > area.height ? 7 : 11) + grow;
   const items = useMemo(() => scene(round, cols, rows), [round, cols, rows]);
   const target = SPY_TARGETS[round % SPY_TARGETS.length];
-  const total = items.filter((i) => i.target).length;
 
   useEffect(() => {
     speak(say.spy(target.name));
   }, [target.name]);
 
   const pick = async (item: Item) => {
-    if (found.includes(item.id) || found.length >= total) return;
+    if (found.length > 0) return;
     if (!item.target) {
       setWrong(item.id);
       playSfx('bloop');
       return;
     }
-    const now = [...found, item.id];
-    setFound(now);
+    setFound([item.id]);
     playSfx('chime');
-    if (now.length < total) return;
     await celebrate(true);
     await speak(say.line('spyDone'));
     await pause(500);
@@ -79,14 +81,14 @@ export default function ISpy() {
 
   const cellW = area.width / cols;
   const cellH = area.height / rows;
-  const base = Math.min(cellW, cellH) * 0.62;
+  const base = Math.min(cellW, cellH) * 1.05;
 
   return (
-    <GameScreen title="I spy" background="#FFF4DD" progress={{ done: found.length, total }} onRepeat={() => speak(say.spy(target.name))}>
+    <GameScreen title="I spy" background="#FFF4DD" level={round} onRepeat={() => speak(say.spy(target.name))}>
       <View style={styles.body}>
         <View style={styles.ask}>
           <Txt size={26} weight="heavy">
-            Find all the {target.plural}
+            Can you find the {target.name}?
           </Txt>
           <Pic name={target.name} size={44} />
         </View>
@@ -102,8 +104,8 @@ export default function ISpy() {
                   onTouch={() => pick(item)}
                   style={{
                     position: 'absolute',
-                    left: item.col * cellW + (cellW - size) / 2 + item.dx * (cellW - size) * 0.8,
-                    top: item.row * cellH + (cellH - size) / 2 + item.dy * (cellH - size) * 0.8,
+                    left: item.col * cellW + (cellW - size) / 2 + item.dx * cellW * 0.5,
+                    top: item.row * cellH + (cellH - size) / 2 + item.dy * cellH * 0.5,
                     width: size,
                     height: size,
                     transform: [{ rotate: `${wrong === item.id ? 0 : item.turn}deg` }],

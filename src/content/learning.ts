@@ -463,7 +463,7 @@ export const SONGS: Song[] = [
 
 /** Things a pet can say. */
 export type PetLine =
-  | 'hello' | 'hungry' | 'wantsPlay' | 'wantsBath' | 'wantsSleep' | 'yum' | 'played' | 'clean' | 'rested' | 'notNow' | 'giggle';
+  | 'hello' | 'hungry' | 'wantsWalk' | 'wantsPlay' | 'wantsBath' | 'wantsSleep' | 'yum' | 'walked' | 'played' | 'clean' | 'rested' | 'notNow' | 'giggle';
 
 export const PETS = [
   { id: 'puppy', name: 'Puppy', mission: 'puppy' },
@@ -503,7 +503,9 @@ export const GAMES = [
   { id: 'breathe', title: 'Breathe with me', picture: 'balloon', color: '#60A5FA', section: 'focus', skills: 'Slow, calm breaths' },
   { id: 'snail', title: 'Snail trail', picture: 'snail', color: '#65A30D', section: 'focus', skills: 'Slow and steady' },
   { id: 'ispy', title: 'I spy', picture: 'ladybug', color: '#F59E0B', section: 'focus', skills: 'Look closely' },
-  { id: 'firstthen', title: 'First, then', picture: 'check', color: '#8B5CF6', section: 'focus', skills: 'Make a plan' },
+  { id: 'tots', title: 'Tiny tots', picture: 'duck', color: '#FB923C', section: 'numbers', skills: 'Colors and counting' },
+  { id: 'pop', title: 'Bubble wrap', picture: 'bubbles', color: '#38BDF8', section: 'focus', skills: 'Pop and relax' },
+  { id: 'catch', title: 'Catch', picture: 'apple', color: '#F97316', section: 'focus', skills: 'Watch and catch' },
   { id: 'pet', title: 'My little pet', picture: 'puppy', color: '#4CAF50', section: 'think', skills: 'Care and share' },
 ] as const;
 export type GameId = (typeof GAMES)[number]['id'];
@@ -586,23 +588,19 @@ export const LINES = {
   calmBreath: "Let's take a slow breath.",
   rlIntro: 'Hold to go. Let go on red!',
   rlGo: 'Go!',
+  rlSlow: 'Slow down!',
   rlStop: 'Stop!',
   rlOops: 'Oops! Red means stop.',
   rlWin: 'You made it!',
-  brIntro: 'Hold the balloon and breathe in.',
+  brIntro: 'Breathe with the box. Tap start.',
   brIn: 'Breathe in.',
   brOut: 'Breathe out.',
-  brSlow: 'Hold a little longer.',
-  brDone: 'Five calm breaths. Well done!',
+  brHold: 'Hold.',
+  brDone: 'Four calm breaths. Well done!',
   snIntro: 'Take the snail home. Go slow!',
   snFast: 'Too fast! Slow and steady.',
   snHome: 'Home sweet home!',
   spyDone: 'You found them all!',
-  ftFirst: 'What do you want to do first?',
-  ftThen: 'What comes next?',
-  ftReady: 'First this, then that!',
-  ftNext: 'Now the next one!',
-  ftDone: 'All done! Great plan!',
   tracePickLetter: 'Pick a letter to trace.',
   tracePickNumber: 'Pick a number to trace.',
   tracePickWord: 'Pick a word to trace.',
@@ -615,6 +613,12 @@ export const LINES = {
   artBlank: 'A fresh new page!',
   memoryIntro: 'Find two that match!',
   memoryNope: 'Not a match.',
+  memoryMatch: 'Match!',
+  popIntro: 'Pop all the bubbles!',
+  totsIntro: 'Tap, tap, tap!',
+  popMore: 'More bubbles!',
+  catchIntro: 'Move the basket. Catch the fruit!',
+  catchWin: 'You caught them all!',
   safariIntro: "Let's listen for sounds!",
   puzzleIntro: "Let's solve puzzles!",
   shapeIntro: 'Drag each shape to its home.',
@@ -646,7 +650,8 @@ export const LINES = {
   songGlow: 'Tap the glowing bar.',
   songEnd: 'You played the whole song!',
   petPick: 'Pick a pet to take care of!',
-  petHowTo: 'Drag things to your pet.',
+  petHowTo: 'Follow the list, one step at a time.',
+  petDone: 'All done! What a happy pet.',
   missingNumber: 'What number is missing?',
   whichMore: 'Which group has more?',
   whichFewer: 'Which group has fewer?',
@@ -674,7 +679,7 @@ export function spokenLines(): Record<string, string> {
   for (const [key, text] of Object.entries(LINES)) lines[say.line(key as keyof typeof LINES)] = text;
   for (const game of GAMES) lines[say.game(game.id)] = `${game.title.replace('&', 'and')}!`;
   for (const song of SONGS) lines[say.song(song.id)] = `${song.title}!`;
-  for (const target of SPY_TARGETS) lines[say.spy(target.name)] = `Find all the ${target.plural}!`;
+  for (const target of SPY_TARGETS) lines[say.spy(target.name)] = `Can you find the ${target.name}?`;
 
   for (const l of LETTERS) {
     lines[say.letterName(l)] = `${l.upper}.`;
@@ -721,7 +726,7 @@ export function spokenLines(): Record<string, string> {
   for (const shape of SHAPES) {
     lines[say.shape(shape)] = capitalize(shape);
     lines[say.findShape(shape)] = `Find all the ${shape}s!`;
-    for (const color of COLORS) lines[say.shapeHome(color.name, shape)] = `Put the ${color.name} ${shape} in its home.`;
+    for (const color of COLORS) lines[say.shapeHome(color.name, shape)] = `${capitalize(color.name)} ${shape}.`;
   }
   for (const color of COLORS) {
     lines[say.color(color.name)] = capitalize(color.name);
@@ -758,6 +763,8 @@ export function spokenLines(): Record<string, string> {
     lines[say.pet(pet.id, 'hello')] = `Hi! I'm your ${pet.name.toLowerCase()}!`;
     const name = pet.name.toLowerCase();
     lines[say.pet(pet.id, 'hungry')] = `${pet.name} is hungry!`;
+    lines[say.pet(pet.id, 'wantsWalk')] = `${pet.name} wants a walk!`;
+    lines[say.pet(pet.id, 'walked')] = `What a nice walk!`;
     lines[say.pet(pet.id, 'wantsPlay')] = `${pet.name} wants to play!`;
     lines[say.pet(pet.id, 'wantsBath')] = `Oh no, ${name} is muddy!`;
     lines[say.pet(pet.id, 'wantsSleep')] = `${pet.name} is sleepy!`;

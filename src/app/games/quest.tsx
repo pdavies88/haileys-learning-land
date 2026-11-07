@@ -166,7 +166,7 @@ function FreeBuild() {
 }
 
 export default function Quest() {
-  const { width } = useWindowDimensions();
+  const { width, height } = useWindowDimensions();
   const [mode, setMode] = useState<'menu' | 'hunt' | 'pick' | 'build' | 'create'>('menu');
   const [build, setBuild] = useState<Build>(BUILDS[0]);
   const [huntKey, setHuntKey] = useState(0);
@@ -178,12 +178,15 @@ export default function Quest() {
   }, []);
 
   const tile = Math.min((width - Spacing.md * 5) / 3, 210);
+  // The three choices are big, wide tiles stacked one above the other.
+  const menuWidth = Math.min(width - Spacing.md * 2, 560);
+  const menuHeight = Math.min((height - 260) / 3, 170);
   const menuButton = (label: string, picture: string, color: string, onPress: () => void) => (
-    <Bouncy accessibilityLabel={label} style={[styles.menuCard, { width: tile, height: tile, backgroundColor: color }]} onPress={onPress}>
+    <Bouncy accessibilityLabel={label} style={[styles.menuCard, styles.menuWide, { width: menuWidth, height: menuHeight, backgroundColor: color }]} onPress={onPress}>
       <View style={styles.bubble}>
-        <Pic name={picture} size={tile * 0.4} />
+        <Pic name={picture} size={menuHeight * 0.55} />
       </View>
-      <Txt size={22} weight="heavy" color={Colors.white}>
+      <Txt size={Math.min(40, menuHeight * 0.28)} weight="heavy" color={Colors.white}>
         {label}
       </Txt>
     </Bouncy>
@@ -192,7 +195,7 @@ export default function Quest() {
   let body;
   if (mode === 'menu') {
     body = (
-      <View style={styles.menu}>
+      <View style={[styles.menu, styles.menuStack]}>
         {menuButton('Hunt', 'magnifier', '#3AA0D9', () => {
           setMode('hunt');
           speak(say.line('questHunt'));
@@ -284,6 +287,8 @@ const styles = StyleSheet.create({
   colorDot: { width: 38, height: 38, borderRadius: 19, borderWidth: 3, borderColor: Colors.white, ...cardShadow },
   colorOn: { borderColor: Colors.text, borderWidth: 3 },
   menu: { flex: 1, flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', alignContent: 'center', justifyContent: 'center', gap: Spacing.md, padding: Spacing.md },
+  menuStack: { flexDirection: 'column', flexWrap: 'nowrap' },
+  menuWide: { flexDirection: 'row', justifyContent: 'flex-start', paddingHorizontal: Spacing.lg, gap: Spacing.lg },
   menuCard: { borderRadius: 28, alignItems: 'center', justifyContent: 'center', gap: Spacing.sm, ...cardShadow },
   bubble: { backgroundColor: 'rgba(255,255,255,0.85)', borderRadius: 999, padding: Spacing.md },
   back: { alignSelf: 'center', paddingHorizontal: Spacing.md, paddingVertical: 6, borderRadius: 999, backgroundColor: 'rgba(255,255,255,0.7)', marginTop: Spacing.xs },

@@ -8,8 +8,7 @@ import { Bouncy } from '@/components/bouncy';
 import { Pic } from '@/components/pic';
 import { Txt } from '@/components/txt';
 import { Colors, Radius, Spacing, gradient, raised, shade } from '@/constants/theme';
-import { GAMES, GAME_SECTIONS, say } from '@/content/learning';
-import { speak } from '@/lib/audio';
+import { GAMES, GAME_SECTIONS } from '@/content/learning';
 
 export default function Home() {
   const { width } = useWindowDimensions();
@@ -57,10 +56,9 @@ export default function Home() {
                     <Bouncy
                       accessibilityLabel={game.title}
                       style={[styles.cardFrame, raised(shade(game.color, -0.32)), { width: cardWidth, height: cardHeight }]}
-                      onPress={() => {
-                        speak(say.game(game.id));
-                        router.push(`/games/${game.id}` as Href);
-                      }}>
+                      // No spoken name here: the game says its own intro as it opens, and two lines at
+                      // once came out late or on top of each other.
+                      onPress={() => router.push(`/games/${game.id}` as Href)}>
                       {/* The shadow sits on the frame; the gradient is clipped to the rounded card inside it. */}
                       <View style={[styles.card, gradient(shade(game.color, 0.12), shade(game.color, -0.12), 150)]}>
                         <View style={[styles.glow, { width: cardHeight, height: cardHeight, borderRadius: cardHeight / 2 }]} />
