@@ -1,4 +1,6 @@
 import { createAudioPlayer, setAudioModeAsync, type AudioPlayer, type AudioStatus } from 'expo-audio';
+import { useSyncExternalStore } from 'react';
+import { Platform } from 'react-native';
 
 import { SFX_FILES, SPEECH_FILES, type SfxName } from '@/content/audio-files';
 
@@ -19,13 +21,23 @@ import { SFX_FILES, SPEECH_FILES, type SfxName } from '@/content/audio-files';
  * line's player is listened to, a line that never starts or never reports finishing is skipped by
  * a timer, and `abandonSpeech` (called when a game screen closes) drops pending promises so nothing
  * waiting on them runs after the child has left.
+ *
+ * Android gives every player its own ExoPlayer, audio track and media session, and caps how many
+ * one app may hold. The 170 players iOS takes in its stride made Android refuse new ones, so the
+ * voice stayed silent and games crashed as they opened. On Android the app keeps a budget: fewer
+ * lines stay loaded, each sound effect has fewer players, instrument notes load only when a game
+ * asks for them (`prepareSfx`), and the least recently used players switch to new sounds.
+ * A player that still can't be created is skipped rather than crashing the game.
  */
 
+const ANDROID = Platform.OS === 'android';
 let queue: string[] = [];
 let waiters: ((finished: boolean) => void)[] = [];
+// The lines of the latest `speak`, so mashing the button that said them doesn't start them over.
+let spoken: string[] = [];
 // Loaded line players, least recently used first.
 const lines = new Map<string, AudioPlayer>();
-const MAX_LOADED = 24;
+const MAX_LOADED = ANDROID ? 8 : 24;
 let current: AudioPlayer | null = null;
 // Each line played gets a number. Status events only count once the current line has started.
 let clip = 0;
@@ -41,16 +53,55 @@ const START_TIMEOUT_MS = 4000;
 type Voice = { player: AudioPlayer; ready: boolean; usedAt: number };
 const effects = new Map<SfxName, Voice[]>();
 const INSTRUMENTS = /^(xylo\d+|piano\d+|string\d|drum|kick|snare|hihat|tomhi|tomlo|crash|clap|shaker|bell|strum)$/;
+const MAX_EFFECT_PLAYERS = ANDROID ? 28 : Infinity;
+let effectPlayers = 0;
+// Mashed taps fire interface sounds faster than anyone can hear them. A repeat of the same sound
+// within a moment, or a fourth sound in half a second, is dropped so they don't pile up into noise.
+// Instruments always play, so fast drumming still works.
+const lastEffect = new Map<SfxName, number>();
+let recentEffects: number[] = [];
+const SAME_EFFECT_MS = 150;
+const EFFECT_BURST = { count: 3, ms: 500 };
+
+// Whether the narrator is talking. Answer cards rest until a question has been asked, so a child
+// listens before she taps. Screens read it with `useTalking`.
+let talking = false;
+const talkListeners = new Set<() => void>();
+function setTalking(next: boolean) {
+  if (talking === next) return;
+  talking = next;
+  talkListeners.forEach((listener) => listener());
+}
+const subscribeTalking = (listener: () => void) => {
+  talkListeners.add(listener);
+  return () => {
+    talkListeners.delete(listener);
+  };
+};
+/** True while the narrator is speaking. */
+export const useTalking = () => useSyncExternalStore(subscribeTalking, () => talking);
+
+/** How many players a sound effect gets, so it can overlap itself. */
+const voicesFor = (name: SfxName) => (INSTRUMENTS.test(name) ? (ANDROID ? 2 : 4) : ANDROID ? 1 : 2);
 
 export async function setUpAudio() {
   // Play even when the phone's silent switch is on: this is a game, and the voice is essential.
   await setAudioModeAsync({ playsInSilentMode: true, interruptionMode: 'mixWithOthers', shouldPlayInBackground: false });
   for (const name of Object.keys(SFX_FILES) as SfxName[]) {
-    const count = INSTRUMENTS.test(name) ? 4 : 2;
-    effects.set(
-      name,
-      Array.from({ length: count }, () => makeVoice(SFX_FILES[name])),
-    );
+    effects.set(name, []);
+    // iOS loads every sound up front. Android loads only the interface sounds, one player each.
+    if (!ANDROID) Array.from({ length: voicesFor(name) }, () => addVoice(name));
+    else if (!INSTRUMENTS.test(name)) addVoice(name);
+  }
+}
+
+/** A player, or null if the system won't make another one. */
+function newPlayer(source: number, updateInterval: number): AudioPlayer | null {
+  try {
+    return createAudioPlayer(source, { updateInterval });
+  } catch (error) {
+    if (__DEV__) console.warn('Could not load a sound', error);
+    return null;
   }
 }
 
@@ -67,18 +118,28 @@ function playerFor(id: string): AudioPlayer | null {
     if (__DEV__) console.warn(`No spoken line "${id}"`);
     return null;
   }
-  const player = createAudioPlayer(source, { updateInterval: 100 });
-  player.addListener('playbackStatusUpdate', (status) => {
-    if (player === current) onStatus(status);
-  });
-  lines.set(id, player);
-  // Unload the least recently used lines, but never one that is playing or waiting to play.
-  for (const [oldId, old] of lines) {
-    if (lines.size <= MAX_LOADED) break;
-    if (old === current || queue.includes(oldId)) continue;
-    old.remove();
-    lines.delete(oldId);
+  // Once enough lines are loaded, the least recently used player (never one playing or waiting to
+  // play) takes the new line instead. Android frees a removed player only when JavaScript gets
+  // round to garbage-collecting it, so removing old players and making new ones piled them up.
+  let player: AudioPlayer | null = null;
+  if (lines.size >= MAX_LOADED) {
+    for (const [oldId, old] of lines) {
+      if (old === current || queue.includes(oldId)) continue;
+      lines.delete(oldId);
+      old.replace(source);
+      player = old;
+      break;
+    }
   }
+  if (!player) {
+    const created = newPlayer(source, 100);
+    if (!created) return null;
+    created.addListener('playbackStatusUpdate', (status) => {
+      if (created === current) onStatus(status);
+    });
+    player = created;
+  }
+  lines.set(id, player);
   return player;
 }
 
@@ -117,6 +178,7 @@ function armWatchdog(ms: number) {
 }
 
 function finish(finished: boolean) {
+  setTalking(false);
   const done = waiters;
   waiters = [];
   done.forEach((resolve) => resolve(finished));
@@ -140,6 +202,7 @@ function playNext() {
     return;
   }
   current = player;
+  setTalking(true);
   const forClip = clip;
   if (player.currentTime > 0.05) {
     // Played before: rewind first.
@@ -163,7 +226,13 @@ const speaking = () => waiters.length > 0 || queue.length > 0;
  * they finish, or `false` if something else interrupts them.
  */
 export function speak(...ids: string[]): Promise<boolean> {
+  // Mashing the button that said these lines would start them over and over: while they are still
+  // being said, wait for them instead.
+  if (current && ids.length === spoken.length && ids.every((id, i) => id === spoken[i])) {
+    return new Promise((resolve) => waiters.push(resolve));
+  }
   stopSpeaking();
+  spoken = ids;
   queue = [...ids];
   prepare(...ids.slice(1));
   return new Promise((resolve) => {
@@ -213,12 +282,46 @@ export function pause(ms: number): Promise<void> {
   });
 }
 
-function makeVoice(source: number): Voice {
-  const voice: Voice = { player: createAudioPlayer(source, { updateInterval: 50 }), ready: true, usedAt: 0 };
-  voice.player.addListener('playbackStatusUpdate', (status) => {
+/**
+ * Adds a player for a sound effect. Once the budget is full, the least recently used idle player of
+ * another sound switches to this one, so the number of players never grows (see `playerFor`).
+ */
+function addVoice(name: SfxName): Voice | null {
+  const voice = effectPlayers < MAX_EFFECT_PLAYERS ? newVoice(name) : reuseIdleVoice(name);
+  if (voice) effects.get(name)?.push(voice);
+  return voice;
+}
+
+function newVoice(name: SfxName): Voice | null {
+  const player = newPlayer(SFX_FILES[name], 50);
+  if (!player) return null;
+  const voice: Voice = { player, ready: true, usedAt: 0 };
+  player.addListener('playbackStatusUpdate', (status) => {
     if (status.didJustFinish) rewind(voice);
   });
+  effectPlayers += 1;
   return voice;
+}
+
+function reuseIdleVoice(name: SfxName): Voice | null {
+  let oldest: { pool: Voice[]; voice: Voice } | null = null;
+  for (const [other, pool] of effects) {
+    if (other === name) continue;
+    for (const voice of pool) {
+      if (voice.ready && (!oldest || voice.usedAt < oldest.voice.usedAt)) oldest = { pool, voice };
+    }
+  }
+  if (!oldest) return null;
+  const { pool, voice } = oldest;
+  pool.splice(pool.indexOf(voice), 1);
+  voice.player.replace(SFX_FILES[name]);
+  voice.usedAt = 0;
+  return voice;
+}
+
+/** Loads sound effects ahead of time, so they play the moment they're touched (instrument notes). */
+export function prepareSfx(...names: SfxName[]) {
+  for (const name of names) if (!effects.get(name)?.length) addVoice(name);
 }
 
 function rewind(voice: Voice) {
@@ -236,13 +339,21 @@ function rewind(voice: Voice) {
 export function playSfx(name: SfxName) {
   const pool = effects.get(name);
   if (!pool) return;
-  const ready = pool.find((v) => v.ready);
+  if (!INSTRUMENTS.test(name)) {
+    const now = Date.now();
+    recentEffects = recentEffects.filter((at) => now - at < EFFECT_BURST.ms);
+    if (now - (lastEffect.get(name) ?? 0) < SAME_EFFECT_MS || recentEffects.length >= EFFECT_BURST.count) return;
+    lastEffect.set(name, now);
+    recentEffects.push(now);
+  }
+  const ready = pool.find((v) => v.ready) ?? (pool.length < voicesFor(name) ? addVoice(name) : null);
   if (ready) {
     ready.ready = false;
     ready.usedAt = Date.now();
     ready.player.play();
     return;
   }
+  if (pool.length === 0) return;
   // Every player is busy: restart the one that started longest ago.
   const oldest = pool.reduce((a, b) => (a.usedAt <= b.usedAt ? a : b));
   oldest.usedAt = Date.now();

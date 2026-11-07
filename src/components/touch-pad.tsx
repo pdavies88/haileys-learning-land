@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import type { StyleProp, ViewStyle } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import Animated, { useAnimatedStyle, useSharedValue, withSequence, withSpring, withTiming } from 'react-native-reanimated';
+import Animated, { useAnimatedStyle, useSharedValue, withSequence, withTiming } from 'react-native-reanimated';
 
 /**
  * Acts the moment a finger touches it, even while other fingers are still down elsewhere.
@@ -24,7 +24,8 @@ export function TouchPad({ onTouch, style, label, disabled, children }: {
     .enabled(!disabled)
     .minDistance(0)
     .onBegin(() => {
-      scale.set(withSequence(withTiming(0.9, { duration: 50 }), withSpring(1, { damping: 10 })));
+      // One quick dip and back, never a wobble: a key that keeps bouncing looks like it was hit twice.
+      scale.set(withSequence(withTiming(0.92, { duration: 50 }), withTiming(1, { duration: 120 })));
       onTouch();
     });
   const animated = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));

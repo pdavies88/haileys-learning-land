@@ -171,3 +171,5 @@ const styles = StyleSheet.create({
   pictureTile: { backgroundColor: Colors.white, borderRadius: 999, padding: Spacing.lg, ...raised('#F2D58A') },
   pictures: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: Spacing.md },
 });
+
+export { GameError as ErrorBoundary } from '@/components/game-error';

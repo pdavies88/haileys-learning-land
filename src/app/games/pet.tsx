@@ -408,3 +408,5 @@ const styles = StyleSheet.create({
   item: { padding: 10, backgroundColor: Colors.white, borderRadius: Radius.md, ...cardShadow },
   change: { paddingHorizontal: Spacing.md, paddingVertical: 6, borderRadius: 999, backgroundColor: 'rgba(255,255,255,0.7)' },
 });
+
+export { GameError as ErrorBoundary } from '@/components/game-error';

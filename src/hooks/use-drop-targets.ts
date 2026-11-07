@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import type { View } from 'react-native';
+import type { HostInstance } from 'react-native';
 
 type Rect = { x: number; y: number; width: number; height: number };
 
@@ -8,10 +8,10 @@ type Rect = { x: number; y: number; width: number; height: number };
  * Give each target `ref={targets.register(id)}` and `onLayout={targets.measure(id)}`.
  */
 export function useDropTargets() {
-  const views = useRef(new Map<string, View>());
+  const views = useRef(new Map<string, HostInstance>());
   const rects = useRef(new Map<string, Rect>());
 
-  const register = (id: string) => (view: View | null) => {
+  const register = (id: string) => (view: HostInstance | null) => {
     if (view) views.current.set(id, view);
     else views.current.delete(id);
   };

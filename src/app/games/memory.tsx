@@ -191,3 +191,5 @@ const styles = StyleSheet.create({
   front: { backgroundColor: Colors.white },
   matched: { backgroundColor: '#FFF8D6' },
 });
+
+export { GameError as ErrorBoundary } from '@/components/game-error';

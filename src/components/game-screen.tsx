@@ -4,6 +4,7 @@ import { StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Bouncy } from '@/components/bouncy';
+import { CalmBreak } from '@/components/calm-break';
 import { Pic } from '@/components/pic';
 import { Txt } from '@/components/txt';
 import { Colors, MIN_TAP, Spacing, gradient, raised, shade } from '@/constants/theme';
@@ -19,11 +20,13 @@ type Props = {
   progress?: { done: number; total: number };
   /** The current level, shown as a small badge from 1 up. */
   level?: number;
+  /** Offer a breathing break when fingers mash the screen. Off where fast tapping is the point. */
+  calm?: boolean;
   children: ReactNode;
 };
 
 /** The frame every game sits in: a big Home button, the title, a "say it again" button and stars. */
-export function GameScreen({ title, background, onRepeat, progress, level, children }: Props) {
+export function GameScreen({ title, background, onRepeat, progress, level, calm = true, children }: Props) {
   const insets = useSafeAreaInsets();
   const leaving = useRef(false);
 
@@ -77,7 +80,7 @@ export function GameScreen({ title, background, onRepeat, progress, level, child
         )}
       </View>
       <View style={[styles.body, { paddingBottom: insets.bottom + Spacing.sm, paddingLeft: insets.left, paddingRight: insets.right }]}>
-        {children}
+        <CalmBreak enabled={calm}>{children}</CalmBreak>
       </View>
     </View>
   );

@@ -247,3 +247,5 @@ const styles = StyleSheet.create({
   reading: { letterSpacing: 6 },
   rhymeCard: { alignItems: 'center', gap: Spacing.sm },
 });
+
+export { GameError as ErrorBoundary } from '@/components/game-error';

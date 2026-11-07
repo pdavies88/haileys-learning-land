@@ -169,3 +169,5 @@ const styles = StyleSheet.create({
   action: { height: 56, minWidth: 56, borderRadius: 28, backgroundColor: Colors.white, alignItems: 'center', justifyContent: 'center', paddingHorizontal: Spacing.md, ...cardShadow },
   newFriend: { backgroundColor: Colors.pink },
 });
+
+export { GameError as ErrorBoundary } from '@/components/game-error';

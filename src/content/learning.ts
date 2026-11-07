@@ -401,12 +401,60 @@ export const XYLOPHONE = [
   { note: 'C', color: '#FF7EB6' },
 ];
 
-/** The alphabet song: each letter with its xylophone bar (0-7) and length in beats. */
-export const ABC_SONG: [string, number, number][] = [
-  ['a', 0, 1], ['b', 0, 1], ['c', 4, 1], ['d', 4, 1], ['e', 5, 1], ['f', 5, 1], ['g', 4, 2],
-  ['h', 3, 1], ['i', 3, 1], ['j', 2, 1], ['k', 2, 1], ['l', 1, 0.5], ['m', 1, 0.5], ['n', 1, 0.5], ['o', 1, 0.5], ['p', 0, 2],
-  ['q', 4, 1], ['r', 4, 1], ['s', 3, 2], ['t', 2, 1], ['u', 2, 1], ['v', 1, 2],
-  ['w', 4, 1], ['x', 4, 1], ['y', 3, 2], ['z', 2, 2],
+/**
+ * Songs to play on the xylophone, one line at a time. Each note is a bar (0 to 7, C up to the next
+ * C) and the syllable sung on it. Easiest first.
+ */
+export type Song = { id: string; title: string; picture: string; lines: [number, string][][] };
+const TWINKLE_A: [number, string][] = [[0, 'Twin'], [0, 'kle'], [4, 'twin'], [4, 'kle'], [5, 'lit'], [5, 'tle'], [4, 'star']];
+const TWINKLE_B: [number, string][] = [[3, 'How'], [3, 'I'], [2, 'won'], [2, 'der'], [1, 'what'], [1, 'you'], [0, 'are']];
+export const SONGS: Song[] = [
+  {
+    id: 'buns',
+    title: 'Hot Cross Buns',
+    picture: 'cupcake',
+    lines: [
+      [[2, 'Hot'], [1, 'cross'], [0, 'buns']],
+      [[2, 'Hot'], [1, 'cross'], [0, 'buns']],
+      [[0, 'One'], [0, 'a'], [0, 'pen'], [0, 'ny'], [1, 'two'], [1, 'a'], [1, 'pen'], [1, 'ny']],
+      [[2, 'Hot'], [1, 'cross'], [0, 'buns']],
+    ],
+  },
+  {
+    id: 'mary',
+    title: 'Mary Had a Little Lamb',
+    picture: 'sheep',
+    lines: [
+      [[2, 'Ma'], [1, 'ry'], [0, 'had'], [1, 'a'], [2, 'lit'], [2, 'tle'], [2, 'lamb']],
+      [[1, 'lit'], [1, 'tle'], [1, 'lamb'], [2, 'lit'], [4, 'tle'], [4, 'lamb']],
+      [[2, 'Ma'], [1, 'ry'], [0, 'had'], [1, 'a'], [2, 'lit'], [2, 'tle'], [2, 'lamb'], [2, 'its']],
+      [[1, 'fleece'], [1, 'was'], [2, 'white'], [1, 'as'], [0, 'snow']],
+    ],
+  },
+  {
+    id: 'twinkle',
+    title: 'Twinkle, Twinkle, Little Star',
+    picture: 'star',
+    lines: [
+      TWINKLE_A,
+      TWINKLE_B,
+      [[4, 'Up'], [4, 'a'], [3, 'bove'], [3, 'the'], [2, 'world'], [2, 'so'], [1, 'high']],
+      [[4, 'Like'], [4, 'a'], [3, 'dia'], [3, 'mond'], [2, 'in'], [2, 'the'], [1, 'sky']],
+      TWINKLE_A,
+      TWINKLE_B,
+    ],
+  },
+  {
+    id: 'row',
+    title: 'Row, Row, Row Your Boat',
+    picture: 'boat',
+    lines: [
+      [[0, 'Row'], [0, 'row'], [0, 'row'], [1, 'your'], [2, 'boat']],
+      [[2, 'Gent'], [1, 'ly'], [2, 'down'], [3, 'the'], [4, 'stream']],
+      [[7, 'Mer'], [7, 'ri'], [7, 'ly'], [4, 'mer'], [4, 'ri'], [4, 'ly'], [2, 'mer'], [2, 'ri'], [2, 'ly'], [0, 'mer'], [0, 'ri'], [0, 'ly']],
+      [[4, 'Life'], [3, 'is'], [2, 'but'], [1, 'a'], [0, 'dream']],
+    ],
+  },
 ];
 
 // ---------------------------------------------------------------------------
@@ -433,6 +481,7 @@ export const GAME_SECTIONS = [
   { id: 'read', title: 'Read & spell', picture: 'book' },
   { id: 'numbers', title: 'Numbers', picture: 'abacus' },
   { id: 'think', title: 'Think & solve', picture: 'puzzle' },
+  { id: 'focus', title: 'Calm & focus', picture: 'balloon' },
 ] as const;
 
 export const GAMES = [
@@ -449,9 +498,24 @@ export const GAMES = [
   { id: 'puzzles', title: 'Puzzle world', picture: 'puzzle', color: '#14B8A6', section: 'think', skills: 'Jigsaws and patterns' },
   { id: 'memory', title: 'Flip & find', picture: 'cat', color: '#22C17A', section: 'think', skills: 'Memory and matching' },
   { id: 'quest', title: 'Shape quest', picture: 'blue diamond', color: '#0EA5E9', section: 'think', skills: 'Shapes and building' },
+  { id: 'follow', title: 'Follow me', picture: 'robot', color: '#3B82F6', section: 'think', skills: 'Watch, remember, repeat' },
+  { id: 'redlight', title: 'Red light, green light', picture: 'turtle', color: '#EF4444', section: 'focus', skills: 'Stop and go' },
+  { id: 'breathe', title: 'Breathe with me', picture: 'balloon', color: '#60A5FA', section: 'focus', skills: 'Slow, calm breaths' },
+  { id: 'snail', title: 'Snail trail', picture: 'snail', color: '#65A30D', section: 'focus', skills: 'Slow and steady' },
+  { id: 'ispy', title: 'I spy', picture: 'ladybug', color: '#F59E0B', section: 'focus', skills: 'Look closely' },
+  { id: 'firstthen', title: 'First, then', picture: 'check', color: '#8B5CF6', section: 'focus', skills: 'Make a plan' },
   { id: 'pet', title: 'My little pet', picture: 'puppy', color: '#4CAF50', section: 'think', skills: 'Care and share' },
 ] as const;
 export type GameId = (typeof GAMES)[number]['id'];
+
+/** What I spy asks her to find, a different one each round. */
+export const SPY_TARGETS = [
+  { name: 'star', plural: 'stars' },
+  { name: 'heart', plural: 'hearts' },
+  { name: 'ladybug', plural: 'ladybugs' },
+  { name: 'strawberry', plural: 'strawberries' },
+  { name: 'fish', plural: 'fish' },
+];
 
 // ---------------------------------------------------------------------------
 // Spoken lines
@@ -463,6 +527,8 @@ const idOf = (text: string) => text.toLowerCase().replace(/[^a-z0-9]+/g, '-').re
 export const say = {
   line: (key: keyof typeof LINES) => `line-${key}`,
   game: (id: GameId) => `game-${id}`,
+  song: (id: string) => `song-${id}`,
+  spy: (name: string) => `spy-${name}`,
   letterName: (l: Letter) => `letter-${l.lower}`,
   letterIsFor: (l: Letter) => `isfor-${l.lower}`,
   traceUpper: (l: Letter) => `trace-upper-${l.lower}`,
@@ -506,25 +572,51 @@ export const say = {
 /** Fixed lines: instructions, encouragement and celebrations. */
 export const LINES = {
   tryAgain: "Let's try again!",
-  almost: 'Almost! Try another one.',
+  almost: 'Almost! Try again.',
   together: "Let's try together.",
   oops: 'Oops! That one is not it.',
-  traceIntro: 'Use your finger to trace the letter.',
-  traceKeepGoing: 'Keep going! Fill it all in.',
+  traceIntro: 'Trace with your finger.',
+  traceWatch: 'Watch me first.',
+  traceYourTurn: 'Your turn! Start at the dot.',
+  traceStartDot: 'Start at the green dot.',
+  traceFollow: 'Follow the line.',
+  followIntro: 'Watch the colors, then copy!',
+  followShapes: 'Watch the shapes, then copy!',
+  followYourTurn: 'Your turn!',
+  calmBreath: "Let's take a slow breath.",
+  rlIntro: 'Hold to go. Let go on red!',
+  rlGo: 'Go!',
+  rlStop: 'Stop!',
+  rlOops: 'Oops! Red means stop.',
+  rlWin: 'You made it!',
+  brIntro: 'Hold the balloon and breathe in.',
+  brIn: 'Breathe in.',
+  brOut: 'Breathe out.',
+  brSlow: 'Hold a little longer.',
+  brDone: 'Five calm breaths. Well done!',
+  snIntro: 'Take the snail home. Go slow!',
+  snFast: 'Too fast! Slow and steady.',
+  snHome: 'Home sweet home!',
+  spyDone: 'You found them all!',
+  ftFirst: 'What do you want to do first?',
+  ftThen: 'What comes next?',
+  ftReady: 'First this, then that!',
+  ftNext: 'Now the next one!',
+  ftDone: 'All done! Great plan!',
   tracePickLetter: 'Pick a letter to trace.',
   tracePickNumber: 'Pick a number to trace.',
   tracePickWord: 'Pick a word to trace.',
   detectiveIntro: "Let's find words!",
-  countIntro: "Let's count! Tap the treats to feed our hungry friend.",
-  countTooMany: "Oops, that's enough! Let's count them again.",
+  countIntro: "Let's count! Tap the treats.",
+  countTooMany: "That's enough! Count again.",
   howMany: 'How many altogether?',
   artIntro: 'Pick a color and draw!',
   artColoring: 'Pick a picture to color.',
   artBlank: 'A fresh new page!',
-  memoryIntro: 'Flip two cards. Can you find the ones that match?',
-  memoryNope: 'Not a match. Remember where they are!',
-  safariIntro: "Welcome to Sound Safari! Let's listen for sounds.",
-  puzzleIntro: "Welcome to Puzzle World! Let's solve some puzzles.",
+  memoryIntro: 'Find two that match!',
+  memoryNope: 'Not a match.',
+  safariIntro: "Let's listen for sounds!",
+  puzzleIntro: "Let's solve puzzles!",
   shapeIntro: 'Drag each shape to its home.',
   jigsawIntro: 'Drag the pieces to finish the picture.',
   questDone: 'You found them all!',
@@ -539,45 +631,41 @@ export const LINES = {
   storyPickObject: 'What do they find?',
   storyPickFriend: 'Who do they meet?',
   storyReady: "Here's your story!",
-  chefPick: 'What shall we cook today? Pick a recipe.',
-  chefStir: 'Move your finger round and round the bowl to stir.',
+  chefPick: 'What shall we cook?',
+  chefStir: 'Stir round and round.',
   chefBake: 'Tap the oven to bake it.',
-  chefSort: 'Sort the fruit by color. Drag each fruit to the plate that matches.',
-  questPick: 'Do you want to hunt for shapes, or build something?',
+  chefSort: 'Match each fruit to its color.',
+  questPick: 'Hunt for shapes, or build?',
   questHunt: "Let's hunt for shapes!",
   questBuild: 'Pick something to build.',
   musicIntro: 'Tap the bars to play.',
   drumsIntro: 'Tap the drums!',
   pianoIntro: 'Play the piano keys!',
   guitarIntro: 'Swipe across the strings!',
-  copyIntro: 'Listen, then copy me!',
-  yourTurn: 'Your turn!',
-  listenAgain: "Let's listen again.",
-  singAbc: "Let's sing the alphabet song!",
-  abcEnd: 'Now I know my A B Cs!',
-  singCount: "Let's count to ten!",
-  countEnd: 'We counted to ten!',
+  songsIntro: 'Pick a song!',
+  songGlow: 'Tap the glowing bar.',
+  songEnd: 'You played the whole song!',
   petPick: 'Pick a pet to take care of!',
-  petHowTo: 'Drag things onto your pet to take care of it. You can pet it too!',
+  petHowTo: 'Drag things to your pet.',
   missingNumber: 'What number is missing?',
   whichMore: 'Which group has more?',
   whichFewer: 'Which group has fewer?',
   readPicture: 'Read it. Find the picture.',
   spellIt: 'Tap the letters to spell it.',
   whichLetter: 'Which letter does it start with?',
-  whatNext: 'What comes next in the pattern?',
-  patternIntro: 'Look at the pattern. Can you figure it out?',
-  memoryLetters: 'Match each big letter with its little letter!',
-  questCreate: 'Make your own picture! Tap a shape, then drag it anywhere you like.',
-  mirrorOn: 'Magic mirror! Draw on one side.',
+  whatNext: 'What comes next?',
+  patternIntro: 'Look at the pattern.',
+  memoryLetters: 'Match big and little letters!',
+  questCreate: 'Tap a shape. Drag it anywhere.',
+  mirrorOn: 'Magic mirror!',
   rainbowOn: 'Rainbow magic!',
-  chefCheck: 'Tap the check when you have the right amount.',
+  chefCheck: 'Tap the check when done.',
   helpOffer: 'Need help? Tap the owl.',
   helpRemove: 'One is gone. Try again!',
   helpListen: 'The next letter is',
-  chefTooMany: "Oops, that's too many! Tap one in the bowl to take it out.",
+  chefTooMany: 'Too many! Tap one to take it out.',
   chefMore: 'Not yet! We need some more.',
-  shelfIntro: 'Welcome to the story shelf! Pick a book, and we can read it together.',
+  shelfIntro: 'Pick a book to read.',
 };
 
 /** Every spoken line, as id -> text. Lines starting with "/" are phonemes, not words. */
@@ -585,6 +673,8 @@ export function spokenLines(): Record<string, string> {
   const lines: Record<string, string> = {};
   for (const [key, text] of Object.entries(LINES)) lines[say.line(key as keyof typeof LINES)] = text;
   for (const game of GAMES) lines[say.game(game.id)] = `${game.title.replace('&', 'and')}!`;
+  for (const song of SONGS) lines[say.song(song.id)] = `${song.title}!`;
+  for (const target of SPY_TARGETS) lines[say.spy(target.name)] = `Find all the ${target.plural}!`;
 
   for (const l of LETTERS) {
     lines[say.letterName(l)] = `${l.upper}.`;
@@ -624,10 +714,10 @@ export function spokenLines(): Record<string, string> {
       lines[say.mission(m, n)] = `Give the ${m.animalName} ${NUMBER_WORDS[n]} ${n === 1 ? m.foodOne : m.foodMany}.`;
     }
   }
-  for (const [a, b] of SUBTRACTION) lines[say.subtraction(a, b)] = `${capitalize(NUMBER_WORDS[a])} take away ${NUMBER_WORDS[b]}. How many are left?`;
+  for (const [a, b] of SUBTRACTION) lines[say.subtraction(a, b)] = `${capitalize(NUMBER_WORDS[a])} take away ${NUMBER_WORDS[b]}?`;
   for (const word of SPELL_WORDS.flat()) lines[say.spell(word)] = `Spell ${word}.`;
   for (const word of RHYMES.flat()) lines[say.rhyme(word)] = `What rhymes with ${word}?`;
-  for (const [a, b] of ADDITION) lines[say.addition(a, b)] = `${capitalize(NUMBER_WORDS[a])} plus ${NUMBER_WORDS[b]}. How many altogether?`;
+  for (const [a, b] of ADDITION) lines[say.addition(a, b)] = `${capitalize(NUMBER_WORDS[a])} plus ${NUMBER_WORDS[b]}?`;
   for (const shape of SHAPES) {
     lines[say.shape(shape)] = capitalize(shape);
     lines[say.findShape(shape)] = `Find all the ${shape}s!`;
@@ -662,20 +752,20 @@ export function spokenLines(): Record<string, string> {
     });
   }
   for (const build of BUILDS) {
-    lines[say.build(build.id)] = `Let's build a ${build.name}! Drag each shape into place.`;
+    lines[say.build(build.id)] = `Let's build a ${build.name}!`;
   }
   for (const pet of PETS) {
-    lines[say.pet(pet.id, 'hello')] = `Hi! I'm your ${pet.name.toLowerCase()}. Let's play together!`;
+    lines[say.pet(pet.id, 'hello')] = `Hi! I'm your ${pet.name.toLowerCase()}!`;
     const name = pet.name.toLowerCase();
     lines[say.pet(pet.id, 'hungry')] = `${pet.name} is hungry!`;
-    lines[say.pet(pet.id, 'wantsPlay')] = `${pet.name} wants to play! Can you find the ball?`;
-    lines[say.pet(pet.id, 'wantsBath')] = `Oh no, ${name} is all muddy! Time for a bubble bath.`;
-    lines[say.pet(pet.id, 'wantsSleep')] = `${pet.name} is getting sleepy. Can you find the bed?`;
+    lines[say.pet(pet.id, 'wantsPlay')] = `${pet.name} wants to play!`;
+    lines[say.pet(pet.id, 'wantsBath')] = `Oh no, ${name} is muddy!`;
+    lines[say.pet(pet.id, 'wantsSleep')] = `${pet.name} is sleepy!`;
     lines[say.pet(pet.id, 'yum')] = `Yum yum! Thank you!`;
-    lines[say.pet(pet.id, 'played')] = `Wheee! ${pet.name} loves playing ball!`;
-    lines[say.pet(pet.id, 'clean')] = `Splish, splash! ${pet.name} is all clean and shiny!`;
-    lines[say.pet(pet.id, 'rested')] = `Good morning! ${pet.name} had a lovely nap.`;
-    lines[say.pet(pet.id, 'notNow')] = `Hmm, ${name} doesn't need that right now.`;
+    lines[say.pet(pet.id, 'played')] = `Wheee! Fun!`;
+    lines[say.pet(pet.id, 'clean')] = `Splish, splash! All clean!`;
+    lines[say.pet(pet.id, 'rested')] = `Good morning!`;
+    lines[say.pet(pet.id, 'notNow')] = `Not right now.`;
     lines[say.pet(pet.id, 'giggle')] = `Hee hee! That tickles!`;
   }
   return lines;

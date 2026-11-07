@@ -38,7 +38,7 @@ In the console, choose **Apps → Add new app → Android**.
 
 Testing instructions:
 
-> Hailey's Learning Land is a free learning app for children aged about 3 to 6. It needs no login, has no ads or purchases, and works fully offline. All 14 games are on the home screen. The Grown-ups button opens a parental gate: tap the two numbers that are written as words. Behind the gate are app information and links to the privacy policy and support page, which open in the browser.
+> Hailey's Learning Land is a free learning app for children aged about 3 to 6. It needs no login, has no ads or purchases, and works fully offline. All 20 games are on the home screen. The Grown-ups button opens a parental gate: tap the two numbers that are written as words. Behind the gate are app information and links to the privacy policy and support page, which open in the browser.
 
 Amazon re-signs the app with its own key. The app uses no Amazon or Google sign-in, so you don't need to do anything with the certificate hashes shown on this screen.
 
@@ -86,7 +86,7 @@ If Amazon asks, reply with this list and a link to the Credits section of the su
 
 **Short description** (about 1,200 characters at most; line breaks are removed):
 
-> Fourteen learning games for young children, all free. A friendly voice reads every instruction aloud, so children who can't read yet can play on their own. Children trace letters and numbers, spell words with letter tiles, read 28 narrated picture books, count and add, solve patterns and jigsaws, cook with Little Chef, play a xylophone, drums, piano and guitar, and draw in the Art Studio with 100 coloring pages. Every game gets harder as children answer correctly and eases off when they need help. No ads, no in-app purchases, no accounts and no tracking. Everything works offline.
+> Twenty learning games for young children, all free. A friendly voice reads every instruction aloud, so children who can't read yet can play on their own. Children trace letters and numbers, spell words with letter tiles, read 28 narrated picture books, count and add, solve patterns and jigsaws, cook with Little Chef, play a xylophone, drums, piano and guitar, and draw in the Art Studio with 100 coloring pages. Every game gets harder as children answer correctly and eases off when they need help. No ads, no in-app purchases, no accounts and no tracking. Everything works offline.
 
 **Product feature bullets** (3 to 5, one per line):
 
@@ -119,6 +119,7 @@ CREATE
 
 THINK AND SOLVE
 - Puzzle World: patterns, a shape sorter and jigsaws up to 16 pieces.
+- Follow Me: watch the colors or shapes light up, then tap them back in the same order.
 - Flip & Find, Shape Quest, and My Little Pet: a pocket pet that tells you what it needs.
 
 Every game adjusts as children play. It moves up after two right answers in a row and eases off after a miss. Wrong answers get a gentle "Let's try again!", never a buzzer, and a friendly owl offers a clue when children are stuck, without giving the answer away.

@@ -270,3 +270,5 @@ const styles = StyleSheet.create({
   seqCard: { width: 76, height: 86, borderRadius: Radius.md, backgroundColor: Colors.white, alignItems: 'center', justifyContent: 'center', ...raised('#F1D3BD', 5) },
   seqGap: { borderWidth: 3, borderColor: Colors.orange, borderStyle: 'dashed' },
 });
+
+export { GameError as ErrorBoundary } from '@/components/game-error';

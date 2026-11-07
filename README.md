@@ -1,10 +1,10 @@
 # Hailey's Learning Land
 
-A free learning app for young children, with fourteen games, built with Expo (SDK 57) and React Native. It runs on iPhone, iPad and Android, including Amazon Fire tablets. Everything works offline: no accounts, ads, purchases, tracking or saved data.
+A free learning app for young children, with twenty games, built with Expo (SDK 58) and React Native. It runs on iPhone, iPad and Android, including Amazon Fire tablets. Everything works offline: no accounts, ads, purchases, tracking or saved data.
 
 ## Games
 
-- **Magic letters:** trace uppercase and lowercase letters, the numbers 1 to 20 and short sight words with a finger. Buttons along the top open a grid to pick from. A shape is finished only when nearly all of it is painted and the finger lifts; then it "comes alive" ("A is for apple"), and the next one follows.
+- **Magic letters:** learn to write uppercase and lowercase letters, the numbers 1 to 20 and short sight words on handwriting lines, stroke by stroke in the order children are taught (`src/content/strokes.ts`). A pen first shows how; then a green dot marks where each stroke starts and an arrow shows the way. A line only counts while it follows the stroke forward from the dot, so scribbling doesn't finish it. Buttons along the top open a grid to pick from. A finished shape "comes alive" ("A is for apple"), and the next one follows.
 - **Word detective:** find the spoken sight word (Dolch pre-primer, then primer words), read a word and pick its picture, spell 3- to 5-letter words from letter tiles, and find rhymes.
 - **Count & collect:** feed animals, find numbers up to 20, fill in missing numbers, compare groups (more or fewer), and add and take away within ten.
 - **Art studio:** crayon, marker, glitter, 20 stamps and eraser, 10 big colors plus a rainbow, 3 sizes, Undo and Pictures buttons above the tools, a magic mirror for symmetrical drawings, and 100 coloring pages in six category tabs (`src/content/coloring.json`).
@@ -16,10 +16,18 @@ A free learning app for young children, with fourteen games, built with Expo (SD
 - **Build a story:** pick a hero, a place, a friend to meet and a magical object, and hear a story built from prerecorded sentences.
 - **Little chef:** recipes with first, next and last steps. Find the right ingredient on a pantry shelf among other foods, add the number on the recipe card and tap Done (tap the bowl to take one out), stir with a spoon, bake, and sort fruit by color. Amounts and decoys grow with each recipe.
 - **Shape quest:** hunt for shapes or colors, drag shapes into an outline to build a house, robot, rocket, castle or car, or make any picture in free-build Create mode.
-- **Music maker:** four instruments that play the moment they're touched, with several fingers at once: a xylophone, a drum kit (cymbals, toms, snare and bass drum), a piano with black keys, and a guitar you strum by swiping across the strings. Also copy-a-tune (3 to 8 notes) and sing-along songs that wait for each word.
+- **Music maker:** four instruments that play the moment they're touched, with several fingers at once: a xylophone, a drum kit drawn like a real one (crash and hi-hat cymbals, two toms, snare, floor tom and bass drum), a piano with black keys, and a guitar you strum by swiping across the strings. Songs (Hot Cross Buns, Mary Had a Little Lamb, Twinkle Twinkle and Row Row Row Your Boat) are played on the xylophone a note at a time: the next bar glows and the words light up, so the child sets the pace. "Hear it" plays the song first.
+- **Follow me:** pads light up in a pattern, each with its own note, and the child taps them back in order. Colors mode has four colored pads; Shapes mode has shape pads, six once patterns get long. Each right answer adds a step; two misses make the next pattern shorter.
+- **Red light, green light:** hold the big button to walk an animal to its prize, and let go when the light turns red. Yellow warns first; holding on after red slides the animal back a little. Each win brings a new animal and a shorter warning, and from level 4 the light sometimes skips yellow. Practises stopping on cue.
+- **Breathe with me:** hold the balloon to breathe in while it fills, let go to breathe out while it shrinks. Five slow breaths fill a jar with stars.
+- **Snail trail:** drag the snail along a winding path to its house. Going too fast makes it hide in its shell, so slow and steady is the only way home.
+- **I spy:** find every star, heart or ladybug hidden among a busy jumble of pictures. Each round hides more among more.
+- **First, then:** pick what to play first and what comes next. The plan opens the first game, and on coming back it's time for the second, which helps with moving from one thing to another.
 - **My little pet:** a pocket pet that gets hungry, bored, muddy and sleepy. A thought bubble shows what it wants; drag food (counting out the treats it asks for), a ball, bubbles or a bed onto it and it eats, plays, splashes or naps. Tap it for a cuddle. Five happy moments fill the love meter.
 
 Every instruction is spoken aloud, and the speaker button repeats it. A right answer gets a success sound and confetti, with no spoken praise that could carry over into the next screen. Wrong answers get a gentle wiggle and "Let's try again!", never a buzzer, and after two misses an owl Help button offers a clue (it takes away a wrong choice, or plays the next letter's sound) without giving the answer. Games start at a level pitched for a five-year-old, move up after two first-try answers in a row, and ease off after two misses on one question. The current level shows next to the game's title. Answers respond the moment they're touched, treats and ingredients count every finger even when several tap at once, extra taps are ignored while a right answer is celebrated, and leaving a game cancels anything it was about to say.
+
+The app is built to help a child who races ahead slow down. Spoken lines are short. A line already being said isn't restarted by mashing, and fast repeats of the same sound are dropped. Answer cards rest (dimmed) while the narrator asks the question or says "try again", so she listens before she taps. Mashing the screen (more than 16 touches in 3 seconds) brings up a short breathing break with a bubble that grows and shrinks; the Music maker and Art studio, where fast tapping is the point, leave it off (`src/components/calm-break.tsx`).
 
 ## How it's built
 

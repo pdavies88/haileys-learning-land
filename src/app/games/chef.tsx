@@ -599,3 +599,5 @@ const styles = StyleSheet.create({
   plateDot: { position: 'absolute', bottom: -6, width: 20, height: 20, borderRadius: 10 },
   again: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm, backgroundColor: Colors.orange, borderRadius: 999, paddingHorizontal: Spacing.lg, paddingVertical: Spacing.sm, ...cardShadow },
 });
+
+export { GameError as ErrorBoundary } from '@/components/game-error';

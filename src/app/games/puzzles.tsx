@@ -296,3 +296,5 @@ const styles = StyleSheet.create({
   pieces: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: Spacing.sm },
   pieceCard: { backgroundColor: Colors.white, borderRadius: 10, padding: 3, ...cardShadow },
 });
+
+export { GameError as ErrorBoundary } from '@/components/game-error';

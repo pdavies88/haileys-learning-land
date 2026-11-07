@@ -97,7 +97,19 @@
       "expo-image",
       "expo-font",
       "expo-asset",
-      "./plugins/with-ios-scene-lifecycle"
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "buildArchs": [
+              "armeabi-v7a",
+              "arm64-v8a"
+            ],
+            "enableMinifyInReleaseBuilds": false
+          }
+        }
+      ],
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true,

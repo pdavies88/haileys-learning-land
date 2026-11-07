@@ -90,7 +90,10 @@ export default function Art() {
   // The finger handlers below only run on touches, but React Compiler can't tell that from a gesture
   // builder. This screen redraws on every move anyway, so it opts out of the compiler.
   'use no memo';
-  const { width } = useWindowDimensions();
+  const { width, height } = useWindowDimensions();
+  // A tablet held sideways is short, so the tools and colors move into columns beside the paper
+  // instead of rows above and below it, and the paper gets the full height.
+  const wide = width > height;
   const [tool, setTool] = useState<Tool>('crayon');
   const [color, setColor] = useState(PALETTE[6]);
   const [size, setSize] = useState(1);
@@ -166,10 +169,11 @@ export default function Art() {
     speak(name ? say.line('artColoring') : say.line('artBlank'));
   };
 
-  // Eleven colors in two rows of six, as big as the screen allows.
-  const swatch = Math.min(60, (width - 32 - 5 * Spacing.sm) / 6);
-  // Six tool buttons and a divider fit on one row, even on a phone.
-  const toolSize = Math.min(60, (width - 32 - 6 * 6 - 14) / 6);
+  // Upright: twelve colors in two rows of six, as big as the screen allows. Sideways: rows of three.
+  const swatch = wide ? Math.min(52, (height - 330) / 4 - Spacing.sm) : Math.min(60, (width - 32 - 5 * Spacing.sm) / 6);
+  const perRow = wide ? 3 : 6;
+  // Upright: six tool buttons and a divider fit on one row, even on a phone. Sideways: two columns.
+  const toolSize = wide ? Math.min(60, (height - 300) / 3 - 6) : Math.min(60, (width - 32 - 6 * 6 - 14) / 6);
   const flip = [{ translateX: paper.width }, { scaleX: -1 }];
   const drawMark = (mark: Mark, key: string) =>
     mark.kind === 'line' ? (
@@ -178,111 +182,148 @@ export default function Art() {
       mark.dots.map((d, j) => <Circle key={`${key}-${j}`} cx={d.x} cy={d.y} r={d.r} color={d.color} />)
     ) : null;
   const toolStyle = { width: toolSize, height: toolSize, borderRadius: toolSize * 0.32 };
-  return (
-    <GameScreen title="Art studio" background="#EADFFF" onRepeat={() => speak(say.line('artIntro'))}>
-      <View style={styles.body}>
-        <View style={styles.topRow}>
-          <Bouncy accessibilityLabel="Undo" style={styles.topButton} onPress={() => setMarks((m) => m.slice(0, -1))}>
-            <Pic name="undo" size={30} />
-            <Txt size={17}>Undo</Txt>
+
+  const topButtons = (
+    <View style={[styles.topRow, wide && styles.column]}>
+      <Bouncy accessibilityLabel="Undo" style={styles.topButton} onPress={() => setMarks((m) => m.slice(0, -1))}>
+        <Pic name="undo" size={30} />
+        <Txt size={17}>Undo</Txt>
+      </Bouncy>
+      <Bouncy accessibilityLabel="Pictures to color" style={styles.topButton} onPress={() => setChoosing(true)}>
+        <Pic name="frame" size={30} />
+        <Txt size={17}>Pictures</Txt>
+      </Bouncy>
+    </View>
+  );
+
+  const toolButtons = (
+    <View style={[styles.tools, wide && { flexWrap: 'wrap', width: toolSize * 2 + 6 }]}>
+      {TOOLS.map((t) => (
+        <Bouncy key={t.id} accessibilityLabel={t.label} style={[styles.tool, toolStyle, tool === t.id && styles.selected]} onPress={() => setTool(t.id)}>
+          <Pic name={t.picture} size={toolSize * 0.6} />
+        </Bouncy>
+      ))}
+      {!wide && <View style={styles.divider} />}
+      <Bouncy
+        accessibilityLabel="Magic mirror"
+        style={[styles.tool, toolStyle, mirror && styles.selected]}
+        onPress={() => {
+          if (!mirror) speak(say.line('mirrorOn'));
+          setMirror(!mirror);
+        }}>
+        <Pic name="mirror" size={toolSize * 0.62} />
+      </Bouncy>
+    </View>
+  );
+
+  const colors =
+    tool === 'stamp' ? (
+      <ScrollView
+        horizontal={!wide}
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
+        style={wide && styles.stampColumn}
+        contentContainerStyle={[styles.row, wide && styles.stampGrid]}>
+        {STAMPS.map((name) => (
+          <Bouncy key={name} accessibilityLabel={name} style={[styles.stampChoice, stamp === name && styles.selected]} onPress={() => setStamp(name)}>
+            <Pic name={name} size={38} />
           </Bouncy>
-          <Bouncy accessibilityLabel="Pictures to color" style={styles.topButton} onPress={() => setChoosing(true)}>
-            <Pic name="frame" size={30} />
-            <Txt size={17}>Pictures</Txt>
-          </Bouncy>
-        </View>
-        <View style={styles.tools}>
-          {TOOLS.map((t) => (
-            <Bouncy key={t.id} accessibilityLabel={t.label} style={[styles.tool, toolStyle, tool === t.id && styles.selected]} onPress={() => setTool(t.id)}>
-              <Pic name={t.picture} size={toolSize * 0.6} />
-            </Bouncy>
-          ))}
-          <View style={styles.divider} />
+        ))}
+      </ScrollView>
+    ) : (
+      <View style={[styles.row, styles.palette, { maxWidth: swatch * perRow + Spacing.sm * (perRow - 1) + Spacing.sm * 2 }]}>
+        <Bouncy
+          accessibilityLabel="Rainbow"
+          style={[styles.swatch, styles.rainbow, { width: swatch, height: swatch }, color === RAINBOW && styles.swatchOn]}
+          onPress={() => {
+            if (color !== RAINBOW) speak(say.line('rainbowOn'));
+            setColor(RAINBOW);
+            if (tool === 'eraser' || tool === 'glitter') setTool('marker');
+          }}>
+          <View />
+        </Bouncy>
+        {PALETTE.map((c) => (
           <Bouncy
-            accessibilityLabel="Magic mirror"
-            style={[styles.tool, toolStyle, mirror && styles.selected]}
+            key={c}
+            accessibilityLabel="Color"
+            style={[styles.swatch, { width: swatch, height: swatch, backgroundColor: c }, color === c && styles.swatchOn]}
             onPress={() => {
-              if (!mirror) speak(say.line('mirrorOn'));
-              setMirror(!mirror);
+              setColor(c);
+              if (tool === 'eraser') setTool('crayon');
             }}>
-            <Pic name="mirror" size={toolSize * 0.62} />
+            <View />
           </Bouncy>
-        </View>
+        ))}
+      </View>
+    );
 
-        <View style={styles.paperArea} onLayout={(e: LayoutChangeEvent) => setPaper({ width: e.nativeEvent.layout.width, height: e.nativeEvent.layout.height })}>
-          <GestureDetector gesture={pan}>
-            <View style={styles.paper}>
-              <Canvas style={StyleSheet.absoluteFill}>
-                {[...marks, ...(active ? [active] : [])].map((mark, i) => (
-                  <Group key={i}>
-                    {drawMark(mark, `m${i}`)}
-                    {mark.mirror ? <Group transform={flip}>{drawMark(mark, `f${i}`)}</Group> : null}
-                  </Group>
-                ))}
-              </Canvas>
-              {marks.flatMap((mark, i) =>
-                mark.kind === 'stamp'
-                  ? [mark.x, ...(mark.mirror ? [paper.width - mark.x] : [])].map((x, j) => (
-                      <Animated.View
-                        key={`${i}-${j}`}
-                        entering={ZoomIn.springify()}
-                        pointerEvents="none"
-                        style={{ position: 'absolute', left: x - mark.size / 2, top: mark.y - mark.size / 2, transform: j ? [{ scaleX: -1 }] : [] }}>
-                        <Pic name={mark.name} size={mark.size} />
-                      </Animated.View>
-                    ))
-                  : [],
-              )}
-              {mirror && <View pointerEvents="none" style={styles.mirrorLine} />}
-              {page && paper.width > 0 && <ColoringPage name={page} width={paper.width} height={paper.height} />}
-            </View>
-          </GestureDetector>
-        </View>
+  const sizes = (
+    <View style={[styles.row, wide && styles.column]}>
+      {SIZES.map((s, i) => (
+        <Bouncy key={s} accessibilityLabel={['Small', 'Medium', 'Big'][i]} style={[styles.sizeButton, size === i && styles.selected]} onPress={() => setSize(i)}>
+          <View style={[{ width: s * 0.9 + 6, height: s * 0.9 + 6, borderRadius: 99, backgroundColor: tool === 'eraser' ? '#CCC' : color }, color === RAINBOW && tool !== 'eraser' && styles.rainbow]} />
+        </Bouncy>
+      ))}
+    </View>
+  );
 
-        <View style={styles.bottom}>
-          {tool === 'stamp' ? (
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.row}>
-              {STAMPS.map((name) => (
-                <Bouncy key={name} accessibilityLabel={name} style={[styles.stampChoice, stamp === name && styles.selected]} onPress={() => setStamp(name)}>
-                  <Pic name={name} size={38} />
-                </Bouncy>
-              ))}
-            </ScrollView>
-          ) : (
-            <View style={[styles.row, styles.palette, { maxWidth: swatch * 6 + Spacing.sm * 5 + Spacing.sm * 2 }]}>
-              <Bouncy
-                accessibilityLabel="Rainbow"
-                style={[styles.swatch, styles.rainbow, { width: swatch, height: swatch }, color === RAINBOW && styles.swatchOn]}
-                onPress={() => {
-                  if (color !== RAINBOW) speak(say.line('rainbowOn'));
-                  setColor(RAINBOW);
-                  if (tool === 'eraser' || tool === 'glitter') setTool('marker');
-                }}>
-                <View />
-              </Bouncy>
-              {PALETTE.map((c) => (
-                <Bouncy
-                  key={c}
-                  accessibilityLabel="Color"
-                  style={[styles.swatch, { width: swatch, height: swatch, backgroundColor: c }, color === c && styles.swatchOn]}
-                  onPress={() => {
-                    setColor(c);
-                    if (tool === 'eraser') setTool('crayon');
-                  }}>
-                  <View />
-                </Bouncy>
-              ))}
-            </View>
-          )}
-          <View style={styles.row}>
-            {SIZES.map((s, i) => (
-              <Bouncy key={s} accessibilityLabel={['Small', 'Medium', 'Big'][i]} style={[styles.sizeButton, size === i && styles.selected]} onPress={() => setSize(i)}>
-                <View style={[{ width: s * 0.9 + 6, height: s * 0.9 + 6, borderRadius: 99, backgroundColor: tool === 'eraser' ? '#CCC' : color }, color === RAINBOW && tool !== 'eraser' && styles.rainbow]} />
-              </Bouncy>
+  const paperView = (
+    <View style={styles.paperArea} onLayout={(e: LayoutChangeEvent) => setPaper({ width: e.nativeEvent.layout.width, height: e.nativeEvent.layout.height })}>
+      <GestureDetector gesture={pan}>
+        <View style={styles.paper}>
+          <Canvas style={StyleSheet.absoluteFill}>
+            {[...marks, ...(active ? [active] : [])].map((mark, i) => (
+              <Group key={i}>
+                {drawMark(mark, `m${i}`)}
+                {mark.mirror ? <Group transform={flip}>{drawMark(mark, `f${i}`)}</Group> : null}
+              </Group>
             ))}
+          </Canvas>
+          {marks.flatMap((mark, i) =>
+            mark.kind === 'stamp'
+              ? [mark.x, ...(mark.mirror ? [paper.width - mark.x] : [])].map((x, j) => (
+                  <Animated.View
+                    key={`${i}-${j}`}
+                    entering={ZoomIn.springify()}
+                    pointerEvents="none"
+                    style={{ position: 'absolute', left: x - mark.size / 2, top: mark.y - mark.size / 2, transform: j ? [{ scaleX: -1 }] : [] }}>
+                    <Pic name={mark.name} size={mark.size} />
+                  </Animated.View>
+                ))
+              : [],
+          )}
+          {mirror && <View pointerEvents="none" style={styles.mirrorLine} />}
+          {page && paper.width > 0 && <ColoringPage name={page} width={paper.width} height={paper.height} />}
+        </View>
+      </GestureDetector>
+    </View>
+  );
+
+  return (
+    <GameScreen title="Art studio" background="#EADFFF" calm={false} onRepeat={() => speak(say.line('artIntro'))}>
+      {wide ? (
+        <View style={[styles.body, styles.bodyWide]}>
+          <View style={styles.side}>
+            {topButtons}
+            {toolButtons}
+          </View>
+          {paperView}
+          <View style={styles.side}>
+            {colors}
+            {sizes}
           </View>
         </View>
-      </View>
+      ) : (
+        <View style={styles.body}>
+          {topButtons}
+          {toolButtons}
+          {paperView}
+          <View style={styles.bottom}>
+            {colors}
+            {sizes}
+          </View>
+        </View>
+      )}
 
       {choosing && (
         <Animated.View entering={FadeIn} exiting={FadeOut} style={styles.chooser}>
@@ -330,6 +371,11 @@ export default function Art() {
 
 const styles = StyleSheet.create({
   body: { flex: 1, padding: Spacing.sm, gap: Spacing.sm },
+  bodyWide: { flexDirection: 'row', alignItems: 'stretch' },
+  side: { justifyContent: 'center', alignItems: 'center', gap: Spacing.md },
+  column: { flexDirection: 'column' },
+  stampColumn: { flexGrow: 0 },
+  stampGrid: { flexWrap: 'wrap', width: 56 * 2 + Spacing.sm * 3 },
   topRow: { flexDirection: 'row', justifyContent: 'center', gap: Spacing.md },
   topButton: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: Spacing.md, height: 50, borderRadius: 25, backgroundColor: Colors.white, ...cardShadow },
   tools: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 6 },
@@ -357,3 +403,5 @@ const styles = StyleSheet.create({
   pageThumb: { width: 96, height: 96, borderRadius: 22, backgroundColor: Colors.background, alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: '#EEE' },
   closeChooser: { backgroundColor: Colors.purple, borderRadius: 999, paddingHorizontal: Spacing.xl, paddingVertical: Spacing.sm },
 });
+
+export { GameError as ErrorBoundary } from '@/components/game-error';

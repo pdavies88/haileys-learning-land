@@ -4,6 +4,7 @@ import Animated, { useAnimatedStyle, useSharedValue, withSequence, withSpring, w
 
 import { Bouncy } from '@/components/bouncy';
 import { Colors, Radius, raised } from '@/constants/theme';
+import { useTalking } from '@/lib/audio';
 
 type Props = {
   onPress: () => void;
@@ -39,7 +40,10 @@ export function Choice({ onPress, children, accessibilityLabel, wiggle, glow, go
   }, [glow, pulse]);
 
   const animated = useAnimatedStyle(() => ({ transform: [{ rotate: `${rotate.value}deg` }, { scale: pulse.value }] }));
-  const fade = useAnimatedStyle(() => ({ opacity: withTiming(gone ? 0.15 : 1, { duration: 250 }) }));
+  // Listen first: while the narrator asks the question (or says "try again"), the cards rest, so a
+  // child hears it before she taps and can't guess as fast as her fingers go.
+  const resting = useTalking() && !glow;
+  const fade = useAnimatedStyle(() => ({ opacity: withTiming(gone ? 0.15 : resting ? 0.6 : 1, { duration: 250 }) }));
 
   return (
     <Animated.View style={[animated, fade]} pointerEvents={gone ? 'none' : 'auto'}>
@@ -47,7 +51,7 @@ export function Choice({ onPress, children, accessibilityLabel, wiggle, glow, go
         accessibilityLabel={accessibilityLabel}
         onPress={onPress}
         instant
-        disabled={gone}
+        disabled={gone || resting}
         sound={false}
         style={[
           {

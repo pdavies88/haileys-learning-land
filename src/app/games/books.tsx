@@ -233,3 +233,5 @@ const styles = StyleSheet.create({
   credits: { alignItems: 'center', gap: 4, maxWidth: 560, marginTop: Spacing.md },
   center: { textAlign: 'center' },
 });
+
+export { GameError as ErrorBoundary } from '@/components/game-error';

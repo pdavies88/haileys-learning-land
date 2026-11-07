@@ -293,3 +293,5 @@ const styles = StyleSheet.create({
   area: { backgroundColor: 'rgba(255,255,255,0.75)', borderRadius: 28 },
   tray: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', gap: Spacing.md, maxWidth: 520 },
 });
+
+export { GameError as ErrorBoundary } from '@/components/game-error';
