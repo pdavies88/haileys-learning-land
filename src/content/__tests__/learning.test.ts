@@ -41,9 +41,9 @@ describe('content', () => {
     }
   });
 
-  it('has twenty-two games, each with a screen and a card picture', () => {
-    expect(GAMES).toHaveLength(22);
-    expect(new Set(GAMES.map((g) => g.id)).size).toBe(22);
+  it('has twenty-three games, each with a screen and a card picture', () => {
+    expect(GAMES).toHaveLength(23);
+    expect(new Set(GAMES.map((g) => g.id)).size).toBe(23);
   });
 
   it('credits every Story Shelf book and gives each page a picture', () => {
