@@ -1,58 +1,38 @@
-// Renders the app icon, splash and web logos: a rocket flying over a rainbow, with a star and
-// sparkles, on a sky-blue-to-violet tile. The artwork is Microsoft's Fluent Emoji in its flat
-// "Color" style (MIT), which is vector, so the icon is sharp at every size.
-// Run after changing the design:  npm run generate:brand
-import { Buffer } from 'node:buffer';
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+// Renders the app icon, favicons and web logos from the storybook logo art:
+//   - assets/brand/logo-source.jpg   the full logo, as drawn (a book house in a tree, with a badger
+//                                    and a fox reading on the branches, over the app's name)
+//   - assets/brand/icon-source.jpg   the icon drawing: the book house in its own tree
+//   - assets/brand/icon-art.png      that drawing, squared up on warm paper
+//   - assets/images/logo.png         the full logo cut out of its page, for the home screen and splash
+// Run after changing the art:  npm run generate:brand
+import { readFileSync, mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { Resvg } from '@resvg/resvg-js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
-const cacheDir = join(root, '.cache', 'fluent-color');
-const FLUENT = 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets';
+const PAPER = '#F7F1E3';
+const dataUri = (path, type) => `data:${type};base64,${readFileSync(join(root, path)).toString('base64')}`;
+const iconArt = dataUri('assets/brand/icon-art.png', 'image/png');
+const logoArt = dataUri('assets/images/logo.png', 'image/png');
 
-async function art(folder, file) {
-  const path = join(cacheDir, file);
-  if (!existsSync(path)) {
-    mkdirSync(cacheDir, { recursive: true });
-    const response = await fetch(`${FLUENT}/${encodeURIComponent(folder)}/Color/${file}`);
-    if (!response.ok) throw new Error(`Fluent Emoji has no ${folder}/Color/${file}`);
-    writeFileSync(path, await response.text());
-  }
-  return `data:image/svg+xml;base64,${Buffer.from(readFileSync(path, 'utf8')).toString('base64')}`;
-}
+/** The book house filling a square, with rounded corners where the platform doesn't add its own. */
+const icon = (corner = 0) => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs><clipPath id="c"><rect width="100" height="100" rx="${corner}"/></clipPath></defs>
+  <g clip-path="url(#c)"><rect width="100" height="100" fill="${PAPER}"/><image width="100" height="100" href="${iconArt}"/></g>
+</svg>`;
 
-const rocket = await art('Rocket', 'rocket_color.svg');
-const star = await art('Star', 'star_color.svg');
-const sparkles = await art('Sparkles', 'sparkles_color.svg');
+/** Android adaptive icons crop the foreground to the middle ~60%, so the art sits in a circle there. */
+const androidForeground = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs><clipPath id="c"><circle cx="50" cy="50" r="33"/></clipPath></defs>
+  <image x="17" y="17" width="66" height="66" href="${iconArt}" clip-path="url(#c)"/>
+</svg>`;
 
-function logo({ corner = 0, background = true } = {}) {
-  const tile = background
-    ? `<defs>
-        <linearGradient id="sky" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stop-color="#4FC3F7"/>
-          <stop offset="0.55" stop-color="#6D7CF5"/>
-          <stop offset="1" stop-color="#9B5CF6"/>
-        </linearGradient>
-        <radialGradient id="glow" cx="0.3" cy="0.25" r="0.6">
-          <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.45"/>
-          <stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
-        </radialGradient>
-      </defs>
-      <rect width="100" height="100" rx="${corner}" fill="url(#sky)"/>
-      <rect width="100" height="100" rx="${corner}" fill="url(#glow)"/>`
-    : '';
-  const arc = (r, color) => `<path d="M${50 - r} 90 A${r} ${r} 0 0 1 ${50 + r} 90" fill="none" stroke="${color}" stroke-width="5" stroke-linecap="round"/>`;
-  return `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 100 100">
-    ${tile}
-    <g opacity="0.95">${arc(38, '#FF6B8B')}${arc(32.5, '#FFB347')}${arc(27, '#FFE15C')}${arc(21.5, '#6EDB8F')}${arc(16, '#7FD3FF')}</g>
-    <image x="20" y="12" width="60" height="60" href="${rocket}"/>
-    <image x="10" y="14" width="16" height="16" href="${star}"/>
-    <image x="72" y="52" width="16" height="16" href="${sparkles}"/>
-  </svg>`;
-}
+/** The full logo on paper, for the web pages. */
+const logo = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 768">
+  <rect width="1024" height="768" fill="${PAPER}"/><image width="1024" height="768" href="${logoArt}"/>
+</svg>`;
 
 function render(svg, size, out) {
   mkdirSync(dirname(join(root, out)), { recursive: true });
@@ -60,11 +40,10 @@ function render(svg, size, out) {
   console.log(`wrote ${out} (${size}px)`);
 }
 
-render(logo(), 1024, 'assets/images/icon.png');
-render(logo({ corner: 22 }), 1024, 'assets/images/splash-icon.png');
-render(logo({ corner: 22 }), 48, 'assets/images/favicon.png');
-render(logo(), 512, 'store/android/play-icon-512.png');
-render(logo({ corner: 22 }), 256, 'docs/logo.png');
-render(logo({ corner: 22 }), 48, 'docs/favicon.png');
-// Android adaptive icons crop to the middle ~60%, so pad the artwork in.
-render(logo({ background: false }).replace('viewBox="0 0 100 100"', 'viewBox="-25 -25 150 150"'), 1024, 'assets/images/android-icon-foreground.png');
+render(icon(), 1024, 'assets/images/icon.png');
+render(icon(22), 1024, 'assets/images/splash-icon.png');
+render(icon(22), 48, 'assets/images/favicon.png');
+render(icon(), 512, 'store/android/play-icon-512.png');
+render(logo, 512, 'docs/logo.png');
+render(icon(22), 48, 'docs/favicon.png');
+render(androidForeground, 1024, 'assets/images/android-icon-foreground.png');

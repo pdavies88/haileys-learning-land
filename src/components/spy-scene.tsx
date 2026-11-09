@@ -243,8 +243,11 @@ function drawThing(c: SkCanvas, p: Pen, t: Thing) {
     }
     case 'pine': {
       p.box(x - s * 0.05, y - s * 0.25, s * 0.1, s * 0.25, s * 0.02, '#7F5539');
-      for (const [top, base, half] of [[0.45, 0.2, 0.35], [0.7, 0.42, 0.28], [1, 0.64, 0.2]])
+      for (const [top, base, half] of [[0.45, 0.2, 0.35], [0.7, 0.42, 0.28], [1, 0.64, 0.2]]) {
         p.shape([[x, y - s * top], [x + s * half, y - s * base], [x - s * half, y - s * base]], a);
+        // On the snowy hill each layer wears a cap of snow.
+        if (b) p.shape([[x, y - s * top], [x + s * half * 0.45, y - s * (top - (top - base) * 0.45)], [x - s * half * 0.45, y - s * (top - (top - base) * 0.45)]], b);
+      }
       return;
     }
     case 'bush': {
@@ -359,6 +362,281 @@ function drawThing(c: SkCanvas, p: Pen, t: Thing) {
       p.shape([[x - s * 0.6, y - s * 0.35], [x + s * 0.6, y - s * 0.35], [x + s * 0.42, y - s * 0.05], [x - s * 0.42, y - s * 0.05]], a);
       return;
     }
+    case 'barn': {
+      const half = s * 0.48;
+      p.box(x - half, y - s * 0.6, half * 2, s * 0.6, 0, a);
+      p.shape([[x - half - s * 0.06, y - s * 0.58], [x - half * 0.55, y - s * 0.92], [x + half * 0.55, y - s * 0.92], [x + half + s * 0.06, y - s * 0.58]], b);
+      p.box(x - s * 0.2, y - s * 0.4, s * 0.4, s * 0.4, 0, a);
+      p.line(x - s * 0.2, y - s * 0.4, x + s * 0.2, y, Math.max(1.4, s * 0.025), '#FFFFFF');
+      p.line(x + s * 0.2, y - s * 0.4, x - s * 0.2, y, Math.max(1.4, s * 0.025), '#FFFFFF');
+      p.box(x - s * 0.1, y - s * 0.78, s * 0.2, s * 0.16, 0, '#FFE8A3');
+      return;
+    }
+    case 'cow':
+    case 'pig':
+    case 'sheep': {
+      const dir = t.flip ? -1 : 1;
+      const legs = t.kind === 'sheep' ? '#3E2723' : t.kind === 'cow' ? a : a;
+      for (const dx of [-0.45, -0.25, 0.25, 0.45]) p.limb(x + dx * s, y - s * 0.45, x + dx * s, y - s * 0.04, s * 0.1, legs);
+      if (t.kind === 'sheep') {
+        for (const [dx, dy] of [[-0.4, -0.55], [-0.1, -0.7], [0.2, -0.68], [0.4, -0.52], [0, -0.45], [-0.25, -0.42], [0.25, -0.42]]) p.circle(x + dx * s, y + dy * s, s * 0.22, a);
+        p.oval(x + dir * s * 0.62, y - s * 0.62, s * 0.15, s * 0.2, '#3E2723');
+        p.circle(x + dir * s * 0.68, y - s * 0.66, s * 0.03, '#FFFFFF', false);
+      } else if (t.kind === 'pig') {
+        p.line(x - dir * s * 0.6, y - s * 0.6, x - dir * s * 0.72, y - s * 0.72, s * 0.05, INK);
+        p.oval(x, y - s * 0.55, s * 0.62, s * 0.36, a);
+        p.circle(x + dir * s * 0.6, y - s * 0.68, s * 0.26, a);
+        p.shape([[x + dir * s * 0.45, y - s * 0.85], [x + dir * s * 0.52, y - s * 1.02], [x + dir * s * 0.62, y - s * 0.9]], a);
+        p.oval(x + dir * s * 0.82, y - s * 0.64, s * 0.1, s * 0.12, '#FF8FAB');
+        p.circle(x + dir * s * 0.66, y - s * 0.76, s * 0.04, INK, false);
+      } else {
+        p.line(x - dir * s * 0.72, y - s * 0.7, x - dir * s * 0.82, y - s * 0.35, s * 0.05, INK);
+        p.oval(x, y - s * 0.62, s * 0.75, s * 0.3, a);
+        p.oval(x - s * 0.25, y - s * 0.68, s * 0.2, s * 0.13, b, false);
+        p.oval(x + s * 0.2, y - s * 0.52, s * 0.15, s * 0.1, b, false);
+        p.box(x + dir * s * 0.6 - s * 0.15, y - s * 1.0, s * 0.3, s * 0.4, s * 0.1, a);
+        p.oval(x + dir * s * 0.62, y - s * 0.62, s * 0.17, s * 0.1, '#FFB3C6');
+        p.line(x + dir * s * 0.5, y - s * 1.0, x + dir * s * 0.44, y - s * 1.12, s * 0.06, '#F1EDE4');
+        p.line(x + dir * s * 0.72, y - s * 1.0, x + dir * s * 0.78, y - s * 1.12, s * 0.06, '#F1EDE4');
+        p.circle(x + dir * s * 0.66, y - s * 0.86, s * 0.04, INK, false);
+      }
+      return;
+    }
+    case 'chicken': {
+      const dir = t.flip ? -1 : 1;
+      p.line(x - s * 0.1, y - s * 0.3, x - s * 0.12, y, s * 0.06, '#FB8500');
+      p.line(x + s * 0.1, y - s * 0.3, x + s * 0.12, y, s * 0.06, '#FB8500');
+      p.shape([[x - dir * s * 0.3, y - s * 0.55], [x - dir * s * 0.55, y - s * 0.85], [x - dir * s * 0.45, y - s * 0.45]], a);
+      p.oval(x, y - s * 0.5, s * 0.42, s * 0.28, a);
+      p.circle(x + dir * s * 0.32, y - s * 0.78, s * 0.18, a);
+      p.circle(x + dir * s * 0.32, y - s * 0.98, s * 0.07, '#E63946');
+      p.shape([[x + dir * s * 0.48, y - s * 0.8], [x + dir * s * 0.64, y - s * 0.75], [x + dir * s * 0.48, y - s * 0.7]], '#FFB703');
+      p.circle(x + dir * s * 0.36, y - s * 0.82, s * 0.035, INK, false);
+      return;
+    }
+    case 'hay': {
+      p.box(x - s * 0.7, y - s * 0.8, s * 1.4, s * 0.8, s * 0.12, a);
+      for (const dy of [0.25, 0.5]) p.line(x - s * 0.62, y - s * dy, x + s * 0.62, y - s * dy, Math.max(1.2, s * 0.04), '#C9A227');
+      for (const dx of [-0.35, 0.35]) p.line(x + dx * s, y - s * 0.78, x + dx * s, y - s * 0.02, Math.max(1.2, s * 0.05), '#BC6C25');
+      return;
+    }
+    case 'tractor': {
+      const dir = t.flip ? -1 : 1;
+      p.box(x - s * 0.55, y - s * 0.75, s * 1.15, s * 0.42, s * 0.08, a);
+      p.box(x - dir * s * 0.35 - s * 0.22, y - s * 1.15, s * 0.44, s * 0.45, s * 0.06, a);
+      p.box(x - dir * s * 0.35 - s * 0.15, y - s * 1.07, s * 0.3, s * 0.25, s * 0.04, '#BDE0FE');
+      p.limb(x + dir * s * 0.35, y - s * 0.75, x + dir * s * 0.35, y - s * 1.0, s * 0.06, '#495057');
+      p.circle(x - dir * s * 0.35, y - s * 0.32, s * 0.32, '#2B2D42');
+      p.circle(x - dir * s * 0.35, y - s * 0.32, s * 0.13, '#FFBE0B', false);
+      p.circle(x + dir * s * 0.45, y - s * 0.18, s * 0.18, '#2B2D42');
+      p.circle(x + dir * s * 0.45, y - s * 0.18, s * 0.07, '#FFBE0B', false);
+      return;
+    }
+    case 'mushroom': {
+      p.box(x - s * 0.17, y - s * 0.55, s * 0.34, s * 0.55, s * 0.08, '#FFF1D6');
+      const cap = Skia.PathBuilder.Make().addArc(rect(x - s * 0.45, y - s, s * 0.9, s * 0.8), 180, 180).close().build();
+      c.drawPath(cap, fill(a));
+      c.drawPath(cap, stroke(INK, Math.max(1.2, s * 0.05)));
+      for (const [dx, dy] of [[-0.22, -0.72], [0.12, -0.85], [0.28, -0.68]]) p.circle(x + dx * s, y + dy * s, s * 0.07, '#FFFFFF', false);
+      return;
+    }
+    case 'rabbit': {
+      const dir = t.flip ? -1 : 1;
+      p.circle(x - dir * s * 0.42, y - s * 0.38, s * 0.12, '#FFFFFF');
+      p.oval(x, y - s * 0.32, s * 0.4, s * 0.3, a);
+      p.oval(x + dir * s * 0.22, y - s * 1.05, s * 0.07, s * 0.25, a);
+      p.oval(x + dir * s * 0.4, y - s * 1.02, s * 0.07, s * 0.25, a);
+      p.circle(x + dir * s * 0.32, y - s * 0.66, s * 0.22, a);
+      p.circle(x + dir * s * 0.4, y - s * 0.7, s * 0.035, INK, false);
+      return;
+    }
+    case 'fox': {
+      const dir = t.flip ? -1 : 1;
+      for (const dx of [-0.3, 0.3]) p.limb(x + dx * s, y - s * 0.4, x + dx * s, y - s * 0.04, s * 0.09, '#3E2723');
+      p.oval(x - dir * s * 0.6, y - s * 0.5, s * 0.35, s * 0.15, a);
+      p.circle(x - dir * s * 0.9, y - s * 0.52, s * 0.1, '#FFFFFF', false);
+      p.oval(x, y - s * 0.5, s * 0.45, s * 0.22, a);
+      p.shape([[x + dir * s * 0.3, y - s * 0.95], [x + dir * s * 0.4, y - s * 1.15], [x + dir * s * 0.52, y - s * 0.95]], a);
+      p.shape([[x + dir * s * 0.55, y - s * 0.95], [x + dir * s * 0.68, y - s * 1.15], [x + dir * s * 0.75, y - s * 0.92]], a);
+      p.shape([[x + dir * s * 0.28, y - s * 0.95], [x + dir * s * 0.78, y - s * 0.92], [x + dir * s * 0.95, y - s * 0.72], [x + dir * s * 0.45, y - s * 0.62]], a);
+      p.circle(x + dir * s * 0.95, y - s * 0.72, s * 0.05, INK, false);
+      p.circle(x + dir * s * 0.6, y - s * 0.84, s * 0.04, INK, false);
+      return;
+    }
+    case 'log': {
+      p.box(x - s * 1.3, y - s, s * 2.6, s, s * 0.5, a);
+      p.oval(x + s * 1.1, y - s * 0.5, s * 0.3, s * 0.5, '#E9C46A');
+      p.oval(x + s * 1.1, y - s * 0.5, s * 0.14, s * 0.24, '#D4A373');
+      p.line(x - s * 0.8, y - s * 0.6, x + s * 0.3, y - s * 0.6, Math.max(1.2, s * 0.06), '#6D4C41');
+      return;
+    }
+    case 'rock': {
+      p.oval(x, y - s * 0.45, s * 0.75, s * 0.45, a);
+      p.oval(x - s * 0.25, y - s * 0.6, s * 0.2, s * 0.1, 'rgba(255,255,255,0.45)', false);
+      return;
+    }
+    case 'snowman': {
+      p.circle(x, y - s * 0.22, s * 0.22, '#FFFFFF');
+      p.circle(x, y - s * 0.58, s * 0.17, '#FFFFFF');
+      p.circle(x, y - s * 0.83, s * 0.13, '#FFFFFF');
+      p.box(x - s * 0.17, y - s * 0.72, s * 0.34, s * 0.06, s * 0.03, a);
+      p.oval(x, y - s * 0.94, s * 0.17, s * 0.03, '#2B2D42');
+      p.box(x - s * 0.1, y - s * 1.08, s * 0.2, s * 0.14, s * 0.02, '#2B2D42');
+      p.shape([[x, y - s * 0.84], [x + s * 0.17, y - s * 0.81], [x, y - s * 0.78]], '#FB8500', false);
+      p.circle(x - s * 0.05, y - s * 0.87, s * 0.02, INK, false);
+      p.circle(x + s * 0.05, y - s * 0.87, s * 0.02, INK, false);
+      p.line(x - s * 0.16, y - s * 0.6, x - s * 0.35, y - s * 0.75, Math.max(1.2, s * 0.025), '#6D4C41');
+      p.line(x + s * 0.16, y - s * 0.6, x + s * 0.35, y - s * 0.75, Math.max(1.2, s * 0.025), '#6D4C41');
+      return;
+    }
+    case 'sled': {
+      const dir = t.flip ? -1 : 1;
+      // Runners with a curled-up front, two struts, and a wooden seat on top.
+      p.line(x - s, y - s * 0.08, x + dir * s * 0.8, y - s * 0.08, s * 0.1, '#495057');
+      c.drawPath(Skia.PathBuilder.Make().addArc(rect(x + dir * s * 0.8 - s * 0.25, y - s * 0.58, s * 0.5, s * 0.5), dir > 0 ? 90 : 90, dir > 0 ? -180 : 180).build(), stroke('#495057', s * 0.1));
+      for (const dx of [-0.55, 0.45]) p.line(x + dx * s, y - s * 0.08, x + dx * s, y - s * 0.45, s * 0.08, '#495057');
+      p.box(x - s * 0.95, y - s * 0.7, s * 1.75, s * 0.3, s * 0.08, a);
+      return;
+    }
+    case 'slide': {
+      const dir = t.flip ? -1 : 1;
+      const lx = x - dir * s * 0.55;
+      p.limb(lx - s * 0.12, y, lx - s * 0.12, y - s * 0.85, s * 0.05, '#6C757D');
+      p.limb(lx + s * 0.12, y, lx + s * 0.12, y - s * 0.85, s * 0.05, '#6C757D');
+      for (let k = 1; k < 5; k++) p.line(lx - s * 0.12, y - s * 0.17 * k, lx + s * 0.12, y - s * 0.17 * k, Math.max(1.2, s * 0.03), '#6C757D');
+      p.box(lx - s * 0.18, y - s * 0.9, s * 0.36, s * 0.08, s * 0.03, '#6C757D');
+      p.shape([[lx + dir * s * 0.12, y - s * 0.9], [x + dir * s * 0.8, y - s * 0.08], [x + dir * s * 0.8, y], [lx + dir * s * 0.12, y - s * 0.78]], a);
+      return;
+    }
+    case 'swing': {
+      p.limb(x - s * 0.8, y, x - s * 0.6, y - s, s * 0.05, '#6C757D');
+      p.limb(x + s * 0.8, y, x + s * 0.6, y - s, s * 0.05, '#6C757D');
+      p.limb(x - s * 0.68, y - s, x + s * 0.68, y - s, s * 0.05, '#6C757D');
+      for (const dx of [-0.25, 0.25]) {
+        p.line(x + (dx - 0.06) * s, y - s, x + (dx - 0.06) * s, y - s * 0.32, Math.max(1, s * 0.015));
+        p.line(x + (dx + 0.06) * s, y - s, x + (dx + 0.06) * s, y - s * 0.32, Math.max(1, s * 0.015));
+        p.box(x + (dx - 0.1) * s, y - s * 0.34, s * 0.2, s * 0.05, s * 0.02, a);
+      }
+      return;
+    }
+    case 'sunflower': {
+      p.limb(x, y, x, y - s * 0.72, s * 0.04, '#38B000');
+      p.oval(x - s * 0.08, y - s * 0.35, s * 0.08, s * 0.04, '#38B000');
+      p.oval(x + s * 0.08, y - s * 0.5, s * 0.08, s * 0.04, '#38B000');
+      const cy = y - s * 0.8;
+      for (let i = 0; i < 10; i++) {
+        const ang = (i * Math.PI) / 5 + t.pose;
+        p.oval(x + Math.cos(ang) * s * 0.13, cy + Math.sin(ang) * s * 0.13, s * 0.07, s * 0.07, a);
+      }
+      p.circle(x, cy, s * 0.1, '#6D4C41');
+      return;
+    }
+    case 'butterfly': {
+      const cy = y - s;
+      p.oval(x - s * 0.3, cy - s * 0.18, s * 0.28, s * 0.24, a);
+      p.oval(x + s * 0.3, cy - s * 0.18, s * 0.28, s * 0.24, a);
+      p.oval(x - s * 0.24, cy + s * 0.2, s * 0.2, s * 0.17, b);
+      p.oval(x + s * 0.24, cy + s * 0.2, s * 0.2, s * 0.17, b);
+      p.limb(x, cy - s * 0.3, x, cy + s * 0.35, s * 0.08, '#2B2D42');
+      return;
+    }
+    case 'gnome': {
+      p.shape([[x - s * 0.25, y], [x + s * 0.25, y], [x + s * 0.18, y - s * 0.5], [x - s * 0.18, y - s * 0.5]], b);
+      p.circle(x, y - s * 0.58, s * 0.13, '#FFDBC4');
+      p.shape([[x - s * 0.15, y - s * 0.55], [x + s * 0.15, y - s * 0.55], [x, y - s * 0.3]], '#FFFFFF');
+      p.shape([[x - s * 0.17, y - s * 0.66], [x + s * 0.17, y - s * 0.66], [x, y - s]], a);
+      p.circle(x, y - s * 0.56, s * 0.04, '#FF8FAB', false);
+      return;
+    }
+    case 'seafish': {
+      const dir = t.flip ? -1 : 1;
+      const cy = y - s * 0.5;
+      p.shape([[x - dir * s * 0.45, cy], [x - dir * s * 0.8, cy - s * 0.3], [x - dir * s * 0.8, cy + s * 0.3]], b);
+      p.oval(x, cy, s * 0.55, s * 0.35, a);
+      p.line(x - dir * s * 0.05, cy - s * 0.28, x - dir * s * 0.05, cy + s * 0.28, Math.max(1, s * 0.06), b);
+      p.circle(x + dir * s * 0.3, cy - s * 0.08, s * 0.08, '#FFFFFF');
+      p.circle(x + dir * s * 0.32, cy - s * 0.08, s * 0.04, INK, false);
+      return;
+    }
+    case 'coral': {
+      const lw = s * 0.1;
+      p.limb(x, y, x, y - s * 0.6, lw, a);
+      p.limb(x, y - s * 0.3, x - s * 0.3, y - s * 0.75, lw, a);
+      p.limb(x, y - s * 0.4, x + s * 0.32, y - s * 0.85, lw, a);
+      p.limb(x, y - s * 0.6, x + s * 0.05, y - s, lw, a);
+      for (const [dx, dy] of [[-0.3, -0.75], [0.32, -0.85], [0.05, -1]]) p.circle(x + dx * s, y + dy * s, lw * 0.75, a);
+      return;
+    }
+    case 'seaweed': {
+      const sway = t.flip ? -1 : 1;
+      let px = x;
+      let py = y;
+      for (let k = 1; k <= 4; k++) {
+        const nx = x + sway * (k % 2 ? 0.12 : -0.05) * s;
+        const ny = y - (k / 4) * s;
+        p.limb(px, py, nx, ny, s * 0.09, a);
+        [px, py] = [nx, ny];
+      }
+      return;
+    }
+    case 'shell': {
+      const cy = y - s * 0.1;
+      const fan: [number, number][] = [];
+      for (let i = 0; i <= 8; i++) {
+        const ang = Math.PI + (i * Math.PI) / 8;
+        fan.push([x + Math.cos(ang) * s * 0.55, cy + Math.sin(ang) * s * 0.8]);
+      }
+      p.shape([[x, cy], ...fan], a);
+      for (let i = 1; i < 8; i += 2) {
+        const ang = Math.PI + (i * Math.PI) / 8;
+        p.line(x, cy, x + Math.cos(ang) * s * 0.5, cy + Math.sin(ang) * s * 0.72, Math.max(1, s * 0.04), '#E5989B');
+      }
+      return;
+    }
+    case 'turtle': {
+      const dir = t.flip ? -1 : 1;
+      p.oval(x - s * 0.42, y - s * 0.2, s * 0.18, s * 0.1, '#95D5B2');
+      p.oval(x + s * 0.42, y - s * 0.2, s * 0.18, s * 0.1, '#95D5B2');
+      p.circle(x + dir * s * 0.62, y - s * 0.42, s * 0.18, '#95D5B2');
+      p.circle(x + dir * s * 0.68, y - s * 0.46, s * 0.035, INK, false);
+      const shell = Skia.PathBuilder.Make().addArc(rect(x - s * 0.55, y - s * 0.85, s * 1.1, s * 1.1), 180, 180).close().build();
+      c.drawPath(shell, fill(a));
+      c.drawPath(shell, stroke(INK, Math.max(1.2, s * 0.04)));
+      for (const dx of [-0.25, 0.05, 0.3]) p.circle(x + dx * s, y - s * 0.5, s * 0.1, '#95D5B2', false);
+      return;
+    }
+    case 'jellyfish': {
+      for (const dx of [-0.25, -0.08, 0.08, 0.25]) {
+        p.line(x + dx * s, y - s * 0.6, x + (dx + 0.06) * s, y - s * 0.3, Math.max(1.2, s * 0.04), a);
+        p.line(x + (dx + 0.06) * s, y - s * 0.3, x + dx * s, y - s * 0.05, Math.max(1.2, s * 0.04), a);
+      }
+      const dome = Skia.PathBuilder.Make().addArc(rect(x - s * 0.38, y - s, s * 0.76, s * 0.8), 180, 180).close().build();
+      c.drawPath(dome, fill(a));
+      c.drawPath(dome, stroke(INK, Math.max(1.2, s * 0.04)));
+      p.circle(x - s * 0.1, y - s * 0.72, s * 0.035, INK, false);
+      p.circle(x + s * 0.1, y - s * 0.72, s * 0.035, INK, false);
+      return;
+    }
+    case 'tent': {
+      p.shape([[x - s * 0.7, y], [x, y - s * 0.9], [x + s * 0.7, y]], a);
+      p.shape([[x - s * 0.22, y], [x, y - s * 0.55], [x + s * 0.22, y]], '#3D405B');
+      p.line(x, y - s * 0.9, x, y - s * 1.0, Math.max(1.2, s * 0.03));
+      return;
+    }
+    case 'campfire': {
+      for (const dx of [-0.45, -0.15, 0.15, 0.45]) p.circle(x + dx * s, y - s * 0.1, s * 0.12, '#9E9E9E');
+      p.limb(x - s * 0.4, y - s * 0.1, x + s * 0.35, y - s * 0.35, s * 0.12, '#8B5A2B');
+      p.limb(x + s * 0.4, y - s * 0.1, x - s * 0.35, y - s * 0.35, s * 0.12, '#8B5A2B');
+      p.shape([[x - s * 0.3, y - s * 0.3], [x - s * 0.15, y - s * 0.8], [x, y - s * 0.55], [x + s * 0.12, y - s], [x + s * 0.3, y - s * 0.3]], '#FB5607');
+      p.shape([[x - s * 0.15, y - s * 0.3], [x, y - s * 0.65], [x + s * 0.15, y - s * 0.3]], '#FFD23F', false);
+      return;
+    }
+    case 'canoe': {
+      p.line(x - s * 0.4, y - s * 1.2, x + s * 0.5, y, Math.max(1.4, s * 0.08), '#8B5A2B');
+      p.shape([[x - s * 1.3, y - s * 0.75], [x + s * 1.3, y - s * 0.75], [x + s * 0.9, y - s * 0.1], [x - s * 0.9, y - s * 0.1]], a);
+      p.line(x - s * 1.1, y - s * 0.6, x + s * 1.1, y - s * 0.6, Math.max(1.2, s * 0.06), '#FFFFFF');
+      return;
+    }
     default:
       return;
   }
@@ -419,6 +697,34 @@ function drawGround(c: SkCanvas, p: Pen, g: Ground, scene: Scene, ow: number) {
       c.drawRect(rect(0, g.height - ow * 1.5, w, ow * 3), fill('#FFFFFF'));
       return;
     }
+    case 'ice': {
+      p.oval(g.cx, g.cy, g.rx, g.ry, '#CDEBF7');
+      p.oval(g.cx - g.rx * 0.15, g.cy - g.ry * 0.15, g.rx * 0.6, g.ry * 0.5, '#E3F4FB', false);
+      for (const [dx, dy, len] of [[-0.4, -0.2, 0.25], [0.1, 0.3, 0.3], [0.35, -0.3, 0.2]])
+        c.drawLine(g.cx + dx * g.rx, g.cy + dy * g.ry, g.cx + (dx + len) * g.rx, g.cy + (dy - len * 0.3) * g.ry, stroke('#FFFFFF', Math.max(1.4, ow)));
+      return;
+    }
+    case 'patch': {
+      p.box(g.x, g.y, g.w, g.h, ow * 4, g.colors[0]);
+      if (g.rows) {
+        // Rows of little plants across the field.
+        const gapY = g.h / 5;
+        for (let y = g.y + gapY * 0.7; y < g.y + g.h - gapY * 0.3; y += gapY)
+          for (let x = g.x + gapY * 0.6; x < g.x + g.w - gapY * 0.3; x += gapY * 0.9) c.drawCircle(x, y, gapY * 0.28, fill(g.colors[1]));
+      } else {
+        c.drawRRect(Skia.RRectXY(rect(g.x, g.y, g.w, g.h), ow * 4, ow * 4), stroke(g.colors[1], ow * 3));
+      }
+      return;
+    }
+    case 'seabed': {
+      const top = scene.height - g.height;
+      const b = Skia.PathBuilder.Make().moveTo(-10, top);
+      for (let x = 0; x <= w + 40; x += 40) b.quadTo(x - 20, top - g.height * 0.15, x, top);
+      const bed = b.lineTo(w + 10, scene.height + 10).lineTo(-10, scene.height + 10).close().build();
+      c.drawPath(bed, fill('#F2D49B'));
+      for (let x = 13; x < w; x += 37) c.drawCircle(x, top + ((x * 7) % (g.height * 0.8)) + g.height * 0.15, 2, fill('#D9B676'));
+      return;
+    }
     case 'towel': {
       c.save();
       c.rotate(-8 + (g.x % 16), g.x, g.y);
@@ -443,6 +749,14 @@ function record(scene: Scene) {
     const joint = stroke('#D6C7B2', 1.2);
     for (let x = 0; x < scene.width; x += step) c.drawLine(x, 0, x, scene.height, joint);
     for (let y = 0; y < scene.height; y += step) c.drawLine(0, y, scene.width, y, joint);
+  }
+  if (scene.kind === 'ocean') {
+    // Soft light coming down through the water.
+    for (let i = 0; i < 4; i++) {
+      const x = ((i + 0.5) * scene.width) / 4;
+      const ray = Skia.PathBuilder.Make().moveTo(x - 20, 0).lineTo(x + 30, 0).lineTo(x + 90, scene.height).lineTo(x + 10, scene.height).close().build();
+      c.drawPath(ray, fill('rgba(255,255,255,0.08)'));
+    }
   }
   for (const g of scene.ground) drawGround(c, p, g, scene, ow);
   for (const t of scene.things) {

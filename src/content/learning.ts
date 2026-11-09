@@ -477,11 +477,12 @@ export const PETS = [
 // ---------------------------------------------------------------------------
 
 export const GAME_SECTIONS = [
-  { id: 'create', title: 'Create', picture: 'paint' },
-  { id: 'read', title: 'Read & spell', picture: 'book' },
-  { id: 'numbers', title: 'Numbers', picture: 'abacus' },
-  { id: 'think', title: 'Think & solve', picture: 'puzzle' },
-  { id: 'focus', title: 'Calm & focus', picture: 'balloon' },
+  { id: 'create', title: 'Create', picture: 'paint', color: '#B85F45' },
+  { id: 'read', title: 'Read & spell', picture: 'book', color: '#4F7CA8' },
+  { id: 'numbers', title: 'Numbers', picture: 'abacus', color: '#C98E2E' },
+  { id: 'think', title: 'Think & solve', picture: 'puzzle', color: '#5E8A4A' },
+  { id: 'focus', title: 'Calm & focus', picture: 'balloon', color: '#3F8682' },
+  { id: 'tots', title: 'Tiny tots', picture: 'duck', color: '#8A6A9E' },
 ] as const;
 
 export const GAMES = [
@@ -499,17 +500,18 @@ export const GAMES = [
   { id: 'memory', title: 'Flip & find', picture: 'cat', color: '#22C17A', section: 'think', skills: 'Memory and matching' },
   { id: 'quest', title: 'Shape quest', picture: 'blue diamond', color: '#0EA5E9', section: 'think', skills: 'Shapes and building' },
   { id: 'follow', title: 'Follow me', picture: 'robot', color: '#3B82F6', section: 'think', skills: 'Watch, remember, repeat' },
-  { id: 'redlight', title: 'Red light, green light', picture: 'turtle', color: '#EF4444', section: 'focus', skills: 'Stop and go' },
+  { id: 'redlight', title: 'Red light, green light', picture: 'stoplight', color: '#EF4444', section: 'focus', skills: 'Stop and go' },
   { id: 'breathe', title: 'Breathe with me', picture: 'balloon', color: '#60A5FA', section: 'focus', skills: 'Slow, calm breaths' },
   { id: 'snail', title: 'Snail trail', picture: 'snail', color: '#65A30D', section: 'focus', skills: 'Slow and steady' },
   { id: 'ispy', title: 'I spy', picture: 'ladybug', color: '#F59E0B', section: 'focus', skills: 'Look closely' },
-  { id: 'tots', title: 'Tiny tots', picture: 'duck', color: '#FB923C', section: 'numbers', skills: 'Colors and counting' },
+  { id: 'tots', title: 'Tiny tots', picture: 'duck', color: '#FB923C', section: 'tots', skills: 'Colors and counting' },
   { id: 'balance', title: 'Frog balance', picture: 'frog', color: '#22C55E', section: 'focus', skills: 'Balance the board' },
   { id: 'pop', title: 'Bubble wrap', picture: 'bubbles', color: '#38BDF8', section: 'focus', skills: 'Pop and relax' },
-  { id: 'catch', title: 'Catch', picture: 'apple', color: '#F97316', section: 'focus', skills: 'Watch and catch' },
+  { id: 'catch', title: 'Catch', picture: 'basket', color: '#F97316', section: 'focus', skills: 'Watch and catch' },
   { id: 'pet', title: 'My little pet', picture: 'puppy', color: '#4CAF50', section: 'think', skills: 'Care and share' },
 ] as const;
 export type GameId = (typeof GAMES)[number]['id'];
+export type SectionId = (typeof GAME_SECTIONS)[number]['id'];
 
 /** What I spy asks her to find, a different one each round. */
 export const SPY_TARGETS = [
@@ -530,6 +532,7 @@ const idOf = (text: string) => text.toLowerCase().replace(/[^a-z0-9]+/g, '-').re
 export const say = {
   line: (key: keyof typeof LINES) => `line-${key}`,
   game: (id: GameId) => `game-${id}`,
+  section: (id: SectionId) => `section-${id}`,
   song: (id: string) => `song-${id}`,
   spy: (name: string) => `spy-${name}`,
   letterName: (l: Letter) => `letter-${l.lower}`,
@@ -574,6 +577,7 @@ export const say = {
 
 /** Fixed lines: instructions, encouragement and celebrations. */
 export const LINES = {
+  hello: 'Hi! What shall we play today?',
   tryAgain: "Let's try again!",
   almost: 'Almost! Try again.',
   together: "Let's try together.",
@@ -593,10 +597,10 @@ export const LINES = {
   rlStop: 'Stop!',
   rlOops: 'Oops! Red means stop.',
   rlWin: 'You made it!',
-  brIntro: 'Breathe with the box. Tap start.',
+  brIntro: 'Hold the balloon and breathe in. Let go and breathe out.',
+  brLetGo: 'Now let go.',
   brIn: 'Breathe in.',
   brOut: 'Breathe out.',
-  brHold: 'Hold.',
   brDone: 'Four calm breaths. Well done!',
   snIntro: 'Take the snail home. Go slow!',
   snFast: 'Too fast! Slow and steady.',
@@ -617,7 +621,7 @@ export const LINES = {
   memoryMatch: 'Match!',
   popIntro: 'Pop all the bubbles!',
   totsIntro: 'Tap, tap, tap!',
-  balIntro: 'Make the board level!',
+  balIntro: 'Pick a frog. Then tap a spot to make the board level!',
   balWin: "It's level!",
   popMore: 'More bubbles!',
   catchIntro: 'Move the basket. Catch the fruit!',
@@ -681,6 +685,7 @@ export function spokenLines(): Record<string, string> {
   const lines: Record<string, string> = {};
   for (const [key, text] of Object.entries(LINES)) lines[say.line(key as keyof typeof LINES)] = text;
   for (const game of GAMES) lines[say.game(game.id)] = `${game.title.replace('&', 'and')}!`;
+  for (const section of GAME_SECTIONS) lines[say.section(section.id)] = `${section.title.replace('&', 'and')}!`;
   for (const song of SONGS) lines[say.song(song.id)] = `${song.title}!`;
   for (const target of SPY_TARGETS) lines[say.spy(target.name)] = `Can you find the ${target.name}?`;
 

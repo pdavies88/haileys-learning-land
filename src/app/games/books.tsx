@@ -6,6 +6,7 @@ import Animated, { FadeIn, FadeInRight, ZoomIn } from 'react-native-reanimated';
 import { Bouncy } from '@/components/bouncy';
 import { useCelebration } from '@/components/celebration';
 import { GameScreen } from '@/components/game-screen';
+import { Pic } from '@/components/pic';
 import { Txt } from '@/components/txt';
 import { Colors, Radius, Spacing, cardShadow, raised } from '@/constants/theme';
 import { say } from '@/content/learning';
@@ -138,12 +139,14 @@ export default function Books() {
           The end
         </Txt>
         <View style={styles.endButtons}>
-          <Bouncy accessibilityLabel="Read it again" style={[styles.endButton, { backgroundColor: Colors.teal }]} onPress={() => readFrom(story, 0)}>
+          <Bouncy accessibilityLabel="Read it again" style={[styles.endButton, { backgroundColor: Colors.teal }, { flexDirection: 'row', alignItems: 'center', gap: 8 }]} onPress={() => readFrom(story, 0)}>
+            <Pic name="again" size={30} />
             <Txt size={20} color={Colors.white}>
               Read again
             </Txt>
           </Bouncy>
-          <Bouncy accessibilityLabel="Pick another book" style={[styles.endButton, { backgroundColor: Colors.purple }]} onPress={closeBook}>
+          <Bouncy accessibilityLabel="Pick another book" style={[styles.endButton, { backgroundColor: Colors.purple }, { flexDirection: 'row', alignItems: 'center', gap: 8 }]} onPress={closeBook}>
+            <Pic name="books" size={30} />
             <Txt size={20} color={Colors.white}>
               Another book
             </Txt>

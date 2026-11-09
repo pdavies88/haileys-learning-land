@@ -145,7 +145,8 @@ export default function Friends() {
           <Bouncy accessibilityLabel="Clear stickers" style={styles.action} onPress={() => setStickers([])}>
             <Pic name="trash" size={30} />
           </Bouncy>
-          <Bouncy accessibilityLabel="New friend" style={[styles.action, styles.newFriend]} onPress={startOver}>
+          <Bouncy accessibilityLabel="New friend" style={[styles.action, styles.newFriend, { flexDirection: 'row', alignItems: 'center', gap: 8 }]} onPress={startOver}>
+            <Pic name="teddy bear" size={30} />
             <Txt size={20} color={Colors.white}>
               New friend
             </Txt>

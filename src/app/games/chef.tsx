@@ -155,9 +155,6 @@ function AddStep({
     <View style={styles.stepBody}>
       <View style={styles.kitchen}>
         <View style={styles.card}>
-          <Txt size={14} weight="bold" color={Colors.textSoft}>
-            Recipe
-          </Txt>
           <View style={styles.cardRow}>
             <Txt size={52} weight="heavy" color={Colors.orange}>
               {count}

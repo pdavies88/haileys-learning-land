@@ -7,7 +7,6 @@ import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { useCelebration } from '@/components/celebration';
 import { GameScreen } from '@/components/game-screen';
 import { Pic } from '@/components/pic';
-import { Txt } from '@/components/txt';
 import { Colors, Spacing } from '@/constants/theme';
 import { say } from '@/content/learning';
 import { playSfx, speak } from '@/lib/audio';
@@ -16,22 +15,22 @@ const FRUIT = ['apple', 'strawberry', 'cherries', 'lemon', 'pear', 'peach', 'ora
 const GOAL = 10;
 const FRAME_MS = 33;
 const ITEM = 64;
-const BOWL = 120;
+const BASKET = 120;
 
 type Falling = { id: number; name: string; x: number; y: number };
 
 /**
- * Catch: fruit falls from the sky; slide the bowl along the bottom (drag anywhere) to catch it.
+ * Catch: fruit falls from the sky; slide the basket along the bottom (drag anywhere) to catch it.
  * Ten catches fill the round and the next one falls a little faster. Missing one doesn't matter,
  * it just rolls away. Practises keeping eyes on a moving target.
  */
 export default function Catch() {
   const [area, setArea] = useState({ width: 0, height: 0 });
   const [items, setItems] = useState<Falling[]>([]);
-  const [bowlX, setBowlX] = useState(0);
+  const [basketX, setBasketX] = useState(0);
   const [caught, setCaught] = useState(0);
   const [level, setLevel] = useState(0);
-  const state = useRef({ items: [] as Falling[], bowlX: 0, caught: 0, level: 0, nextId: 1, sinceSpawn: 0, paused: false });
+  const state = useRef({ items: [] as Falling[], basketX: 0, caught: 0, level: 0, nextId: 1, sinceSpawn: 0, paused: false });
   const { celebrate, overlay } = useCelebration();
 
   useEffect(() => {
@@ -41,8 +40,8 @@ export default function Catch() {
   useEffect(() => {
     if (area.width === 0) return;
     const s = state.current;
-    s.bowlX = area.width / 2;
-    setBowlX(s.bowlX);
+    s.basketX = area.width / 2;
+    setBasketX(s.basketX);
     const id = setInterval(() => {
       if (s.paused) return;
       const speed = (2.2 + s.level * 0.6) * (area.height / 600);
@@ -51,11 +50,11 @@ export default function Catch() {
         s.sinceSpawn = 0;
         s.items.push({ id: s.nextId++, name: FRUIT[Math.floor(Math.random() * FRUIT.length)], x: ITEM / 2 + Math.random() * (area.width - ITEM), y: -ITEM });
       }
-      const catchY = area.height - BOWL * 0.75;
+      const catchY = area.height - BASKET * 0.75;
       const kept: Falling[] = [];
       for (const it of s.items) {
         it.y += speed;
-        if (it.y >= catchY && it.y - speed < catchY && Math.abs(it.x - s.bowlX) < BOWL * 0.6) {
+        if (it.y >= catchY && it.y - speed < catchY && Math.abs(it.x - s.basketX) < BASKET * 0.6) {
           s.caught += 1;
           playSfx('chime');
           continue;
@@ -85,9 +84,9 @@ export default function Catch() {
   }, [area.width, area.height]);
 
   const move = (x: number) => {
-    const clamped = Math.max(BOWL / 2, Math.min(area.width - BOWL / 2, x));
-    state.current.bowlX = clamped;
-    setBowlX(clamped);
+    const clamped = Math.max(BASKET / 2, Math.min(area.width - BASKET / 2, x));
+    state.current.basketX = clamped;
+    setBasketX(clamped);
   };
   const drag = Gesture.Pan()
     .runOnJS(true)
@@ -111,15 +110,12 @@ export default function Catch() {
               </View>
             ))}
             {area.width > 0 && (
-              <View pointerEvents="none" style={[styles.at, { left: bowlX - BOWL / 2, top: area.height - BOWL }]}>
-                <Pic name="bowl" size={BOWL} />
+              <View pointerEvents="none" style={[styles.at, { left: basketX - BASKET / 2, top: area.height - BASKET }]}>
+                <Pic name="basket" size={BASKET} />
               </View>
             )}
           </View>
         </GestureDetector>
-        <Txt size={18} color={Colors.textSoft}>
-          Slide the bowl to catch the fruit
-        </Txt>
       </View>
       {overlay}
     </GameScreen>

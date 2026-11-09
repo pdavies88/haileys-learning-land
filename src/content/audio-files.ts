@@ -2,6 +2,7 @@
 // Metro only bundles files referenced by a static require(), so every file is listed here.
 
 export const SPEECH_FILES: Record<string, number> = {
+  'line-hello': require('../../assets/audio/speech/line-hello.m4a'),
   'line-tryAgain': require('../../assets/audio/speech/line-tryAgain.m4a'),
   'line-almost': require('../../assets/audio/speech/line-almost.m4a'),
   'line-together': require('../../assets/audio/speech/line-together.m4a'),
@@ -22,9 +23,9 @@ export const SPEECH_FILES: Record<string, number> = {
   'line-rlOops': require('../../assets/audio/speech/line-rlOops.m4a'),
   'line-rlWin': require('../../assets/audio/speech/line-rlWin.m4a'),
   'line-brIntro': require('../../assets/audio/speech/line-brIntro.m4a'),
+  'line-brLetGo': require('../../assets/audio/speech/line-brLetGo.m4a'),
   'line-brIn': require('../../assets/audio/speech/line-brIn.m4a'),
   'line-brOut': require('../../assets/audio/speech/line-brOut.m4a'),
-  'line-brHold': require('../../assets/audio/speech/line-brHold.m4a'),
   'line-brDone': require('../../assets/audio/speech/line-brDone.m4a'),
   'line-snIntro': require('../../assets/audio/speech/line-snIntro.m4a'),
   'line-snFast': require('../../assets/audio/speech/line-snFast.m4a'),
@@ -125,6 +126,12 @@ export const SPEECH_FILES: Record<string, number> = {
   'game-pop': require('../../assets/audio/speech/game-pop.m4a'),
   'game-catch': require('../../assets/audio/speech/game-catch.m4a'),
   'game-pet': require('../../assets/audio/speech/game-pet.m4a'),
+  'section-create': require('../../assets/audio/speech/section-create.m4a'),
+  'section-read': require('../../assets/audio/speech/section-read.m4a'),
+  'section-numbers': require('../../assets/audio/speech/section-numbers.m4a'),
+  'section-think': require('../../assets/audio/speech/section-think.m4a'),
+  'section-focus': require('../../assets/audio/speech/section-focus.m4a'),
+  'section-tots': require('../../assets/audio/speech/section-tots.m4a'),
   'song-buns': require('../../assets/audio/speech/song-buns.m4a'),
   'song-mary': require('../../assets/audio/speech/song-mary.m4a'),
   'song-twinkle': require('../../assets/audio/speech/song-twinkle.m4a'),

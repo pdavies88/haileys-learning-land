@@ -6,7 +6,6 @@ import { Bouncy } from '@/components/bouncy';
 import { useCelebration } from '@/components/celebration';
 import { GameScreen } from '@/components/game-screen';
 import { Pic } from '@/components/pic';
-import { Txt } from '@/components/txt';
 import { Colors, Spacing, cardShadow } from '@/constants/theme';
 import { say } from '@/content/learning';
 import { pause, playSfx, speak } from '@/lib/audio';
@@ -23,6 +22,34 @@ function challenge(): { board: Board; fixed: number } {
   const at = Math.floor(Math.random() * PEGS);
   left[at] = WEIGHTS[Math.floor(Math.random() * WEIGHTS.length)];
   return { board: { left, right: Array(PEGS).fill(null) }, fixed: at };
+}
+
+const FULCRUM = { half: 60, height: 100, edge: 6 };
+
+/**
+ * The wooden triangle the board rests on, with its tip right under the middle of the board. Drawn
+ * with the border trick: a box with no size and one wide coloured border is a triangle. A smaller,
+ * lighter one inside the darker one gives it an outline.
+ */
+function Fulcrum({ level }: { level: boolean }) {
+  const { half, height, edge } = FULCRUM;
+  const inner = (height - edge * 2.6) / height;
+  const triangle = (h: number, color: string) => ({
+    width: 0,
+    height: 0,
+    borderLeftWidth: h * half,
+    borderRightWidth: h * half,
+    borderBottomWidth: h * height,
+    borderLeftColor: 'transparent',
+    borderRightColor: 'transparent',
+    borderBottomColor: color,
+  });
+  return (
+    <View style={styles.pivot}>
+      <View style={triangle(1, level ? '#3E9E54' : '#8A5A2B')} />
+      <View style={[styles.pivotInner, { left: half * (1 - inner), top: height - edge - inner * height }, triangle(inner, level ? '#7BD389' : '#C98A4B')]} />
+    </View>
+  );
 }
 
 const turning = (side: (number | null)[]) => side.reduce<number>((sum, w, i) => sum + (w ?? 0) * (i + 1), 0);
@@ -89,18 +116,13 @@ export default function Balance() {
   return (
     <GameScreen title="Frog balance" background="#E8F7E4" onRepeat={() => speak(say.line('balIntro'))}>
       <View style={styles.body}>
-        <Txt size={30} weight="heavy" color={level ? Colors.green : Colors.purpleDark}>
-          {level ? 'Level!' : 'Make it level'}
-        </Txt>
         <View style={styles.stage}>
           <Animated.View style={[styles.swing, { width: boardWidth }, swing]}>
             {frogsOn('left')}
             {frogsOn('right')}
             <View style={[styles.board, level && styles.boardLevel]} />
           </Animated.View>
-          <View style={styles.pivot}>
-            <Pic name="frog" size={110} />
-          </View>
+          <Fulcrum level={level} />
         </View>
         <View style={styles.tray}>
           {WEIGHTS.map((w) => (
@@ -109,9 +131,6 @@ export default function Balance() {
             </Bouncy>
           ))}
         </View>
-        <Txt size={17} color={Colors.textSoft}>
-          Pick a frog, then tap a spot on the right
-        </Txt>
       </View>
       {overlay}
     </GameScreen>
@@ -130,6 +149,7 @@ const styles = StyleSheet.create({
   spot: { width: 30, height: 12, borderRadius: 6, backgroundColor: 'rgba(138,90,43,0.35)', marginBottom: 2 },
   fixed: { opacity: 0.95 },
   pivot: { marginTop: -100 },
+  pivotInner: { position: 'absolute' },
   tray: { flexDirection: 'row', alignItems: 'flex-end', gap: Spacing.lg, padding: Spacing.md, borderRadius: 28, backgroundColor: 'rgba(255,255,255,0.75)', ...cardShadow },
   pick: { padding: 8, borderRadius: 20, borderWidth: 4, borderColor: 'transparent' },
   pickOn: { borderColor: Colors.yellow, backgroundColor: '#FFF6CC' },

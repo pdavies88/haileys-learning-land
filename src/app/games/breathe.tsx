@@ -1,8 +1,19 @@
+/* eslint-disable react-hooks/refs -- the flagged code runs in finger handlers, not during render. */
 import { useEffect, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
-import Animated, { Easing, ZoomIn, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import Animated, {
+  Easing,
+  ZoomIn,
+  cancelAnimation,
+  useAnimatedStyle,
+  useReducedMotion,
+  useSharedValue,
+  withRepeat,
+  withSequence,
+  withTiming,
+} from 'react-native-reanimated';
 
-import { Bouncy } from '@/components/bouncy';
 import { useCelebration } from '@/components/celebration';
 import { GameScreen } from '@/components/game-screen';
 import { Pic } from '@/components/pic';
@@ -11,127 +22,160 @@ import { Colors, Spacing, cardShadow } from '@/constants/theme';
 import { say } from '@/content/learning';
 import { pause, speak } from '@/lib/audio';
 
-// Box breathing: four sides of four counts each. The balloon grows as she breathes in, stays full
-// while she holds, shrinks as she breathes out, and stays small while she holds again.
-const SIDES = [
-  { label: 'Breathe in', short: 'In', line: 'brIn', balloon: 1.15 },
-  { label: 'Hold', short: 'Hold', line: 'brHold', balloon: 1.15 },
-  { label: 'Breathe out', short: 'Out', line: 'brOut', balloon: 0.6 },
-  { label: 'Hold', short: 'Hold', line: 'brHold', balloon: 0.6 },
-] as const;
 const COUNT_MS = 1000;
-const BOXES = 4;
-const BOX = 260;
+const COUNTS = 4;
+const BREATHS = 4; // breaths to fill the stars
+const SMALL = 0.55;
+const BIG = 1.15;
+const IN_COLOR = Colors.blue;
+const OUT_COLOR = Colors.green;
+
+type Phase = 'ready' | 'in' | 'full' | 'out';
 
 /**
- * Breathe with me: box breathing. The narrator guides four equal steps, counting to four in each:
- * breathe in, hold, breathe out, hold. A dot travels round the box and the balloon grows, holds and
- * shrinks with it. Four boxes fill the jar. A calm corner to come back to whenever she needs it.
+ * Breathe with me: hold the balloon and breathe in while it fills, one, two, three, four. Let go
+ * and breathe out while it shrinks, one, two, three, four. The narrator counts both. Four dots
+ * show the count and four stars fill as she goes, so nothing needs reading. A calm corner to come
+ * back to whenever she needs it.
  */
 export default function Breathe() {
-  const [running, setRunning] = useState(false);
-  const [side, setSide] = useState(0);
+  const [phase, setPhase] = useState<Phase>('ready');
   const [count, setCount] = useState(0);
   const [stars, setStars] = useState(0);
-  const run = useRef(0);
-  const around = useSharedValue(0); // 0 to 4: how far round the box the dot has gone
-  const size = useSharedValue(0.6);
+  const live = useRef({ run: 0, holding: false, phase: 'ready' as Phase, reached: false });
+  const size = useSharedValue(SMALL);
+  const nudge = useSharedValue(0);
+  const reduceMotion = useReducedMotion();
   const { celebrate, overlay } = useCelebration();
+
+  const to = (p: Phase) => {
+    live.current.phase = p;
+    setPhase(p);
+  };
 
   useEffect(() => {
     speak(say.line('brIntro'));
+    const s = live.current;
     return () => {
-      run.current += 1;
+      s.run += 1;
     };
   }, []);
 
-  const start = async () => {
-    const id = ++run.current;
-    setRunning(true);
-    setStars(0);
-    around.set(0);
-    size.set(0.6);
-    for (let box = 0; box < BOXES; box++) {
-      for (let s = 0; s < SIDES.length; s++) {
-        if (run.current !== id) return;
-        setSide(s);
-        around.set(withTiming(s + 1, { duration: COUNT_MS * 4, easing: Easing.linear }));
-        size.set(withTiming(SIDES[s].balloon, { duration: COUNT_MS * 4, easing: Easing.inOut(Easing.sin) }));
-        for (let c = 1; c <= 4; c++) {
-          if (run.current !== id) return;
-          setCount(c);
-          // The step's name counts as "one", then the numbers.
-          speak(c === 1 ? say.line(SIDES[s].line) : say.number(c));
-          await pause(COUNT_MS);
-        }
-      }
-      around.set(0);
-      setStars(box + 1);
+  // The pointing hand bobs while the balloon waits to be held.
+  useEffect(() => {
+    if (phase !== 'ready' || reduceMotion) {
+      cancelAnimation(nudge);
+      nudge.set(0);
+      return;
     }
-    if (run.current !== id) return;
-    setRunning(false);
+    nudge.set(withRepeat(withSequence(withTiming(-10, { duration: 600 }), withTiming(0, { duration: 600 })), -1));
+  }, [phase, reduceMotion, nudge]);
+
+  /** Counts one to four with the narrator; the first count is the step's name. */
+  const countFour = async (id: number, first: 'brIn' | 'brOut') => {
+    for (let c = 1; c <= COUNTS; c++) {
+      if (live.current.run !== id) return false;
+      setCount(c);
+      speak(c === 1 ? say.line(first) : say.number(c));
+      await pause(COUNT_MS);
+    }
+    return live.current.run === id;
+  };
+
+  const breatheIn = async () => {
+    const s = live.current;
+    if (s.phase !== 'ready') return;
+    const id = ++s.run;
+    s.reached = false;
+    to('in');
+    size.set(withTiming(BIG, { duration: COUNT_MS * COUNTS, easing: Easing.inOut(Easing.sin) }));
+    if (!(await countFour(id, 'brIn'))) return;
+    s.reached = true;
+    to('full');
+    // Still holding a moment after four? Remind her to let go.
+    await pause(1200);
+    if (s.run === id && (s.phase as Phase) === 'full' && s.holding) speak(say.line('brLetGo'));
+  };
+
+  const breatheOut = async () => {
+    const s = live.current;
+    if (s.phase !== 'in' && s.phase !== 'full') return;
+    const id = ++s.run;
+    const counted = s.reached;
+    to('out');
+    size.set(withTiming(SMALL, { duration: COUNT_MS * COUNTS, easing: Easing.inOut(Easing.sin) }));
+    if (!(await countFour(id, 'brOut'))) return;
     setCount(0);
+    if (!counted) {
+      to('ready');
+      return;
+    }
+    const done = stars + 1;
+    setStars(done);
+    if (done < BREATHS) {
+      to('ready');
+      return;
+    }
     await celebrate(true);
-    speak(say.line('brDone'));
+    await speak(say.line('brDone'));
+    if (s.run !== id) return;
+    setStars(0);
+    to('ready');
   };
 
-  const stop = () => {
-    run.current += 1;
-    setRunning(false);
-    setCount(0);
-    around.set(0);
-    size.set(withTiming(0.6));
-  };
+  const hold = Gesture.Pan()
+    .runOnJS(true)
+    .minDistance(0)
+    .onBegin(() => {
+      live.current.holding = true;
+      breatheIn();
+    })
+    .onFinalize(() => {
+      live.current.holding = false;
+      breatheOut();
+    });
 
-  const dot = useAnimatedStyle(() => {
-    const t = around.value % 4;
-    const f = t - Math.floor(t);
-    const edge = Math.floor(t);
-    const x = edge === 0 ? f : edge === 1 ? 1 : edge === 2 ? 1 - f : 0;
-    const y = edge === 0 ? 0 : edge === 1 ? f : edge === 2 ? 1 : 1 - f;
-    return { transform: [{ translateX: x * BOX - 18 }, { translateY: y * BOX - 18 }] };
-  });
   const balloon = useAnimatedStyle(() => ({ transform: [{ scale: size.value }] }));
+  const hand = useAnimatedStyle(() => ({ transform: [{ translateY: nudge.value }] }));
+  const color = phase === 'out' ? OUT_COLOR : IN_COLOR;
 
   return (
     <GameScreen title="Breathe with me" background="#E3F0FF" onRepeat={() => speak(say.line('brIntro'))}>
       <View style={styles.body}>
-        <View style={styles.say}>
-          <Txt size={34} weight="heavy" color={Colors.purpleDark}>
-            {running ? SIDES[side].label : 'Breathe with the box'}
-          </Txt>
-          {running && count > 0 ? (
-            <Animated.View key={`${side}-${count}`} entering={ZoomIn.duration(200)}>
-              <Txt size={56} weight="heavy" color={Colors.blue}>
+        <View style={styles.counter}>
+          {count > 0 ? (
+            <Animated.View key={`${phase}-${count}`} entering={ZoomIn.duration(200)}>
+              <Txt size={64} weight="heavy" color={color}>
                 {count}
               </Txt>
             </Animated.View>
           ) : null}
         </View>
 
-        <View style={styles.boxWrap}>
-          <View style={[styles.box, { width: BOX, height: BOX }]}>
+        <GestureDetector gesture={hold}>
+          <View accessible accessibilityRole="button" accessibilityLabel="Hold to breathe in. Let go to breathe out." style={styles.pad}>
             <Animated.View style={balloon}>
-              <Pic name="balloon" size={170} />
+              <Pic name="balloon" size={220} />
             </Animated.View>
           </View>
-          <Txt size={18} weight="heavy" color={Colors.textSoft} style={[styles.sideLabel, { top: -30 }]}>
-            {SIDES[0].short}
-          </Txt>
-          <Txt size={18} weight="heavy" color={Colors.textSoft} style={[styles.sideLabel, { right: -62, top: BOX / 2 - 12 }]}>
-            {SIDES[1].short}
-          </Txt>
-          <Txt size={18} weight="heavy" color={Colors.textSoft} style={[styles.sideLabel, { bottom: -30 }]}>
-            {SIDES[2].short}
-          </Txt>
-          <Txt size={18} weight="heavy" color={Colors.textSoft} style={[styles.sideLabel, { left: -62, top: BOX / 2 - 12 }]}>
-            {SIDES[3].short}
-          </Txt>
-          <Animated.View pointerEvents="none" style={[styles.dot, dot]} />
+        </GestureDetector>
+
+        <View style={styles.under}>
+          {phase === 'ready' ? (
+            <Animated.View style={hand} pointerEvents="none">
+              <Pic name="point up" size={64} />
+            </Animated.View>
+          ) : (
+            <View style={styles.dots}>
+              {Array.from({ length: COUNTS }, (_, i) => (
+                <View key={i} style={[styles.dot, { borderColor: color }, i < count && { backgroundColor: color }]} />
+              ))}
+            </View>
+          )}
         </View>
 
         <View style={styles.jar}>
-          {Array.from({ length: BOXES }, (_, i) =>
+          {Array.from({ length: BREATHS }, (_, i) =>
             i < stars ? (
               <Animated.View key={i} entering={ZoomIn.springify()}>
                 <Pic name="star" size={44} />
@@ -141,12 +185,6 @@ export default function Breathe() {
             ),
           )}
         </View>
-
-        <Bouncy accessibilityLabel={running ? 'Stop' : 'Start'} style={[styles.button, { backgroundColor: running ? Colors.textSoft : Colors.blue }]} onPress={running ? stop : start}>
-          <Txt size={26} weight="heavy" color={Colors.white}>
-            {running ? 'Stop' : 'Start'}
-          </Txt>
-        </Bouncy>
       </View>
       {overlay}
     </GameScreen>
@@ -155,14 +193,13 @@ export default function Breathe() {
 
 const styles = StyleSheet.create({
   body: { flex: 1, alignItems: 'center', justifyContent: 'space-around', padding: Spacing.md },
-  say: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md, minHeight: 72 },
-  boxWrap: { width: BOX, height: BOX, alignItems: 'center' },
-  box: { borderWidth: 6, borderColor: '#B9C9E8', borderRadius: 18, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255,255,255,0.5)' },
-  sideLabel: { position: 'absolute', width: 56, textAlign: 'center' },
-  dot: { position: 'absolute', left: 0, top: 0, width: 36, height: 36, borderRadius: 18, backgroundColor: Colors.blue, borderWidth: 5, borderColor: Colors.white, ...cardShadow },
+  counter: { height: 84, justifyContent: 'center' },
+  pad: { width: 300, height: 300, borderRadius: 150, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255,255,255,0.55)' },
+  under: { height: 72, justifyContent: 'center' },
+  dots: { flexDirection: 'row', gap: Spacing.md },
+  dot: { width: 28, height: 28, borderRadius: 14, borderWidth: 4, backgroundColor: 'transparent' },
   jar: { flexDirection: 'row', gap: Spacing.sm, padding: Spacing.md, borderRadius: 32, backgroundColor: 'rgba(255,255,255,0.75)', ...cardShadow },
   slot: { width: 44, height: 44, borderRadius: 22, borderWidth: 3, borderStyle: 'dashed', borderColor: '#B9C9E8' },
-  button: { paddingHorizontal: Spacing.xl, height: 72, borderRadius: 36, alignItems: 'center', justifyContent: 'center', ...cardShadow },
 });
 
 export { GameError as ErrorBoundary } from '@/components/game-error';

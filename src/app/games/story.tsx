@@ -160,7 +160,8 @@ export default function Story() {
           <Bouncy accessibilityLabel="Read it again" style={styles.action} onPress={() => read()}>
             <Pic name="book" size={30} />
           </Bouncy>
-          <Bouncy accessibilityLabel="New story" style={[styles.action, styles.newStory]} onPress={startOver}>
+          <Bouncy accessibilityLabel="New story" style={[styles.action, styles.newStory, { flexDirection: 'row', alignItems: 'center', gap: 8 }]} onPress={startOver}>
+            <Pic name="sparkles" size={30} />
             <Txt size={20} color={Colors.white}>
               New story
             </Txt>

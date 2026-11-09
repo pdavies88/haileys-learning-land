@@ -1,18 +1,26 @@
 /**
- * The busy picture for I spy: a park, a town square or a beach, crowded with drawn people, animals
- * and things, with one small target hidden somewhere in it.
+ * The busy picture for I spy: one of ten drawn places (a park, a town square, a beach, a farm, a
+ * forest, a snowy hill, a playground, a garden, the bottom of the sea or a campsite), crowded with
+ * drawn people, animals and things, with one small target hidden somewhere in it.
  *
  * This file only decides what goes where. `src/components/spy-scene.tsx` draws it with Skia. Keeping
  * the layout as plain data means it can be tested without a screen, and the same seed gives the
  * same picture, so turning the tablet re-lays the picture without changing the round.
  */
 
-export type SceneKind = 'park' | 'town' | 'beach';
-export const SCENE_KINDS: SceneKind[] = ['park', 'town', 'beach'];
+export type SceneKind = 'park' | 'town' | 'beach' | 'farm' | 'forest' | 'snow' | 'playground' | 'garden' | 'ocean' | 'camp';
+export const SCENE_KINDS: SceneKind[] = ['park', 'town', 'beach', 'farm', 'forest', 'snow', 'playground', 'garden', 'ocean', 'camp'];
 
 export type ThingKind =
   | 'person' | 'tree' | 'pine' | 'bush' | 'flower' | 'dog' | 'cat' | 'duck' | 'bird' | 'bench' | 'lamp'
-  | 'house' | 'car' | 'stall' | 'umbrella' | 'castle' | 'crab' | 'ball' | 'boat' | 'swimmer' | 'target';
+  | 'house' | 'car' | 'stall' | 'umbrella' | 'castle' | 'crab' | 'ball' | 'boat' | 'swimmer'
+  | 'barn' | 'cow' | 'pig' | 'sheep' | 'chicken' | 'hay' | 'tractor'
+  | 'mushroom' | 'rabbit' | 'fox' | 'log' | 'rock'
+  | 'snowman' | 'sled' | 'slide' | 'swing'
+  | 'sunflower' | 'butterfly' | 'gnome'
+  | 'seafish' | 'coral' | 'seaweed' | 'shell' | 'turtle' | 'jellyfish'
+  | 'tent' | 'campfire' | 'canoe'
+  | 'target';
 
 /** One drawn thing. (x, y) is where it stands: the middle of its bottom edge. `s` is its height. */
 export type Thing = { kind: ThingKind; x: number; y: number; s: number; colors: string[]; flip: boolean; pose: number };
@@ -20,7 +28,10 @@ export type Thing = { kind: ThingKind; x: number; y: number; s: number; colors: 
 /** Flat things on the ground, drawn first and never in front of anything. */
 export type Ground =
   | { kind: 'path'; points: [number, number][]; width: number }
-  | { kind: 'pond' | 'fountain' | 'bed'; cx: number; cy: number; rx: number; ry: number; colors: string[] }
+  | { kind: 'pond' | 'fountain' | 'bed' | 'ice'; cx: number; cy: number; rx: number; ry: number; colors: string[] }
+  /** A flat patch: a sandpit, or a field of crops when `rows` is set. */
+  | { kind: 'patch'; x: number; y: number; w: number; h: number; colors: string[]; rows?: boolean }
+  | { kind: 'seabed'; height: number }
   | { kind: 'road'; y: number; height: number }
   | { kind: 'sea'; height: number }
   | { kind: 'towel'; x: number; y: number; w: number; h: number; colors: string[] }
@@ -54,6 +65,9 @@ const WALLS = ['#F4D35E', '#EE964B', '#F7EDE2', '#A8DADC', '#F28482', '#CDB4DB',
 const ROOFS = ['#9D0208', '#3D405B', '#6A4C93', '#BC6C25', '#264653', '#E76F51'];
 const ANIMALS = ['#8D6E63', '#F4E1C1', '#3E2723', '#D7A86E', '#FFFFFF', '#5D4037', '#E0E0E0'];
 const BRIGHTS = ['#E63946', '#3A86FF', '#FFBE0B', '#06D6A0', '#FB5607', '#FF6FB5', '#8338EC', '#FFFFFF'];
+// Sea fish are never the orange of the fish she is looking for.
+const FISH = ['#3A86FF', '#FFD23F', '#FF6FB5', '#8338EC', '#06D6A0', '#90E0EF', '#E63946'];
+const CORAL = ['#FF6F91', '#FF9671', '#C34A36', '#F9F871', '#B388EB', '#FFC75F'];
 
 // ---------------------------------------------------------------------------
 // Randomness that can be repeated
@@ -94,7 +108,14 @@ type Box = [number, number, number, number]; // left, top, right, bottom
 const WIDTH: Record<ThingKind, number> = {
   person: 0.4, tree: 0.9, pine: 0.7, bush: 1.6, flower: 0.6, dog: 1.5, cat: 1.3, duck: 1.2, bird: 1.3,
   bench: 2.2, lamp: 0.3, house: 0.85, car: 2, stall: 1.25, umbrella: 1.1, castle: 1.3, crab: 1.6,
-  ball: 1, boat: 1.3, swimmer: 1.2, target: 1,
+  ball: 1, boat: 1.3, swimmer: 1.2,
+  barn: 1, cow: 1.6, pig: 1.5, sheep: 1.4, chicken: 1, hay: 1.4, tractor: 1.5,
+  mushroom: 0.9, rabbit: 1, fox: 1.6, log: 2.6, rock: 1.5,
+  snowman: 0.65, sled: 2, slide: 1.6, swing: 1.6,
+  sunflower: 0.5, butterfly: 1.2, gnome: 0.6,
+  seafish: 1.6, coral: 1, seaweed: 0.4, shell: 1.1, turtle: 1.7, jellyfish: 0.8,
+  tent: 1.4, campfire: 1.2, canoe: 2.6,
+  target: 1,
 };
 
 /** The solid parts of a thing: the boxes that hide whatever is behind them. */
@@ -109,6 +130,13 @@ export function solidBoxes(t: Thing): Box[] {
       return [[x - 0.15 * s, y - s, x + 0.15 * s, y - 0.8 * s], [x - 0.04 * s, y - 0.8 * s, x + 0.04 * s, y]];
     case 'flower':
       return [[x - 0.3 * s, y - s, x + 0.3 * s, y - 0.5 * s]];
+    case 'sunflower':
+      return [[x - 0.25 * s, y - s, x + 0.25 * s, y - 0.55 * s]];
+    case 'seaweed':
+      return [[x - 0.15 * s, y - s, x + 0.15 * s, y]];
+    case 'butterfly':
+      // It flies above the spot it is placed at.
+      return [[x - 0.6 * s, y - 1.5 * s, x + 0.6 * s, y - 0.5 * s]];
     default: {
       const half = (WIDTH[t.kind] * s) / 2;
       return [[x - half, y - s, x + half, y]];
@@ -174,8 +202,10 @@ export function buildScene(opts: { kind: SceneKind; targetName: string; width: n
   const ground: Ground[] = [];
   const things: Thing[] = [];
 
+  // The playground is mostly children.
+  const kids = kind === 'playground' ? 0.65 : 0.3;
   const person = (x: number, y: number, scale = 1): Thing => {
-    const child = rand() < 0.3;
+    const child = rand() < kids;
     return {
       kind: 'person', x, y, s: u * scale * (child ? between(rand, 0.62, 0.75) : between(rand, 0.88, 1.08)),
       // shirt, trousers, skin, hair, and an extra colour for a hat or a balloon
@@ -188,7 +218,7 @@ export function buildScene(opts: { kind: SceneKind; targetName: string; width: n
     const f = { kind: k, x, y, flip: rand() < 0.5, pose: rand() };
     switch (k) {
       case 'tree': return { ...f, s: u * between(rand, 1.8, 2.3), colors: [pick(rand, GREENS), pick(rand, GREENS), rand() < 0.25 ? pick(rand, ['#E63946', '#FF8C42', '#FFFFFF']) : ''] };
-      case 'pine': return { ...f, s: u * between(rand, 1.7, 2.2), colors: [pick(rand, ['#2D6A4F', '#40916C', '#1B4332'])] };
+      case 'pine': return { ...f, s: u * between(rand, 1.7, 2.2), colors: [pick(rand, ['#2D6A4F', '#40916C', '#1B4332']), kind === 'snow' ? '#FFFFFF' : ''] };
       case 'bush': return { ...f, s: u * between(rand, 0.55, 0.75), colors: [pick(rand, GREENS), rand() < 0.5 ? pick(rand, PETALS) : ''] };
       case 'flower': return { ...f, s: u * between(rand, 0.35, 0.5), colors: [pick(rand, PETALS), pick(rand, ['#FFD23F', '#FB5607', '#6D4C41'])] };
       case 'dog': return { ...f, s: u * between(rand, 0.38, 0.5), colors: [pick(rand, ANIMALS), pick(rand, ANIMALS), pick(rand, BRIGHTS)] };
@@ -206,12 +236,55 @@ export function buildScene(opts: { kind: SceneKind; targetName: string; width: n
       case 'boat': return { ...f, s: u * between(rand, 1, 1.3), colors: [pick(rand, BRIGHTS), pick(rand, ['#FFFFFF', '#FFBE0B', '#E63946'])] };
       case 'swimmer': return { ...f, s: u * 0.4, colors: [pick(rand, SKIN), pick(rand, HAIR), pick(rand, BRIGHTS)] };
       case 'house': return { ...f, s: u * between(rand, 2.1, 2.6), colors: [pick(rand, WALLS), pick(rand, ROOFS), pick(rand, BRIGHTS)] };
+      case 'barn': return { ...f, s: u * between(rand, 2, 2.4), colors: [pick(rand, ['#C1121F', '#BC4749', '#9D0208']), pick(rand, ['#3D405B', '#6D597A', '#7F5539'])] };
+      case 'cow': return { ...f, s: u * between(rand, 0.55, 0.65), colors: ['#FFFFFF', pick(rand, ['#2B2D42', '#6D4C41'])] };
+      case 'pig': return { ...f, s: u * between(rand, 0.38, 0.45), colors: [pick(rand, ['#FFB3C6', '#FF8FAB', '#F4ACB7'])] };
+      case 'sheep': return { ...f, s: u * between(rand, 0.42, 0.5), colors: [pick(rand, ['#FFFFFF', '#F1EDE4', '#E8E2D0'])] };
+      case 'chicken': return { ...f, s: u * between(rand, 0.28, 0.34), colors: [pick(rand, ['#FFFFFF', '#D4A373', '#8D5B3C'])] };
+      case 'hay': return { ...f, s: u * between(rand, 0.4, 0.5), colors: ['#E9C46A'] };
+      case 'tractor': return { ...f, s: u * between(rand, 0.75, 0.85), colors: [pick(rand, ['#2A9D8F', '#E63946', '#3A86FF', '#FFBE0B'])] };
+      case 'mushroom': return { ...f, s: u * between(rand, 0.3, 0.42), colors: [pick(rand, ['#E63946', '#C1440E', '#A0522D', '#FFBE0B'])] };
+      case 'rabbit': return { ...f, s: u * between(rand, 0.32, 0.4), colors: [pick(rand, ['#FFFFFF', '#D7A86E', '#9E9E9E', '#8D6E63'])] };
+      case 'fox': return { ...f, s: u * between(rand, 0.4, 0.46), colors: ['#F77F00'] };
+      case 'log': return { ...f, s: u * between(rand, 0.26, 0.34), colors: ['#8B5A2B'] };
+      case 'rock': return { ...f, s: u * between(rand, 0.28, 0.4), colors: [pick(rand, ['#9E9E9E', '#ADB5BD', '#8D99AE'])] };
+      case 'snowman': return { ...f, s: u * between(rand, 0.85, 1.05), colors: [pick(rand, BRIGHTS.filter((c) => c !== '#FFFFFF'))] };
+      case 'sled': return { ...f, s: u * 0.4, colors: [pick(rand, ['#E63946', '#3A86FF', '#8338EC', '#06D6A0'])] };
+      case 'slide': return { ...f, s: u * between(rand, 1.2, 1.4), colors: [pick(rand, ['#FFBE0B', '#E63946', '#3A86FF', '#06D6A0'])] };
+      case 'swing': return { ...f, s: u * between(rand, 1.4, 1.6), colors: [pick(rand, ['#E63946', '#3A86FF', '#FB5607', '#8338EC'])] };
+      case 'sunflower': return { ...f, s: u * between(rand, 0.95, 1.2), colors: ['#FFD23F'] };
+      case 'butterfly': return { ...f, s: u * between(rand, 0.24, 0.3), colors: [pick(rand, ['#FF6FB5', '#3A86FF', '#FFBE0B', '#B388EB', '#FB5607']), pick(rand, BRIGHTS)] };
+      case 'gnome': return { ...f, s: u * between(rand, 0.45, 0.55), colors: [pick(rand, ['#E63946', '#3A86FF', '#06D6A0']), pick(rand, ['#3A86FF', '#2A9D8F', '#8338EC'])] };
+      case 'seafish': return { ...f, s: u * between(rand, 0.26, 0.38), colors: [pick(rand, FISH), pick(rand, FISH)] };
+      case 'coral': return { ...f, s: u * between(rand, 0.6, 0.85), colors: [pick(rand, CORAL)] };
+      case 'seaweed': return { ...f, s: u * between(rand, 0.8, 1.2), colors: [pick(rand, ['#2A9D8F', '#38B000', '#4CAF50', '#2D6A4F'])] };
+      case 'shell': return { ...f, s: u * between(rand, 0.24, 0.32), colors: [pick(rand, ['#FFE5D9', '#FFCAD4', '#F4E1C1', '#FFFFFF'])] };
+      case 'turtle': return { ...f, s: u * between(rand, 0.4, 0.5), colors: [pick(rand, ['#2D6A4F', '#40916C', '#606C38'])] };
+      case 'jellyfish': return { ...f, s: u * between(rand, 0.5, 0.6), colors: [pick(rand, ['#FFAFCC', '#CDB4DB', '#BDE0FE', '#FFC8DD'])] };
+      case 'tent': return { ...f, s: u * between(rand, 0.9, 1.1), colors: [pick(rand, ['#E76F51', '#2A9D8F', '#FFBE0B', '#3A86FF', '#8338EC'])] };
+      case 'campfire': return { ...f, s: u * 0.45, colors: [] };
+      case 'canoe': return { ...f, s: u * 0.35, colors: [pick(rand, ['#E63946', '#FFBE0B', '#2A9D8F', '#BC6C25'])] };
       default: return { ...f, s: u, colors: [] };
     }
   };
 
   const specks = (count: number, color: string, r: number) =>
     ground.push({ kind: 'specks', r, color, points: Array.from({ length: count }, () => [rand() * w, rand() * h] as [number, number]) });
+
+  /** A pond (or a frozen one) kept clear of the edges. Returns a test for points inside it. */
+  const addPond = (k: 'pond' | 'ice', scale = 1) => {
+    const rx = Math.min(w * 0.3, Math.max(T * 2.8, w * 0.2 * scale));
+    const ry = Math.min(h * 0.18 * scale, rx * 0.6);
+    const g = { kind: k, cx: between(rand, rx + 8, w - rx - 8), cy: between(rand, ry + h * 0.1, h - ry - h * 0.1), rx, ry, colors: [] };
+    ground.push(g);
+    return (x: number, y: number, m = 0) => ((x - g.cx) / (g.rx - m)) ** 2 + ((y - g.cy) / (g.ry - m)) ** 2 <= 1;
+  };
+  /** A winding path across the picture, left to right. */
+  const addPath = (width: number) => {
+    const across = h * between(rand, 0.25, 0.75);
+    ground.push({ kind: 'path', width, points: [[-u, across], [w * 0.3, across + between(rand, -1, 1) * u * 2], [w * 0.7, across + between(rand, -1, 1) * u * 2], [w + u, across + between(rand, -1, 1) * u]] });
+  };
+  const nothing = () => false;
 
   // Each kind of place lays out its ground first, then says what grows where.
   let layout: Layout;
@@ -255,6 +328,67 @@ export function buildScene(opts: { kind: SceneKind; targetName: string; width: n
       reserved: (x, y) => y < street + u * 0.15 || inFountain(x, y),
     };
     weights = { person: 50, tree: 5, bush: 4, flower: 5, dog: 6, cat: 5, bench: 4, lamp: 6, stall: 5, bird: 8, ball: 2 };
+  } else if (kind === 'farm') {
+    background = '#A7D46F';
+    specks(Math.round((w * h) / 900), '#94C25D', 2);
+    // Barns along the top, a field of crops and a duck pond.
+    const yard = u * 2.2;
+    const fw = Math.min(w * 0.45, u * 5);
+    ground.push({ kind: 'patch', rows: true, x: between(rand, 0, w - fw), y: between(rand, yard + u, Math.max(yard + u, h - u * 3)), w: fw, h: u * 2, colors: ['#8D5B3C', '#6A994E'] });
+    const inPond = addPond('pond', 0.8);
+    for (let x = -u * 0.3; x < w + u; x += u * between(rand, 2.4, 3)) things.push(make('barn', x, yard));
+    layout = { water: inPond, road: nothing, reserved: (x, y) => y < yard + u * 0.15 || inPond(x, y) };
+    weights = { person: 18, cow: 10, pig: 8, sheep: 10, chicken: 12, hay: 6, tractor: 3, tree: 4, dog: 4, cat: 3, flower: 5, bush: 3 };
+    waterThings = { duck: 1 };
+  } else if (kind === 'forest') {
+    background = '#6BA84F';
+    specks(Math.round((w * h) / 800), '#5E9944', 2.4);
+    addPath(u * 0.7);
+    const inPond = addPond('pond', 0.75);
+    layout = { water: inPond, road: nothing, reserved: nothing };
+    weights = { pine: 16, tree: 10, bush: 12, mushroom: 12, rabbit: 7, fox: 4, log: 6, rock: 5, person: 16, bird: 4, flower: 6 };
+    waterThings = { duck: 1 };
+  } else if (kind === 'snow') {
+    background = '#EEF5FB';
+    specks(Math.round((w * h) / 700), '#D6E6F2', 2.2);
+    // A frozen pond: people skate on it, so it is ground, not water.
+    addPond('ice');
+    layout = { water: nothing, road: nothing, reserved: nothing };
+    weights = { person: 40, snowman: 12, pine: 12, sled: 6, dog: 6, bird: 3, rock: 3 };
+  } else if (kind === 'playground') {
+    background = '#9BD27A';
+    specks(Math.round((w * h) / 900), '#8BC46A', 2);
+    const sw = Math.min(w * 0.4, u * 4);
+    ground.push({ kind: 'patch', x: between(rand, 0, w - sw), y: between(rand, u, Math.max(u, h - u * 3)), w: sw, h: u * 2.2, colors: ['#F6DFA1', '#C08552'] });
+    addPath(u * 0.8);
+    layout = { water: nothing, road: nothing, reserved: nothing };
+    weights = { person: 50, slide: 3, swing: 3, ball: 6, bench: 4, tree: 4, bush: 5, dog: 3, bird: 3, flower: 3 };
+  } else if (kind === 'garden') {
+    background = '#7FBF5F';
+    specks(Math.round((w * h) / 900), '#6FAE50', 2);
+    addPath(u * 0.6);
+    for (let i = 0; i < 2; i++) {
+      const fw = Math.min(w * 0.35, u * 4);
+      ground.push({ kind: 'patch', rows: true, x: between(rand, 0, w - fw), y: between(rand, 0, h - u * 1.6), w: fw, h: u * 1.6, colors: ['#8D5B3C', '#F77F00'] });
+    }
+    for (let i = 0; i < 5; i++) ground.push({ kind: 'bed', cx: rand() * w, cy: rand() * h, rx: u * between(rand, 0.6, 1), ry: u * 0.35, colors: [pick(rand, PETALS), pick(rand, PETALS)] });
+    layout = { water: nothing, road: nothing, reserved: nothing };
+    weights = { flower: 28, sunflower: 10, bush: 12, butterfly: 10, gnome: 4, person: 14, cat: 4, bird: 4, tree: 3 };
+  } else if (kind === 'ocean') {
+    // Under the sea: everything is in the water, so it is all "ground" for the crowd.
+    background = '#2E86C1';
+    ground.push({ kind: 'seabed', height: h * 0.2 });
+    specks(Math.round((w * h) / 2500), '#7FC8F8', 3);
+    layout = { water: nothing, road: nothing, reserved: nothing };
+    weights = { seafish: 30, coral: 12, seaweed: 16, rock: 5, shell: 5, turtle: 4, jellyfish: 6, crab: 4 };
+  } else if (kind === 'camp') {
+    background = '#86B85A';
+    specks(Math.round((w * h) / 900), '#77A84D', 2.2);
+    addPath(u * 0.6);
+    const inLake = addPond('pond', 1.1);
+    layout = { water: inLake, road: nothing, reserved: nothing };
+    weights = { person: 30, tent: 8, campfire: 3, pine: 14, tree: 6, log: 6, rock: 5, dog: 4, bush: 6, flower: 4, bird: 3 };
+    waterThings = { canoe: 2, duck: 1 };
   } else {
     background = '#F6DFA1';
     specks(Math.round((w * h) / 700), '#E9C979', 1.6);
@@ -288,7 +422,8 @@ export function buildScene(opts: { kind: SceneKind; targetName: string; width: n
     }
 
   // Hide the target. Fish swim in the water when there is some; everything else sits on dry land.
-  const swims = targetName === 'fish' && kind !== 'town';
+  // Under the sea the whole picture is water, so a fish can go anywhere there.
+  const swims = targetName === 'fish' && Object.keys(waterThings).length > 0;
   let tx = w / 2;
   let ty = h / 2;
   for (let tries = 0; tries < 400; tries++) {
@@ -303,7 +438,11 @@ export function buildScene(opts: { kind: SceneKind; targetName: string; width: n
 
   // Tuck it partly behind something: a bush, a person or a sandcastle just in front of one side.
   const side = rand() < 0.5 ? -1 : 1;
-  const tuckKind: ThingKind = swims ? (kind === 'beach' ? 'swimmer' : 'duck') : kind === 'park' ? 'bush' : kind === 'town' ? 'person' : 'castle';
+  const TUCK: Record<SceneKind, ThingKind> = {
+    park: 'bush', town: 'person', beach: 'castle', farm: 'hay', forest: 'bush', snow: 'snowman',
+    playground: 'person', garden: 'bush', ocean: 'coral', camp: 'bush',
+  };
+  const tuckKind: ThingKind = swims ? (kind === 'beach' ? 'swimmer' : 'duck') : TUCK[kind];
   const tuck = make(tuckKind, tx + side * T * 0.85, ty + T * 0.5 + T * 0.35);
   things.push(tuck);
 

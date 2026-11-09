@@ -347,9 +347,7 @@ export default function Art() {
             </ScrollView>
             <ScrollView key={category} contentContainerStyle={styles.pages}>
               <Bouncy accessibilityLabel="Blank paper" style={styles.pageThumb} onPress={() => choosePage(null)}>
-                <Txt size={18} color={Colors.textSoft}>
-                  Blank
-                </Txt>
+                <Pic name="paper" size={64} />
               </Bouncy>
               {COLORING_CATEGORIES.find((c) => c.id === category)!.pages.map((name) => (
                 <Bouncy key={name} accessibilityLabel={name} style={styles.pageThumb} onPress={() => choosePage(name)}>
@@ -357,7 +355,8 @@ export default function Art() {
                 </Bouncy>
               ))}
             </ScrollView>
-            <Bouncy accessibilityLabel="Close" style={styles.closeChooser} onPress={() => setChoosing(false)}>
+            <Bouncy accessibilityLabel="Keep drawing" style={[styles.closeChooser, { flexDirection: 'row', alignItems: 'center', gap: 8 }]} onPress={() => setChoosing(false)}>
+              <Pic name="brush" size={30} />
               <Txt size={20} color={Colors.white}>
                 Keep drawing
               </Txt>

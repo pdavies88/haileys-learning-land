@@ -336,11 +336,12 @@ export default function PetGame() {
 
         <Bouncy
           accessibilityLabel="Pick another pet"
-          style={styles.change}
+          style={[styles.change, { flexDirection: 'row', alignItems: 'center', gap: 8 }]}
           onPress={() => {
             setPet(null);
             speak(say.line('petPick'));
           }}>
+          <Pic name="again" size={26} />
           <Txt size={16} color={Colors.textSoft}>
             Another pet
           </Txt>

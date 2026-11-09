@@ -15,14 +15,16 @@ import { SCENE_KINDS, buildScene, hitsTarget } from '@/lib/spy-scene';
 const newSeed = () => Math.floor(Math.random() * 2 ** 31);
 
 /**
- * I spy: like a busy picture book, find the one star (or heart, or ladybug) hidden in a drawn park,
- * town square or beach full of people, pets and things. It is tucked partly behind something but
- * always shows enough to spot. Tapping anything else does nothing, so there is nothing to get
- * wrong: just keep looking. Each round moves to a new place, and the places get busier.
+ * I spy: like a busy picture book, find the one star (or heart, or ladybug) hidden in one of ten
+ * drawn places, such as a park, a farm, a snowy hill or the bottom of the sea, full of people,
+ * animals and things. It is tucked partly behind something but always shows enough to spot.
+ * Tapping anything else does nothing, so there is nothing to get wrong: just keep looking. Each
+ * round moves to the next place, starting from a different one each time, and the places get busier.
  */
 export default function ISpy() {
   const [round, setRound] = useState(0);
   const [seed, setSeed] = useState(newSeed);
+  const [firstPlace] = useState(() => Math.floor(Math.random() * SCENE_KINDS.length));
   const [found, setFound] = useState(false);
   const [area, setArea] = useState({ width: 0, height: 0 });
   const { celebrate, overlay } = useCelebration();
@@ -32,9 +34,9 @@ export default function ISpy() {
   const scene = useMemo(
     () =>
       area.width > 0
-        ? buildScene({ kind: SCENE_KINDS[round % SCENE_KINDS.length], targetName: target.name, width: Math.round(area.width), height: Math.round(area.height), round, seed })
+        ? buildScene({ kind: SCENE_KINDS[(firstPlace + round) % SCENE_KINDS.length], targetName: target.name, width: Math.round(area.width), height: Math.round(area.height), round, seed })
         : null,
-    [area.width, area.height, round, seed, target.name],
+    [area.width, area.height, round, seed, target.name, firstPlace],
   );
 
   useEffect(() => {

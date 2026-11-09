@@ -1,10 +1,17 @@
 import { Platform } from 'react-native';
 
-/** A bright, friendly palette with deeper inks. The app always uses its light, colorful look. */
+/**
+ * A storybook palette taken from the logo: warm paper, soft brown ink, and earthy, slightly muted
+ * colours (moss, ochre, rust, dusk blue) like a hand-painted picture book. Bright colours stay in
+ * the games, where they help children find things. The app always uses this light look.
+ */
 export const Colors = {
-  text: '#2A1E4F',
-  textSoft: '#6B6390',
-  background: '#F6F3FF',
+  text: '#3B2F26',
+  textSoft: '#7A6A5C',
+  background: '#F7F1E3',
+  ink: '#3B2F26',
+  brand: '#4F7CA8',
+  brandSoft: '#EAE1CC',
   card: '#FFFFFF',
   line: 'rgba(42, 30, 79, 0.08)',
   purple: '#8B5CF6',

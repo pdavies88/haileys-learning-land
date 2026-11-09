@@ -157,9 +157,6 @@ export default function SightWords() {
           <Pic name="fox" size={80} />
           <Pic name="magnifier" size={52} style={styles.glass} />
         </View>
-        <Txt size={20} weight="regular" color={Colors.textSoft}>
-          Find the word you hear
-        </Txt>
         <View style={styles.cards}>
           {question.cards.map((word, i) => (
             <Animated.View key={`${question.key}-${word}`} entering={ZoomIn.delay(i * 80).springify()}>
