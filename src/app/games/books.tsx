@@ -177,8 +177,10 @@ export default function Books() {
         <View style={styles.textSide}>
           <Animated.View key={`text-${page}`} entering={FadeInRight.duration(300)} style={styles.words}>
             {words.map((word, i) => (
+              // Only colours change on the lit word: a bolder weight is wider and would push words onto
+              // the next line mid-sentence.
               <View key={i} style={[styles.word, i === lit && styles.wordLit]}>
-                <Txt size={textSize} weight={i === lit ? 'heavy' : 'bold'} color={i === lit ? Colors.purpleDark : Colors.text}>
+                <Txt size={textSize} weight="bold" color={i === lit ? Colors.purpleDark : Colors.text}>
                   {word}
                 </Txt>
               </View>

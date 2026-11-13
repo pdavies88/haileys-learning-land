@@ -143,6 +143,7 @@ export const PICTURE_FILES: Record<string, number> = {
   'stoplight': require('../../assets/pics/stoplight.png'),
   'point up': require('../../assets/pics/point-up.png'),
   'again': require('../../assets/pics/again.png'),
+  'footprints': require('../../assets/pics/footprints.png'),
   'robot': require('../../assets/pics/robot.png'),
   'bell': require('../../assets/pics/bell.png'),
   'guitar': require('../../assets/pics/guitar.png'),

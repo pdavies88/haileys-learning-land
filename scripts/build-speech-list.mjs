@@ -9,6 +9,17 @@ import { say, spokenLines } from '../src/content/learning.ts';
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const lines = spokenLines();
 
+// Words the voice model says wrongly, spelled the way they should sound. Only the narrator sees
+// these spellings; the app still shows the real word.
+const SOUNDS_LIKE = { zebra: 'zeebra' };
+const pronounceable = (text) =>
+  text.replace(/\b[A-Za-z]+\b/g, (word) => {
+    const fix = SOUNDS_LIKE[word.toLowerCase()];
+    if (!fix) return word;
+    return word[0] === word[0].toUpperCase() ? fix[0].toUpperCase() + fix.slice(1) : fix;
+  });
+for (const id of Object.keys(lines)) lines[id] = pronounceable(lines[id]);
+
 // Voice models spell out shouting in capitals ("ROAR" becomes R-O-A-R), so say it in normal case.
 // The page still shows the capitals.
 const speakable = (text) => text.replace(/\b[A-Z]{3,}\b/g, (word) => word.charAt(0) + word.slice(1).toLowerCase());

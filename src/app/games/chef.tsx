@@ -492,7 +492,10 @@ export default function Chef() {
   };
 
   const bowlSize = Math.min(width * 0.5, height * 0.26, 240);
-  const tile = Math.min((width - Spacing.md * 4) / 2, 200);
+  // All the recipes fit on one screen: two across on a phone, four across on a tablet.
+  const columns = width >= 700 ? 4 : 2;
+  const rows = Math.ceil(RECIPES.length / columns);
+  const tile = Math.min((width - Spacing.md * (columns + 1)) / columns, (height - 160 - Spacing.md * (rows + 1)) / rows, 200);
 
   let body;
   if (!recipe) {

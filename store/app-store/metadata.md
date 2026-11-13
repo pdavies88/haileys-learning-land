@@ -28,15 +28,15 @@ READ AND SPELL
 
 NUMBERS
 - Count & Collect: counting, missing numbers, more or fewer, adding and taking away.
-- Little chef: find the right ingredients, add the right amount, and follow first, next and last steps.
+- Little chef: eight recipes. Find the right ingredients, add the right amount, and follow first, next and last steps.
 
 CREATE
 - Art Studio: crayons, glitter, stamps, a rainbow color, a magic mirror for symmetrical drawings and 100 coloring pages.
-- Build a story, Make a friend, and Music maker with a xylophone, drum kit, piano and guitar.
+- Build a story, and Music maker with a xylophone, drum kit, piano and guitar.
 
 THINK AND SOLVE
 - Puzzle World: patterns and jigsaws up to 16 pieces.
-- Flip & find, Shape quest, and My little pet: a pocket pet that tells you what it needs.
+- Flip & find, Shape quest, and Follow me.
 
 Every game adjusts as children play, and a friendly owl offers a clue when they're stuck, without giving the answer away. It moves up after two right answers in a row and eases off after a miss, and wrong answers get a gentle "Let's try again!", never a buzzer.
 

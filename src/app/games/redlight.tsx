@@ -31,15 +31,35 @@ const REACT_MS = 600;
 const SLIP_BACK = 0.12;
 const STUCK_MS = 1200;
 
-/** How long each light stays on, in ms, by level. Higher levels warn for less time, or not at all. */
+const between = (a: number, b: number) => a + Math.random() * (b - a);
+
+/**
+ * One turn of the lights, in ms. Greens and reds come short, medium or long, so she can't count
+ * along and has to watch. Higher levels warn for less time, or not at all, and from level 2 a
+ * yellow sometimes turns back to green instead of red.
+ */
 function timing(level: number) {
+  const roll = Math.random();
   return {
-    green: 2500 + Math.random() * 2500 - level * 250,
-    yellow: Math.max(0, 1400 - level * 300),
-    red: 2000 + Math.random() * 2000,
-    // From level 3, now and then the light goes straight from green to red.
+    green: roll < 0.3 ? between(900, 1600) : roll < 0.75 ? between(2000, 4000) : between(4500, 6500),
+    yellow: Math.max(0, 1400 - level * 300) + between(0, 500),
+    red: Math.random() < 0.35 ? between(1200, 2000) : between(2500, 4500),
     skipYellow: level >= 3 && Math.random() < 0.3,
+    backToGreen: level >= 1 && Math.random() < 0.25,
   };
+}
+
+// Different words each time a light changes, never the same twice in a row.
+const SAYINGS = {
+  green: ['rlGo', 'rlGoMore', 'rlGoGreen', 'rlGoOff'],
+  yellow: ['rlSlow', 'rlSlowCareful', 'rlSlowYellow'],
+  red: ['rlStop', 'rlStopFreeze', 'rlStopRed', 'rlStopThere'],
+} as const;
+let lastSaid = '';
+function saying(light: Light) {
+  const options = SAYINGS[light].filter((line) => line !== lastSaid);
+  lastSaid = options[Math.floor(Math.random() * options.length)];
+  return say.line(lastSaid as (typeof SAYINGS)[Light][number]);
 }
 
 const LIGHT_COLORS: Record<Light, string> = { green: '#22C17A', yellow: '#FFC93C', red: '#F2545B' };
@@ -63,7 +83,7 @@ function TrafficLight({ light, size, sideways }: { light: Light; size: number; s
 }
 
 /**
- * Red light, green light: hold the big button to walk the animal to its prize, and let go when the
+ * Stop and Go: hold the big button to walk the animal to its prize, and let go when the
  * light turns red. Practises stopping on cue. Yellow warns that red is coming. Holding on after red
  * slides the animal back a little and holds it there for a moment, with no other penalty.
  */
@@ -87,14 +107,8 @@ export default function RedLight() {
     state.current.light = next;
     if (next === 'red') state.current.redSince = Date.now();
     setLight(next);
-    if (next === 'green') {
-      playSfx('chime');
-      speak(say.line('rlGo'));
-    } else if (next === 'yellow') {
-      speak(say.line('rlSlow'));
-    } else {
-      speak(say.line('rlStop'));
-    }
+    if (next === 'green') playSfx('chime');
+    speak(saying(next));
   };
 
   // The lights: green, then (usually) yellow, then red, then green again, until the screen closes.
@@ -114,7 +128,8 @@ export default function RedLight() {
         if (!t.skipYellow && t.yellow > 0) {
           changeLight('yellow');
           await pause(t.yellow);
-          if (!alive || state.current.won) continue;
+          // Sometimes the yellow turns back to green: keep going.
+          if (!alive || state.current.won || t.backToGreen) continue;
         }
         changeLight('red');
         await pause(t.red);
@@ -188,7 +203,7 @@ export default function RedLight() {
   const color = LIGHT_COLORS[light];
 
   return (
-    <GameScreen title="Red light, green light" background="#E6F6EC" level={level} onRepeat={() => speak(say.line('rlIntro'))}>
+    <GameScreen title="Stop and Go" background="#E6F6EC" level={level} onRepeat={() => speak(say.line('rlIntro'))}>
       <View style={styles.body}>
         <View style={styles.top}>
           <TrafficLight light={light} size={short ? 46 : 84} sideways={short} />

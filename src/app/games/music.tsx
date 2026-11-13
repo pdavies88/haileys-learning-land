@@ -384,12 +384,15 @@ function Songs({ width, height }: { width: number; height: number }) {
   };
 
   if (!song) {
+    // Two across on a phone, three on a tablet, so every song shows without scrolling far.
+    const across = width >= 700 ? 3 : 2;
+    const card = Math.min(220, (width - Spacing.lg * 2 - Spacing.md * (across - 1)) / across);
     return (
       <ScrollView contentContainerStyle={styles.songList}>
         {SONGS.map((s) => (
-          <Bouncy key={s.id} accessibilityLabel={s.title} style={styles.songCard} onPress={() => choose(s)}>
-            <Pic name={s.picture} size={72} />
-            <Txt size={20} weight="heavy" style={styles.center}>
+          <Bouncy key={s.id} accessibilityLabel={s.title} style={[styles.songCard, { width: card, minHeight: card * 0.9 }]} onPress={() => choose(s)}>
+            <Pic name={s.picture} size={Math.min(72, card * 0.4)} />
+            <Txt size={card < 180 ? 16 : 20} weight="heavy" style={styles.center}>
               {s.title}
             </Txt>
           </Bouncy>
@@ -508,7 +511,7 @@ const styles = StyleSheet.create({
   string: { position: 'absolute', left: 0, right: 0, borderRadius: 3 },
   stringLit: { backgroundColor: '#FFF3B0', transform: [{ scaleY: 1.8 }] },
   songList: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', gap: Spacing.md, padding: Spacing.lg },
-  songCard: { width: 200, minHeight: 170, alignItems: 'center', justifyContent: 'center', gap: Spacing.sm, padding: Spacing.md, borderRadius: 28, backgroundColor: Colors.white, ...cardShadow },
+  songCard: { alignItems: 'center', justifyContent: 'center', gap: Spacing.sm, padding: Spacing.md, borderRadius: 28, backgroundColor: Colors.white, ...cardShadow },
   center: { textAlign: 'center' },
   playing: { flex: 1, alignItems: 'center', paddingTop: Spacing.sm, gap: Spacing.sm },
   songBar: { flexDirection: 'row', gap: Spacing.sm },

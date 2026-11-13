@@ -1,6 +1,6 @@
 # Hailey's Learning Land
 
-A free learning app for young children, with nineteen games, built with Expo (SDK 58) and React Native. It runs on iPhone, iPad and Android, including Amazon Fire tablets. Everything works offline: no accounts, ads, purchases, tracking or saved data.
+A free learning app for young children, with twenty-one games, built with Expo (SDK 58) and React Native. It runs on iPhone, iPad and Android, including Amazon Fire tablets. Everything works offline: no accounts, ads, purchases, tracking or saved data.
 
 ## Games
 
@@ -12,18 +12,17 @@ A free learning app for young children, with nineteen games, built with Expo (SD
 - **Story shelf:** 28 picture books from Book Dash (CC BY 4.0). The narrator reads each page, lights up each word as it goes, and turns the page by itself.
 - **Sound safari:** pick the picture that starts with a letter's sound, or pick the first letter of a picture.
 - **Puzzle world:** pattern puzzles (AB, AAB, ABC and more), a shape sorter, and 4-, 9- and 16-piece jigsaws.
-- **Make a friend:** choose a friend and a home, then pick a sticker and tap the picture to place it.
 - **Build a story:** pick a hero, a place, a friend to meet and a magical object, and hear a story built from prerecorded sentences.
-- **Little chef:** recipes with first, next and last steps. Find the right ingredient on a pantry shelf among other foods, add the number on the recipe card and tap Done (tap the bowl to take one out), stir with a spoon, bake, and sort fruit by color. Amounts and decoys grow with each recipe.
-- **Shape quest:** hunt for shapes or colors, drag shapes into an outline to build a house, robot, rocket, castle or car, or make any picture in free-build Create mode.
-- **Music maker:** four instruments that play the moment they're touched, with several fingers at once: a xylophone, a drum kit drawn like a real one (crash and hi-hat cymbals, two toms, snare, floor tom and bass drum), a piano with black keys, and a guitar you strum by swiping across the strings. Songs (Hot Cross Buns, Mary Had a Little Lamb, Twinkle Twinkle and Row Row Row Your Boat) are played on the xylophone a note at a time: the next bar glows and the words light up, so the child sets the pace. "Hear it" plays the song first.
+- **Little chef:** eight recipes with first, next and last steps. Find the right ingredient on a pantry shelf among other foods, add the number on the recipe card and tap Done (tap the bowl to take one out), stir with a spoon, bake, and sort fruit by color. Amounts and decoys grow with each recipe.
+- **Shape quest:** hunt for shapes and colors. The hunts grow trickier as the levels go up.
+- **Music maker:** four instruments that play the moment they're touched, with several fingers at once: a xylophone, a drum kit drawn like a real one (crash and hi-hat cymbals, two toms, snare, floor tom and bass drum), a piano with black keys, and a guitar you strum by swiping across the strings. Six songs (Hot Cross Buns, Mary Had a Little Lamb, Twinkle Twinkle, Row Row Row Your Boat, Old MacDonald and The Itsy Bitsy Spider) are played on the xylophone a note at a time: the next bar glows and the words light up, so the child sets the pace. "Hear it" plays the song first.
 - **Follow me:** pads light up in a pattern, each with its own note, and the child taps them back in order. Colors mode has four colored pads; Shapes mode has shape pads, six once patterns get long. Each right answer adds a step; two misses make the next pattern shorter.
-- **Red light, green light:** hold the big button to walk an animal to its prize, and let go when the light turns red. Yellow warns first; holding on after red slides the animal back a little. Each win brings a new animal and a shorter warning, and from level 4 the light sometimes skips yellow. Practises stopping on cue.
-- **Breathe with me:** box breathing. The narrator guides four equal steps, counting to four in each: breathe in, hold, breathe out, hold. A dot travels round a square and the balloon grows, holds and shrinks with it. Four boxes fill a jar with stars.
+- **Stop and Go:** hold the big button to walk an animal to its prize, and let go when the light turns red. Greens and reds come in short and long turns, the narrator says each change a different way, from level 2 a yellow sometimes turns back to green, and from level 4 the light sometimes skips yellow. Holding on after red slides the animal back a little. Practises stopping on cue.
+- **Breathe with me:** hold the balloon and breathe in while the narrator counts to four and the balloon fills; let go and breathe out for four while it shrinks. Four breaths fill a jar with stars.
 - **Snail trail:** drag the snail along a winding path to its house. Going too fast makes it hide in its shell, so slow and steady is the only way home.
 - **I spy:** find every star, heart or ladybug hidden among a busy jumble of pictures. Each round hides more among more.
+- **Tiny tots:** a sound board for toddlers. Pick colors, shapes, animals or numbers by picture, then tap anything to hear its name.
 - **Frog balance:** after the seesaw toy used in occupational therapy. A frog sits on one side of the board; pick small, medium or big frogs and tap spots on the other side until it's level. Heavier frogs and frogs further out tip it more, and the board swings to show it.
-- **My little pet:** look after a pet by following its care routine, the same steps in the same order every time (a puppy eats, goes for a walk, plays, then sleeps). The list at the top shows what's done and what's next, the pet asks for it, and only the next step works, so caring for it becomes a habit. Finishing the list ends the day with a celebration.
 
 Every instruction is spoken aloud, and the speaker button repeats it. A right answer gets a success sound and confetti, with no spoken praise that could carry over into the next screen. Wrong answers get a gentle wiggle and "Let's try again!", never a buzzer, and after two misses an owl Help button offers a clue (it takes away a wrong choice, or plays the next letter's sound) without giving the answer. Games start at a level pitched for a five-year-old, move up after two first-try answers in a row, and ease off after two misses on one question. The current level shows next to the game's title. Answers respond the moment they're touched, treats and ingredients count every finger even when several tap at once, extra taps are ignored while a right answer is celebrated, and leaving a game cancels anything it was about to say.
 

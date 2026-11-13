@@ -1,11 +1,12 @@
 import { describe, expect, it } from '@jest/globals';
 
+import { SPEECH_FILES } from '../audio-files';
 import coloring from '../coloring.json';
 import pictures from '../pictures.json';
 import stories from '../stories.json';
 import {
-  BUILDS, CHEF_MAX, CHEF_MIN, FRIENDS, GAMES, PANTRY, GAME_SECTIONS, RHYMES, SPELL_WORDS, JIGSAW_PICTURES, LETTERS, MEMORY_SETS, MISSIONS, PETS, PLACES, RECIPES, SIGHT_WORDS, SORT_FRUIT, TRACE_NUMBERS, TRACE_WORDS,
-  SOUND_PICTURES, STICKERS, STORY_FRIENDS, STORY_HEROES, STORY_OBJECTS, STORY_PLACES, say, spokenLines,
+  CHEF_MAX, CHEF_MIN, GAMES, PANTRY, GAME_SECTIONS, RHYMES, SPELL_WORDS, JIGSAW_PICTURES, LETTERS, MEMORY_SETS, MISSIONS, PLACES, RECIPES, SIGHT_WORDS, SORT_FRUIT, TRACE_NUMBERS, TRACE_WORDS,
+  SOUND_PICTURES, STORY_FRIENDS, STORY_HEROES, STORY_OBJECTS, STORY_PLACES, say, spokenLines,
 } from '../learning';
 
 const known = new Set(Object.keys(pictures));
@@ -16,8 +17,6 @@ describe('content', () => {
       ...Object.values(SOUND_PICTURES).flat(),
       ...MEMORY_SETS.flatMap((s) => s.pictures),
       ...MISSIONS.flatMap((m) => [m.animal, m.food]),
-      ...FRIENDS,
-      ...STICKERS,
       ...PLACES.flatMap((p) => p.decor),
       ...LETTERS.map((l) => l.word),
       ...GAMES.map((g) => g.picture),
@@ -26,8 +25,6 @@ describe('content', () => {
       ...STORY_OBJECTS.map((o) => o.id),
       ...RECIPES.flatMap((r) => [r.result, ...r.steps.flatMap((s) => (s.kind === 'add' ? [s.item] : []))]),
       ...Object.values(SORT_FRUIT).flat(),
-      ...PETS.map((p) => p.id),
-      ...BUILDS.map((b) => b.id),
       ...GAME_SECTIONS.map((s) => s.picture),
       ...SPELL_WORDS.flat(),
       ...RHYMES.flat(),
@@ -41,9 +38,9 @@ describe('content', () => {
     }
   });
 
-  it('has twenty-three games, each with a screen and a card picture', () => {
-    expect(GAMES).toHaveLength(23);
-    expect(new Set(GAMES.map((g) => g.id)).size).toBe(23);
+  it('has twenty-one games, each with a screen and a card picture', () => {
+    expect(GAMES).toHaveLength(21);
+    expect(new Set(GAMES.map((g) => g.id)).size).toBe(21);
   });
 
   it('credits every Story Shelf book and gives each page a picture', () => {
@@ -52,17 +49,6 @@ describe('content', () => {
       expect(story.source).toMatch(/^https:\/\/github\.com\/bookdash\//);
       expect(story.pages.length).toBeGreaterThan(0);
       for (const page of story.pages) expect(page.image).toMatch(/^\d\d$/);
-    }
-  });
-
-  it('builds each picture in Shape Quest inside its area', () => {
-    for (const build of BUILDS) {
-      for (const p of build.pieces) {
-        expect(p.x - p.w / 2).toBeGreaterThanOrEqual(0);
-        expect(p.x + p.w / 2).toBeLessThanOrEqual(1);
-        expect(p.y - p.h / 2).toBeGreaterThanOrEqual(0);
-        expect(p.y + p.h / 2).toBeLessThanOrEqual(1);
-      }
     }
   });
 
@@ -87,7 +73,6 @@ describe('content', () => {
       ...TRACE_WORDS.flatMap((w) => [say.traceWord(w), say.word(w)]),
       ...MISSIONS.flatMap((m) => Array.from({ length: 10 }, (_, i) => say.mission(m, i + 1))),
       ...Object.entries(SOUND_PICTURES).flatMap(([letter, names]) => [say.safariFind(letter), ...names.map((n) => say.startsWith(n, letter))]),
-      ...FRIENDS.map(say.picture),
       ...MEMORY_SETS.flatMap((s) => s.pictures.map(say.picture)),
       ...STORY_HEROES.flatMap((h) => [
         say.storyIntro(h.id), say.storyEnd(h.id),
@@ -102,10 +87,13 @@ describe('content', () => {
         ),
       ]),
       ...PANTRY.map(say.picture),
-      ...BUILDS.flatMap((b) => [say.build(b.id)]),
-      ...PETS.flatMap((p) => (['hello', 'hungry', 'wantsPlay', 'wantsBath', 'wantsSleep', 'yum', 'played', 'clean', 'rested', 'notNow', 'giggle'] as const).map((w) => say.pet(p.id, w))),
-      ...PETS.flatMap((p) => Array.from({ length: 10 }, (_, i) => say.mission(MISSIONS.find((m) => m.animal === p.mission)!, i + 1))),
+      ...STORY_HEROES.map((h) => say.picture(h.id)),
+      ...STORY_FRIENDS.map(say.picture),
     ];
     expect(needed.filter((id) => !(id in lines))).toEqual([]);
+  });
+
+  it('has a recording for every spoken line', () => {
+    expect(Object.keys(spokenLines()).filter((id) => !(id in SPEECH_FILES))).toEqual([]);
   });
 });

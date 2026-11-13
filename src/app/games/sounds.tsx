@@ -109,7 +109,6 @@ export default function Sounds() {
       <View style={styles.body}>
         {question.kind === 'picture' ? (
           <View style={styles.guide}>
-            <Pic name="lion" size={72} />
             <Bouncy accessibilityLabel={`Letter ${info.upper}`} style={styles.letterTile} onPress={() => speak(...promptFor(question))} sound={false}>
               <Txt size={64} weight="heavy" color={Colors.orange}>
                 {info.upper}

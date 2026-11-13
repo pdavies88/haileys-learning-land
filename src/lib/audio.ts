@@ -42,6 +42,12 @@ let current: AudioPlayer | null = null;
 // Each line played gets a number. Status events only count once the current line has started.
 let clip = 0;
 let startedClip = -1;
+// The line being spoken and when it started, to catch lines that end before they could be heard.
+let currentId = '';
+// Story Shelf books are read a little slower than everything else, for young listeners.
+const BOOK_RATE = 0.95;
+let rate = 1;
+let startedAt = 0;
 // How far into the current line the narrator is, in seconds, for following along word by word.
 let position = 0;
 let watchdog: ReturnType<typeof setTimeout> | null = null;
@@ -150,9 +156,13 @@ export function prepare(...ids: string[]) {
 }
 
 function onStatus(status: AudioStatus) {
-  if (status.playing && startedClip !== clip) {
+  // A reused player can still report the end of the line it played last. The new line only counts
+  // as started once the player is playing near its beginning, so that stale report can't skip it.
+  const fresh = !status.didJustFinish && status.currentTime < Math.max(0.5, status.duration - 0.25);
+  if (status.playing && startedClip !== clip && fresh) {
     // It started: cancel the "never started" timer.
     startedClip = clip;
+    startedAt = Date.now();
   }
   if (startedClip !== clip) return;
   position = status.currentTime;
@@ -162,7 +172,7 @@ function onStatus(status: AudioStatus) {
   }
   // If the player never reports the end of this line, move on shortly after it should have ended.
   // Re-armed on every update, so a line that is still playing is never cut off.
-  if (status.playing && status.duration > 0) armWatchdog((status.duration - status.currentTime) * 1000 + 1500);
+  if (status.playing && status.duration > 0) armWatchdog(((status.duration - status.currentTime) * 1000) / rate + 1500);
 }
 
 /** Seconds into the line being spoken right now (0 before it starts). */
@@ -186,6 +196,9 @@ function finish(finished: boolean) {
 }
 
 function playNext() {
+  if (__DEV__ && current && startedClip === clip && Date.now() - startedAt < 250) {
+    console.warn(`Spoken line "${currentId}" ended after ${Date.now() - startedAt}ms`);
+  }
   if (watchdog) clearTimeout(watchdog);
   watchdog = null;
   current?.pause();
@@ -203,6 +216,11 @@ function playNext() {
     return;
   }
   current = player;
+  currentId = next;
+  // Players are reused, so every line sets its speed.
+  rate = next.startsWith('book-') ? BOOK_RATE : 1;
+  player.shouldCorrectPitch = true;
+  player.setPlaybackRate(rate, 'high');
   setTalking(true);
   const forClip = clip;
   if (player.currentTime > 0.05) {
@@ -240,6 +258,17 @@ export function speak(...ids: string[]): Promise<boolean> {
     waiters.push(resolve);
     playNext();
   });
+}
+
+/**
+ * For sound boards: lets the line being said finish, then says this one. Only the newest tap waits,
+ * so quick taps never chop words in half and a toddler mashing tiles never builds up a long queue.
+ */
+export function speakNext(id: string): Promise<boolean> {
+  if (!current) return speak(id);
+  queue = [id];
+  prepare(id);
+  return new Promise((resolve) => waiters.push(resolve));
 }
 
 /** Adds lines after whatever is being said. Resolves when everything queued has been spoken. */
