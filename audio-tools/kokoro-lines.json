@@ -1,7 +1,4 @@
 {
-  "_comment": "Single words the Qwen narrator says unclearly (checked with check_speech.py). generate_audio.py speaks these with Kokoro, and generate_speech_qwen.py skips them.",
-  "lines": [
-    "pic-wand",
-    "word-get"
-  ]
+  "_comment": "Single words the Qwen narrator says unclearly, to be spoken by Kokoro instead. Empty: every line is in the narrator's voice. If a word comes out wrong, prefer another narrator take (generate_speech_qwen.py --retry) or a respelling in scripts/build-speech-list.mjs before adding it here.",
+  "lines": []
 }
